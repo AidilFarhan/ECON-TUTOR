@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Econ Tutor</title>
+<meta name="description" content="Nota interaktif Ekonomi SPM Tingkatan 4 dan 5: graf dengan nod boleh diseret, kad study dan kuiz mengikut bab, serta Kertas Percubaan SPM Kelantan 2025.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400..800&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var d = JSON.parse(localStorage.getItem("econtutor:v1") || "{}");
+      if (d.tema === "cerah") { document.documentElement.setAttribute("data-theme", "light"); document.documentElement.setAttribute("data-tema-kami", "1"); }
+      if (d.tema === "gelap") { document.documentElement.setAttribute("data-theme", "dark"); document.documentElement.setAttribute("data-tema-kami", "1"); }
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+<div class="latar" aria-hidden="true"></div>
+<a class="sr-only" href="#app">Langkau ke kandungan</a>
+
+<header class="bar-atas">
+  <div class="bekas">
+    <div class="bar-dalam kaca">
+      <a class="jenama" id="jenama" href="#utama" aria-label="Econ Tutor, laman utama"></a>
+      <nav class="nav-atas" id="nav-atas" aria-label="Navigasi utama"></nav>
+      <button class="ikon-btn" id="btn-tema" type="button" aria-label="Tukar tema"></button>
+    </div>
+  </div>
+</header>
+
+<main id="app" tabindex="-1">
+  <noscript><div class="bekas"><p class="kotak">Laman ini memerlukan JavaScript untuk memaparkan nota, graf dan kuiz.</p></div></noscript>
+</main>
+
+<footer class="kaki-laman">
+  <div class="bekas">
+    <span>Econ Tutor · Ekonomi SPM KSSM · Nota Tingkatan 4 berdasarkan buku teks, Tingkatan 5 berdasarkan sukatan dan glosari buku teks.</span>
+    <span>Soalan percubaan: Modul Koleksi Item Peperiksaan Percubaan SPM 2025 (Kelantan).</span>
+  </div>
+</footer>
+
+<div class="bar-bawah"><nav class="kaca" id="nav-bawah" aria-label="Navigasi"></nav></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/eko-core.js" defer></script>
+<script src="assets/js/graf.js" defer></script>
+<script src="assets/js/graf-t4.js" defer></script>
+<script src="assets/js/graf-t5.js" defer></script>
+<script src="assets/js/data/t4-bab1.js" defer></script>
+<script src="assets/js/data/t4-bab2.js" defer></script>
+<script src="assets/js/data/t4-bab3.js" defer></script>
+<script src="assets/js/data/t4-bab4.js" defer></script>
+<script src="assets/js/data/t5-bab1.js" defer></script>
+<script src="assets/js/data/t5-bab2.js" defer></script>
+<script src="assets/js/data/percubaan-kelantan-2025.js" defer></script>
+<script src="assets/js/app.js" defer></script>
+</body>
+</html>
