@@ -1228,10 +1228,10 @@
       nama: ["Rani", "Sofea"],
       f: [
         function (p) {
-          return Math.max(0, (60 - p) / 10);
+          return (60 - p) / 10;
         },
         function (p) {
-          return Math.max(0, (70 - p) / 10);
+          return (70 - p) / 10;
         }
       ],
       y: [0, 70],
@@ -1272,20 +1272,45 @@
   G.daftar("jumlah-pasaran", function (host, opt) {
     var pr = PRESET_JUMLAH[opt.jenis] || PRESET_JUMLAH.dd;
     var isD = (opt.jenis || "dd") === "dd";
-    var K = G.kad(host, { tajuk: opt.tajuk || pr.tajuk, petunjuk: "Seret garis harga ke atas atau bawah", kawalan: false });
-    var st = { p: pr.p0 };
+    var kls = pr.kls;
+    var K = G.kad(host, {
+      tajuk: opt.tajuk || pr.tajuk,
+      petunjuk: "Seret nod di sepanjang keluk, atau seret keluk " + pr.nama[0] + " dan " + pr.nama[1] + " ke kiri atau kanan"
+    });
+    var HAD = isD ? 3 : 15; // had peralihan keluk individu (unit)
+    var LANGKAH = isD ? 0.5 : 1;
+    var st = { p: pr.p0, dq: [0, 0] };
+    var seretan = null;
+    var panelSimpan = [];
+
+    G.butang(K.kawalan, E.ikon("ulang") + " Set semula", function () {
+      st.p = pr.p0;
+      st.dq = [0, 0];
+      lukis();
+    });
+
     var plot = G.plot(K.kanvas, {
       x: [0, 1],
       y: pr.y,
+      // tiga panel sentiasa disusun ke bawah, bukan bersebelahan
       nisbah: function (w) {
-        return w < 560 ? 1.5 : 0.5;
+        var h = Math.max(190, Math.min(250, w * 0.42));
+        return (h * 3 + 32) / w;
       },
       margin: { l: 0, r: 0, t: 0, b: 0 },
-      aria: "Pembentukan keluk pasaran"
+      aria: "Pembentukan keluk pasaran. Seret nod atau keluk individu."
     });
 
+    // kuantiti individu (i = 0, 1) dan pasaran (i = 2); asal = tanpa peralihan
+    function q(i, p, asal) {
+      if (i === 2) return q(0, p, asal) + q(1, p, asal);
+      return Math.max(0, pr.f[i](p) + (asal ? 0 : st.dq[i]));
+    }
+    function dianjak(i) {
+      return i === 2 ? Math.abs(st.dq[0]) + Math.abs(st.dq[1]) > 0.01 : Math.abs(st.dq[i]) > 0.01;
+    }
+
     function panel(i, susun) {
-      // pulang kawasan panel dalam px
       var W = plot.W,
         H = plot.H;
       var jarak = 16;
@@ -1297,24 +1322,54 @@
       return { x: 0, y: i * (h + jarak), w: W, h: h };
     }
 
+    // skala data ↔ piksel bagi satu panel (fungsi berasingan supaya setiap
+    // panel menyimpan margin sendiri)
+    function skala(kp) {
+      var m = { l: kp.x + 44, r: plot.W - (kp.x + kp.w) + 10, t: kp.y + 26, b: plot.H - (kp.y + kp.h) + 34 };
+      var lebar = plot.W - m.l - m.r,
+        tinggi = plot.H - m.t - m.b;
+      return {
+        kp: kp,
+        X: function (v) {
+          return m.l + ((v - pr.x[0]) / (pr.x[1] - pr.x[0])) * lebar;
+        },
+        Y: function (v) {
+          return plot.H - m.b - ((v - pr.y[0]) / (pr.y[1] - pr.y[0])) * tinggi;
+        },
+        invX: function (px) {
+          return pr.x[0] + ((px - m.l) / lebar) * (pr.x[1] - pr.x[0]);
+        },
+        invY: function (py) {
+          return pr.y[0] + ((plot.H - m.b - py) / tinggi) * (pr.y[1] - pr.y[0]);
+        }
+      };
+    }
+
+    function laluanKeluk(ps, i, asal) {
+      var pts = [];
+      for (var k = 0; k <= 80; k++) {
+        var p = pr.pMin - 2 + ((pr.pMaks + 3 - (pr.pMin - 2)) * k) / 80;
+        var qq = q(i, p, asal);
+        if (qq > 0.001 && qq <= pr.x[1]) pts.push([ps.X(qq), ps.Y(p)]);
+      }
+      return pts;
+    }
+    function d(pts) {
+      return "M" + pts.map(function (pp) {
+        return pp[0].toFixed(1) + " " + pp[1].toFixed(1);
+      }).join(" L");
+    }
+
     function lukis() {
       plot.kosong();
-      var susun = plot.W >= 560 ? "lajur" : "baris";
-      var jumlah = 0;
+      var susun = "baris";
       var nilai = [];
       for (var i = 0; i < 3; i++) {
         var kp = panel(i, susun);
-        var sub = {
-          m: { l: kp.x + 44, r: plot.W - (kp.x + kp.w) + 10, t: kp.y + 26, b: plot.H - (kp.y + kp.h) + 34 },
-          W: plot.W,
-          H: plot.H
-        };
-        var X = function (v) {
-          return sub.m.l + ((v - pr.x[0]) / (pr.x[1] - pr.x[0])) * (sub.W - sub.m.l - sub.m.r);
-        };
-        var Y = function (v) {
-          return sub.H - sub.m.b - ((v - pr.y[0]) / (pr.y[1] - pr.y[0])) * (sub.H - sub.m.t - sub.m.b);
-        };
+        var ps = skala(kp);
+        panelSimpan[i] = ps;
+        var X = ps.X,
+          Y = ps.Y;
         // paksi
         var L = plot.lapis.paksi;
         svgEl("line", { x1: X(0), y1: Y(0), x2: X(0), y2: Y(pr.y[1]) - 8, class: "g-paksi" }, L);
@@ -1333,86 +1388,136 @@
         judul.textContent = (i < 2 ? "(" + "abc"[i] + ") " + pr.nama[i] : "(c) Pasaran") + " · Harga (RM)";
         var qLabel = svgEl("text", { x: X(pr.x[1]) + 6, y: Y(0) + 28, class: "g-label", "text-anchor": "end" }, L);
         qLabel.textContent = "Kuantiti (" + pr.unit + ")";
-        // keluk
-        var fq = i < 2 ? pr.f[i] : function (p) {
-          return pr.f[0](p) + pr.f[1](p);
-        };
-        var pts = [];
-        for (var k = 0; k <= 60; k++) {
-          var p = pr.pMin - 2 + ((pr.pMaks + 3 - (pr.pMin - 2)) * k) / 60;
-          var q = fq(p);
-          if (q >= 0 && q <= pr.x[1]) pts.push([X(q), Y(p)]);
+
+        // keluk asal (hantu) jika sudah dialih
+        if (dianjak(i)) {
+          var ptsAsal = laluanKeluk(ps, i, true);
+          if (ptsAsal.length > 1) svgEl("path", { d: d(ptsAsal), class: "g-lengkung " + kls + " hantu" }, plot.lapis.hantu || plot.lapis.lengkung);
         }
-        svgEl("path", { d: "M" + pts.map(function (pp) { return pp[0].toFixed(1) + " " + pp[1].toFixed(1); }).join(" L"), class: "g-lengkung " + pr.kls + (i === 2 ? "" : " nipis") }, plot.lapis.lengkung);
-        var ujung = pts[isD ? pts.length - 1 : pts.length - 1];
-        var tl = svgEl("text", { x: ujung[0] + 6, y: ujung[1] + (isD ? 4 : -2), class: "g-teks " + pr.kls }, plot.lapis.label);
-        tl.textContent = pr.labelKeluk[i] + (i === 2 ? "ₚ" : "");
-        // garis harga & titik
-        var qq = fq(st.p);
+        var pts = laluanKeluk(ps, i, false);
+        if (pts.length > 1) {
+          svgEl("path", { d: d(pts), class: "g-lengkung " + kls + (i === 2 ? "" : " nipis") }, plot.lapis.lengkung);
+          var ujung = pts[pts.length - 1];
+          var diTepi = ujung[0] + 24 > ps.X(pr.x[1]);
+          var tl = svgEl("text", { x: diTepi ? ujung[0] - 6 : ujung[0] + 6, y: diTepi ? ujung[1] - 8 : ujung[1] + (isD ? 4 : -2), class: "g-teks " + kls, "text-anchor": diTepi ? "end" : "start" }, plot.lapis.label);
+          tl.textContent = pr.labelKeluk[i] + (i === 2 ? "ₚ" : dianjak(i) ? "₁" : "");
+        }
+
+        // garis harga, panduan dan nod
+        var qq = q(i, st.p, false);
         nilai.push(qq);
-        if (i < 2) jumlah += qq;
         svgEl("line", { x1: X(0), y1: Y(st.p), x2: X(pr.x[1]), y2: Y(st.p), class: "g-garis-harga" }, plot.lapis.panduan);
         svgEl("line", { x1: X(qq), y1: Y(st.p), x2: X(qq), y2: Y(0), class: "g-panduan" }, plot.lapis.panduan);
-        svgEl("circle", { cx: X(qq), cy: Y(st.p), r: 6, class: "g-nod isi " + pr.kls }, plot.lapis.tanda);
-        var cip = E.fmt(qq, 1);
-        plot.cip(X(qq), Y(0) + 12, cip, { anchor: "middle" });
-        // pemegang harga (di hujung kanan setiap panel)
-        var g = svgEl("g", { "data-pegang": "harga", class: "g-pemegang", style: "touch-action:none" }, plot.lapis.pemegang);
-        svgEl("line", { x1: X(0), y1: Y(st.p), x2: X(pr.x[1]), y2: Y(st.p), class: "g-garis-hit" }, g);
-        svgEl("circle", { cx: X(pr.x[1]) - 4, cy: Y(st.p), r: 12, class: "g-nod-halo" }, g);
-        svgEl("circle", { cx: X(pr.x[1]) - 4, cy: Y(st.p), r: 7, class: "g-nod" }, g);
-        if (i === 0) plot.cip(X(0) - 4, Y(st.p), "RM" + E.fmt(st.p, 0), { anchor: "end" });
-        // simpan skala panel pertama untuk interaksi
-        if (i === 0) {
-          plot._Y0 = Y;
-          plot._panel0 = sub;
+        plot.cip(X(qq), Y(0) + 12, E.fmt(qq, 1), { anchor: "middle" });
+        if (i === 0 || susun === "baris") plot.cip(X(0) - 4, Y(st.p), "RM" + E.fmt(st.p, 1), { anchor: "end" });
+        // pemegang harga di hujung kanan garis
+        var gh = svgEl("g", { "data-pegang": "harga" + i, class: "g-pemegang", style: "touch-action:none" }, plot.lapis.pemegang);
+        svgEl("line", { x1: X(0), y1: Y(st.p), x2: X(pr.x[1]), y2: Y(st.p), class: "g-garis-hit" }, gh);
+        svgEl("circle", { cx: X(pr.x[1]) - 4, cy: Y(st.p), r: 12, class: "g-nod-halo" }, gh);
+        svgEl("circle", { cx: X(pr.x[1]) - 4, cy: Y(st.p), r: 6, class: "g-nod" }, gh);
+        // kawasan sentuh untuk mengalih keluk individu (di atas garis harga)
+        if (i < 2 && pts.length > 1) {
+          var gk = svgEl("g", { "data-pegang": "keluk" + i, class: "g-pemegang", style: "touch-action:none;cursor:grab" }, plot.lapis.pemegang);
+          svgEl("path", { d: d(pts), class: "g-lengkung tebal-hit" }, gk);
         }
-        panelSimpan[i] = { X: X, Y: Y, kp: kp };
+        // nod pada keluk (boleh diseret di sepanjang keluk)
+        var gn = svgEl("g", { "data-pegang": "nod" + i, class: "g-pemegang", style: "touch-action:none" }, plot.lapis.pemegang);
+        svgEl("circle", { cx: X(qq), cy: Y(st.p), r: 15, class: "g-nod-halo" }, gn);
+        svgEl("circle", { cx: X(qq), cy: Y(st.p), r: 7, class: "g-nod isi " + kls }, gn);
       }
+      baca(nilai);
+    }
+
+    function baca(nilai) {
       var eq = pr.nama[0] + " " + E.fmt(nilai[0], 1) + " + " + pr.nama[1] + " " + E.fmt(nilai[1], 1) + " = <b>" + E.fmt(nilai[2], 1) + " " + pr.unit + "</b>";
+      var ayat =
+        "Pada harga RM" + E.fmt(st.p, 1) + ": " + eq + ". Keluk pasaran diperoleh dengan <b>menjumlahkan secara mendatar</b> kuantiti " +
+        (isD ? "diminta" : "ditawarkan") + " setiap " + (isD ? "individu" : "firma") + " pada setiap tingkat harga. Harga pasaran sama bagi semua, jadi menyeret satu nod menggerakkan nod lain di sepanjang keluk masing-masing.";
+      var alih = [];
+      [0, 1].forEach(function (i) {
+        if (!dianjak(i)) return;
+        var kanan = st.dq[i] > 0;
+        alih.push(
+          "Keluk " + pr.nama[i] + " beralih ke <b>" + (kanan ? "kanan" : "kiri") + "</b> sebanyak " + E.fmt(Math.abs(st.dq[i]), 1) + " " + pr.unit + " (" +
+            (isD ? (kanan ? "permintaan bertambah, contohnya pendapatan " + pr.nama[i] + " meningkat" : "permintaan berkurang, contohnya pendapatan " + pr.nama[i] + " menurun")
+                 : (kanan ? "penawaran bertambah, contohnya kos pengeluaran " + pr.nama[i] + " turun" : "penawaran berkurang, contohnya kos pengeluaran " + pr.nama[i] + " naik")) +
+            ")"
+        );
+      });
+      if (alih.length) {
+        var jum = st.dq[0] + st.dq[1];
+        ayat +=
+          " " + alih.join("; ") + ". Maka keluk pasaran turut beralih " +
+          (Math.abs(jum) < 0.01 ? "sehingga kesannya saling membatalkan" : "ke <b>" + (jum > 0 ? "kanan" : "kiri") + "</b> sebanyak " + E.fmt(Math.abs(jum), 1) + " " + pr.unit + " pada setiap harga") +
+          ". Garis putus-putus ialah keluk asal.";
+      }
       K.baca.innerHTML =
         G.nilai([
-          ["Harga", "RM" + E.fmt(st.p, 1), pr.kls],
+          ["Harga", "RM" + E.fmt(st.p, 1), kls],
           [pr.nama[0], E.fmt(nilai[0], 1), ""],
           [pr.nama[1], E.fmt(nilai[1], 1), ""],
-          ["Pasaran", E.fmt(nilai[2], 1) + " " + pr.unit, pr.kls]
+          ["Pasaran", E.fmt(nilai[2], 1) + " " + pr.unit, kls]
         ]) +
-        '<div class="ayat">Pada harga RM' + E.fmt(st.p, 1) + ": " + eq + ". Keluk pasaran diperoleh dengan <b>menjumlahkan secara mendatar</b> kuantiti " +
-        (isD ? "diminta" : "ditawarkan") + " setiap " + (isD ? "individu" : "firma") + " pada setiap tingkat harga, jadi keluk pasaran lebih landai.</div>";
+        '<div class="ayat">' + ayat + "</div>";
     }
-    var panelSimpan = [];
 
-    function hargaDariPx(py, px) {
-      // cari panel yang mengandungi titik (berdasarkan susun)
-      var p = null;
-      panelSimpan.forEach(function (ps) {
-        if (py >= ps.kp.y - 10 && py <= ps.kp.y + ps.kp.h + 10 && px >= ps.kp.x - 10 && px <= ps.kp.x + ps.kp.w + 10) {
-          var Y = ps.Y;
-          // invers linear
-          var y0 = Y(pr.y[0]),
-            y1 = Y(pr.y[1]);
-          p = pr.y[0] + ((py - y0) / (y1 - y0)) * (pr.y[1] - pr.y[0]);
+    function panelDi(px, py) {
+      for (var i = 0; i < panelSimpan.length; i++) {
+        var kp = panelSimpan[i].kp;
+        if (py >= kp.y - 10 && py <= kp.y + kp.h + 10 && px >= kp.x - 10 && px <= kp.x + kp.w + 10) return i;
+      }
+      return -1;
+    }
+    function setHarga(p) {
+      st.p = E.clamp(Math.round(p * 2) / 2, pr.pMin, pr.pMaks);
+    }
+    // harga yang meletakkan nod panel i paling hampir dengan penunjuk
+    function hargaTerdekat(i, px, py) {
+      var ps = panelSimpan[i];
+      var terbaik = st.p,
+        jarak = Infinity;
+      for (var p = pr.pMin; p <= pr.pMaks + 1e-9; p += 0.25) {
+        var dx = ps.X(q(i, p, false)) - px,
+          dy = ps.Y(p) - py;
+        var j = dx * dx + dy * dy;
+        if (j < jarak) {
+          jarak = j;
+          terbaik = p;
         }
-      });
-      return p;
+      }
+      return terbaik;
     }
 
     G.interaksi(plot, {
-      seret: function (n, pt) {
-        var p = hargaDariPx(pt.py, pt.px);
-        if (p == null) return;
-        st.p = E.clamp(Math.round(p * 2) / 2, pr.pMin, pr.pMaks);
+      seret: function (n, pt, fasa) {
+        var jenis = n.replace(/\d+$/, ""),
+          i = parseInt(n.slice(jenis.length), 10);
+        var ps = panelSimpan[i];
+        if (!ps) return;
+        if (jenis === "harga") {
+          if (pt.py != null) setHarga(ps.invY(pt.py));
+        } else if (jenis === "nod") {
+          if (pt.px != null) setHarga(hargaTerdekat(i, pt.px, pt.py));
+        } else if (jenis === "keluk") {
+          if (fasa === "mula") seretan = { q0: ps.invX(pt.px), dq0: st.dq[i] };
+          if (!seretan || pt.px == null) return;
+          var baru = seretan.dq0 + (ps.invX(pt.px) - seretan.q0);
+          baru = E.clamp(Math.round(baru / LANGKAH) * LANGKAH, -HAD, HAD);
+          st.dq[i] = Math.abs(baru) < LANGKAH / 2 ? 0 : baru;
+          if (fasa === "tamat") seretan = null;
+        } else return;
         lukis();
       },
       tekan: function (pt) {
-        var p = hargaDariPx(pt.py, pt.px);
-        if (p == null) return;
-        st.p = E.clamp(Math.round(p * 2) / 2, pr.pMin, pr.pMaks);
+        var i = panelDi(pt.px, pt.py);
+        if (i < 0) return;
+        setHarga(panelSimpan[i].invY(pt.py));
         lukis();
       },
       tekanSeret: true,
       kekunci: function (k) {
-        st.p = E.clamp(st.p + (k.dy || k.dx) * 2.5, pr.pMin, pr.pMaks);
+        if (k.dy) setHarga(st.p + k.dy * 2.5);
+        else if (k.dx) st.dq[0] = E.clamp(st.dq[0] + k.dx * LANGKAH, -HAD, HAD);
         lukis();
       }
     });

@@ -3148,3 +3148,41 @@ ol.roman > li::before {
     min-width: 4.5em;
   }
 }
+
+/* graf disusun satu lajur ke bawah, tidak bersebelahan */
+.galeri {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 860px;
+}
+.soalan-kad .rajah .grid-rajah {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+.soalan-kad .rajah .grid-rajah figure {
+  width: min(100%, 380px);
+}
+
+/* jadual penuh dalam graf kos */
+.jadual-kos {
+  margin-top: 12px;
+}
+.jadual-kos tbody tr {
+  cursor: pointer;
+}
+.jadual-kos tbody tr.aktif td {
+  background: var(--accent-soft);
+  font-weight: 750;
+  color: var(--ink);
+}
+.jadual-kos tbody tr:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.jadual-kos td:last-child {
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+/* label kecil dalam graf (huruf titik, kurungan import) */
+.g-teks.kecil { font-size: 11px; font-weight: 650; }
+.julat output { white-space: nowrap; }

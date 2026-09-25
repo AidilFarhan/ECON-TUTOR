@@ -67,7 +67,7 @@ EKO.daftarBab({
 <h3><span class="no">2.1.5</span> Perubahan Permintaan</h3>
 <p><span class="istilah">Perubahan permintaan</span> ditunjukkan oleh <b>peralihan keluk permintaan</b> ke kiri atau ke kanan selari dengan keluk asal, akibat perubahan penentu <b>bukan harga</b> barang itu.</p>
 <ul><li><b>Pertambahan permintaan</b>: keluk beralih ke kanan (D₀D₀ ke D₁D₁). Pada harga yang sama, kuantiti diminta lebih banyak. Contoh: pendapatan pengguna naik.</li><li><b>Pengurangan permintaan</b>: keluk beralih ke kiri. Contoh: harga barang pengganti turun.</li></ul>
-<figure data-graf="permintaan" data-opt='{"mod":"alih"}'></figure>
+<p class="teks-lemah">Cuba sendiri: dalam graf permintaan Han Boon di bahagian 2.1.2, tekan <b>Peralihan keluk</b> dan pilih satu faktor bukan harga.</p>
 <div class="kotak tip"><span class="kotak-label">Jangan keliru</span><p><b>Pengembangan/penguncupan</b> = pergerakan di sepanjang keluk (sebab: harga barang itu). <b>Pertambahan/pengurangan</b> = peralihan keluk (sebab: faktor bukan harga). Istilah yang sama digunakan untuk penawaran.</p></div>
 
 <h3><span class="no">2.1.6</span> Hukum Penawaran</h3>
@@ -108,7 +108,7 @@ EKO.daftarBab({
 <h3><span class="no">2.1.10</span> Perubahan Penawaran</h3>
 <p>Peralihan keluk penawaran ke kiri atau ke kanan akibat perubahan penentu bukan harga.</p>
 <ul><li><b>Pertambahan penawaran</b>: keluk ke kanan (S₀S₀ ke S₁S₁). Contoh: kemajuan teknologi.</li><li><b>Pengurangan penawaran</b>: keluk ke kiri. Contoh: cuaca buruk.</li></ul>
-<figure data-graf="penawaran" data-opt='{"mod":"alih"}'></figure>
+<p class="teks-lemah">Cuba sendiri: dalam graf penawaran Kasut Teguh di bahagian 2.1.7, tekan <b>Peralihan keluk</b> dan pilih satu faktor bukan harga.</p>
 
 <h3><span class="no">2.1.11</span> Keseimbangan Pasaran</h3>
 <div class="kotak def"><span class="kotak-label">Definisi</span><p><b>Pasaran</b> ialah suatu tempat atau situasi yang membolehkan penjual dan pembeli berinteraksi sama ada secara langsung atau tidak langsung untuk menjalankan urus niaga pada suatu tingkat harga dalam tempoh masa tertentu.</p></div>

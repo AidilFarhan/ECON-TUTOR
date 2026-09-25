@@ -1189,14 +1189,15 @@
         { id: "primer", nama: "Pendapatan primer", pendek: "Primer", nota: "pampasan pekerja dan pendapatan pelaburan seperti dividen, faedah dan keuntungan" },
         { id: "sekunder", nama: "Pendapatan sekunder", pendek: "Sekunder", nota: "bayaran pindahan seperti kiriman wang pekerja asing dan bantuan" }
       ];
-      var ASAL = { barang: 140, khidmat: -25, primer: -55, sekunder: -20 };
+      // Jadual 2.5 buku teks: imbangan pembayaran Malaysia 2016 (RM bilion)
+      var ASAL = { barang: 101.4, khidmat: -19.1, primer: -34.6, sekunder: -18.6 };
       var st = Object.assign({}, ASAL);
       G.butang(K.kawalan, "Pelancong asing bertambah", function () {
-        st.khidmat = ASAL.khidmat + 30;
+        st.khidmat = ASAL.khidmat + 25;
         lukis();
       });
       G.butang(K.kawalan, "Harga komoditi jatuh", function () {
-        st.barang = ASAL.barang - 90;
+        st.barang = ASAL.barang - 70;
         lukis();
       });
       G.butang(K.kawalan, E.ikon("ulang") + " Set semula", function () {
@@ -1230,22 +1231,22 @@
             ke = kum + v;
           plot.segi(x - lebar / 2, Math.min(dari, ke), x + lebar / 2, Math.max(dari, ke), "g-bar " + (v >= 0 ? "c3" : "s"), "kawasan");
           plot.garis(x + lebar / 2, ke, x + 1 - lebar / 2, ke, "g-panduan", "panduan");
-          plot.teks(x, Math.max(dari, ke), (v >= 0 ? "+" : "−") + Math.abs(v), "g-teks " + (v >= 0 ? "c3" : "s"), "middle", "label", 0, v >= 0 ? -24 : -8);
+          plot.teks(x, Math.max(dari, ke), (v >= 0 ? "+" : "−") + E.fmt(Math.abs(v), 1), "g-teks " + (v >= 0 ? "c3" : "s"), "middle", "label", 0, v >= 0 ? -24 : -8);
           plot.teksPx(plot.X(x), plot.bawah() + 17, plot.sempit ? k.pendek.slice(0, 7) : k.pendek, "g-tik", "middle", "paksi");
           pemegang(plot, plot.X(x), plot.Y(ke), k.id, v >= 0 ? "c3" : "s", 7);
           kum = ke;
         });
         var xT = 4.5;
         plot.segi(xT - lebar / 2, Math.min(0, kum), xT + lebar / 2, Math.max(0, kum), "g-bar " + (kum >= 0 ? "baik" : "buruk"), "kawasan");
-        plot.teks(xT, Math.max(0, kum), (kum >= 0 ? "+" : "−") + Math.abs(kum), "g-teks besar", "middle", "label", 0, -8);
+        plot.teks(xT, Math.max(0, kum), (kum >= 0 ? "+" : "−") + E.fmt(Math.abs(kum), 1), "g-teks besar", "middle", "label", 0, -8);
         plot.teksPx(plot.X(xT), plot.bawah() + 17, "Baki", "g-tik", "middle", "paksi");
         var lebih = kum > 0,
           sama = kum === 0;
         K.baca.innerHTML =
           G.nilai(
             KOMP.map(function (k) {
-              return [k.pendek, (st[k.id] >= 0 ? "+" : "−") + Math.abs(st[k.id]), st[k.id] >= 0 ? "c3" : "s"];
-            }).concat([["Baki akaun semasa", (kum >= 0 ? "+" : "−") + "RM" + Math.abs(kum) + "b", kum >= 0 ? "c3" : "s"]])
+              return [k.pendek, (st[k.id] >= 0 ? "+" : "−") + E.fmt(Math.abs(st[k.id]), 1), st[k.id] >= 0 ? "c3" : "s"];
+            }).concat([["Baki akaun semasa", (kum >= 0 ? "+" : "−") + "RM" + E.fmt(Math.abs(kum), 1) + "b", kum >= 0 ? "c3" : "s"]])
           ) +
           '<div class="ayat">' +
           (sama ? '<span class="status neutral">Seimbang</span> ' : lebih ? '<span class="status baik">Lebihan akaun semasa</span> Jumlah penerimaan melebihi jumlah pembayaran. ' : '<span class="status buruk">Defisit akaun semasa</span> Jumlah pembayaran melebihi jumlah penerimaan. ') +
@@ -1253,7 +1254,7 @@
           KOMP.map(function (k) {
             return "<b>" + k.nama + "</b>: " + k.nota;
           }).join("; ") +
-          "." + CONTOH + "</div>";
+          ". <span class=\"teks-lemah\">(Data asal: Jadual 2.5 buku teks, tahun 2016. Seret bar untuk menguji keadaan lain.)</span></div>";
       }
 
       G.interaksi(plot, {
@@ -1284,20 +1285,24 @@
   /* =========================================================
      BAB 2 · Penukaran mata wang: harga belian & harga jualan
      ========================================================= */
+  // Jadual 2.8 buku teks: kadar Bank Negara Malaysia, 3 Februari 2017 (0900)
   var KADAR = [
-    { kod: "USD", nama: "Dolar AS", unit: 1, beli: 4.35, jual: 4.45 },
-    { kod: "SGD", nama: "Dolar Singapura", unit: 1, beli: 3.3, jual: 3.4 },
-    { kod: "EUR", nama: "Euro", unit: 1, beli: 4.75, jual: 4.9 },
-    { kod: "GBP", nama: "Paun sterling", unit: 1, beli: 5.6, jual: 5.8 },
-    { kod: "THB", nama: "Baht Thailand", unit: 100, beli: 12.5, jual: 13.2 },
-    { kod: "IDR", nama: "Rupiah Indonesia", unit: 1000, beli: 0.26, jual: 0.3 }
+    { kod: "USD", nama: "Dolar Amerika", unit: 1, beli: 4.425, jual: 4.429 },
+    { kod: "SGD", nama: "Dolar Singapura", unit: 1, beli: 3.1307, jual: 3.1345 },
+    { kod: "AUD", nama: "Dolar Australia", unit: 1, beli: 3.3851, jual: 3.3891 },
+    { kod: "EUR", nama: "Euro", unit: 1, beli: 4.7613, jual: 4.7674 },
+    { kod: "GBP", nama: "Paun Sterling", unit: 1, beli: 5.5397, jual: 5.5464 },
+    { kod: "CNY", nama: "Renminbi China", unit: 1, beli: 0.6426, jual: 0.644 },
+    { kod: "JPY", nama: "Yen Jepun", unit: 100, beli: 3.917, jual: 3.9233 },
+    { kod: "THB", nama: "Baht Thailand", unit: 100, beli: 12.6054, jual: 12.6215 },
+    { kod: "IDR", nama: "Rupiah Indonesia", unit: 100, beli: 0.0331, jual: 0.0332 }
   ];
 
   G.daftar(
     "penukar",
     function (host, opt) {
       var K = G.kad(host, { tajuk: opt.tajuk || "Penukaran mata wang: harga belian dan harga jualan", petunjuk: "Pilih mata wang dan arah pertukaran" });
-      var st = { i: 1, arah: "beli", rm: 1000, asing: 500 };
+      var st = { i: 0, arah: "beli", rm: 796500, asing: 36000 };
       var pil = G.pilih(K.kawalan, {
         label: "Mata wang asing",
         kumpulan: [
@@ -1355,21 +1360,21 @@
         svgEl("line", { x1: xB, y1: y, x2: xJ, y2: y, class: "g-trek-isi", style: "stroke:var(--c-4)" }, plot.lapis.tanda);
         svgEl("circle", { cx: xB, cy: y, r: 8, class: "g-nod isi c3" }, plot.lapis.tanda);
         svgEl("circle", { cx: xJ, cy: y, r: 8, class: "g-nod isi s" }, plot.lapis.tanda);
-        teksPx(plot, xB, y - 18, "Harga belian RM" + E.fmt(k.beli, 2, true), "g-teks c3", "end");
-        teksPx(plot, xJ, y - 18, "Harga jualan RM" + E.fmt(k.jual, 2, true), "g-teks s", "start");
-        teksPx(plot, (xB + xJ) / 2, y + 28, "margin pengurup wang RM" + E.fmt(k.jual - k.beli, 2, true), "g-teks c4", "middle");
+        teksPx(plot, xB, y - 18, "Harga belian RM" + E.fmt(k.beli, 4, true), "g-teks c3", "end");
+        teksPx(plot, xJ, y - 18, "Harga jualan RM" + E.fmt(k.jual, 4, true), "g-teks s", "start");
+        teksPx(plot, (xB + xJ) / 2, y + 28, "margin pengurup wang RM" + E.fmt(k.jual - k.beli, 4, true), "g-teks c4", "middle");
         var unitTeks = k.unit > 1 ? k.unit + " " + k.kod : "1 " + k.kod;
         var hasil, ayat;
         if (st.arah === "beli") {
           hasil = (st.rm / k.jual) * k.unit;
           ayat =
-            "Anda <b>membeli</b> " + k.kod + ", jadi pengurup wang <b>menjual</b> mata wang asing kepada anda pada <b>harga jualan</b> RM" + E.fmt(k.jual, 2, true) + " bagi " + unitTeks + ". " +
-            E.rm(st.rm, 2, true) + " ÷ " + E.fmt(k.jual, 2, true) + (k.unit > 1 ? " × " + k.unit : "") + " = <b>" + E.fmt(hasil, 2, true) + " " + k.kod + "</b>.";
+            "Anda <b>membeli</b> " + k.kod + ", jadi pengurup wang <b>menjual</b> mata wang asing kepada anda pada <b>harga jualan</b> RM" + E.fmt(k.jual, 4, true) + " bagi " + unitTeks + ". " +
+            E.rm(st.rm, 2, true) + " ÷ " + E.fmt(k.jual, 4, true) + (k.unit > 1 ? " × " + k.unit : "") + " = <b>" + E.fmt(hasil, 2, true) + " " + k.kod + "</b>.";
         } else {
           hasil = (st.asing / k.unit) * k.beli;
           ayat =
-            "Anda <b>menjual</b> " + k.kod + ", jadi pengurup wang <b>membeli</b> mata wang asing daripada anda pada <b>harga belian</b> RM" + E.fmt(k.beli, 2, true) + " bagi " + unitTeks + ". " +
-            E.fmt(st.asing, 2, true) + " " + k.kod + (k.unit > 1 ? " ÷ " + k.unit : "") + " × " + E.fmt(k.beli, 2, true) + " = <b>" + E.rm(hasil, 2, true) + "</b>.";
+            "Anda <b>menjual</b> " + k.kod + ", jadi pengurup wang <b>membeli</b> mata wang asing daripada anda pada <b>harga belian</b> RM" + E.fmt(k.beli, 4, true) + " bagi " + unitTeks + ". " +
+            E.fmt(st.asing, 2, true) + " " + k.kod + (k.unit > 1 ? " ÷ " + k.unit : "") + " × " + E.fmt(k.beli, 4, true) + " = <b>" + E.rm(hasil, 2, true) + "</b>.";
         }
         var pusing = st.arah === "beli" ? (hasil / k.unit) * k.beli : null;
         K.baca.innerHTML =
@@ -1379,7 +1384,7 @@
           ]) +
           '<div class="ayat">' + ayat +
           (pusing != null ? " Jika ditukar semula serta-merta, anda hanya mendapat " + E.rm(pusing, 2, true) + ": perbezaan harga jualan dan harga belian ialah keuntungan pengurup wang." : "") +
-          ' <span class="teks-lemah">(Kadar contoh, bukan kadar semasa.)</span></div>';
+          ' <span class="teks-lemah">(Kadar BNM 3 Februari 2017 daripada Jadual 2.8 buku teks, bukan kadar semasa.)</span></div>';
       }
 
       lukis();
@@ -1390,5 +1395,686 @@
       return { musnah: henti };
     },
     { tajuk: "Penukaran mata wang", bab: "t5-b2" }
+  );
+  /* =========================================================
+     BAB 2 · Kesan tarif, subsidi dan kuota (Rajah 2.5 – 2.7)
+     Model: DD: Q = 100 − P; penawaran tempatan S₀: Q = P − 10;
+     penawaran import sebelum dasar: Q = 1.6(P − 10).
+     ========================================================= */
+  // Label paksi yang bertingkat supaya tidak bertindih
+  function cipBertingkat(plot, senarai, paksi) {
+    var baris = [[], []];
+    senarai
+      .slice()
+      .sort(function (a, b) {
+        return paksi === "x" ? a.px - b.px : b.px - a.px;
+      })
+      .forEach(function (c) {
+        var lebar = String(c.teks).length * 6.7 + 14;
+        var r = 0;
+        var akhir = baris[0][baris[0].length - 1];
+        if (akhir != null && Math.abs(c.px - akhir) < (paksi === "x" ? lebar + 2 : 22)) r = 1;
+        baris[r].push(c.px);
+        if (paksi === "x") plot.cip(c.px, plot.bawah() + 12 + r * 22, c.teks, { anchor: "middle", kelas: c.kelas });
+        else plot.cip(plot.kiri() - 4 - r * 34, c.px, c.teks, { anchor: "end", kelas: c.kelas });
+      });
+  }
+
+  G.daftar(
+    "sekatan-import",
+    function (host, opt) {
+      var K = G.kad(host, {
+        tajuk: opt.tajuk || "Kesan tarif, subsidi dan kuota terhadap perdagangan antarabangsa",
+        petunjuk: "Pilih dasar, kemudian seret nod pada keluk S₂"
+      });
+      var DS = {
+        tarif: { nama: "Tarif", barang: "kereta", min: 0, max: 35, step: 2.5, rajah: "Rajah 2.5" },
+        subsidi: { nama: "Subsidi", barang: "tepung gandum", min: 0, max: 30, step: 1, rajah: "Rajah 2.6" },
+        kuota: { nama: "Kuota import", barang: "kereta", min: 0, max: 40, step: 2, rajah: "Rajah 2.7" }
+      };
+      var AWAL = { tarif: 22.5, subsidi: 18, kuota: 20 };
+      var st = { d: DS[opt.dasar] ? opt.dasar : "tarif", v: Object.assign({}, AWAL) };
+
+      G.segmen(
+        K.kawalan,
+        [
+          ["tarif", "Tarif"],
+          ["subsidi", "Subsidi"],
+          ["kuota", "Kuota import"]
+        ],
+        st.d,
+        function (v) {
+          st.d = v;
+          var ds = DS[v];
+          julat.el.querySelector("span").textContent = labelJulat();
+          julat.input.min = ds.min;
+          julat.input.max = ds.max;
+          julat.input.step = ds.step;
+          julat.set(st.v[v]);
+          lukis();
+        }
+      );
+      var julat = G.julat(K.kawalan, {
+        label: labelJulat(),
+        min: DS[st.d].min,
+        max: DS[st.d].max,
+        step: DS[st.d].step,
+        nilai: st.v[st.d],
+        fmt: function (v) {
+          if (st.d === "tarif") return fmtP(kira("tarif", v).P2 - 35);
+          if (st.d === "subsidi") return "RM" + E.fmt(v / 10, 2, true);
+          return E.fmt(v, 0) + " ribu";
+        },
+        ubah: function (v) {
+          st.v[st.d] = v;
+          lukis();
+        }
+      });
+      G.butang(K.kawalan, E.ikon("ulang") + " Set semula", function () {
+        st.v[st.d] = AWAL[st.d];
+        julat.set(st.v[st.d]);
+        lukis();
+      });
+
+      function labelJulat() {
+        return st.d === "tarif" ? "Tarif P₁P₂" : st.d === "subsidi" ? "Subsidi seunit" : "Kuota import";
+      }
+      function kereta() {
+        return st.d !== "subsidi";
+      }
+      function fmtP(p) {
+        return kereta() ? "RM" + E.fmt(p, 1) + " ribu" : "RM" + E.fmt(p / 10, 2, true);
+      }
+      function fmtQ(q) {
+        return E.fmt(q, 1) + (kereta() ? " ribu unit" : " ribu pek");
+      }
+
+      // Pengiraan keseimbangan (harga dalam RM ribu bagi kereta; ×0.1 bagi tepung sepek)
+      function kira(d, v) {
+        var r = { P0: 55, Q0: 45, P1: 35, dom1: 25, jum1: 65, imp1: 40 };
+        var P2, dom2, jum2, imp2;
+        if (d === "tarif") {
+          P2 = (126 + 1.6 * v) / 3.6;
+          imp2 = 1.6 * (P2 - v - 10);
+          if (imp2 <= 0) {
+            P2 = 55;
+            imp2 = 0;
+          }
+          dom2 = P2 - 10;
+          jum2 = 100 - P2;
+        } else if (d === "subsidi") {
+          P2 = (126 - v) / 3.6;
+          dom2 = P2 + v - 10;
+          jum2 = 100 - P2;
+          imp2 = jum2 - dom2;
+        } else {
+          var kq = Math.min(v, 40);
+          P2 = (110 - kq) / 2;
+          dom2 = P2 - 10;
+          jum2 = 100 - P2;
+          imp2 = kq;
+        }
+        r.P2 = P2;
+        r.dom2 = dom2;
+        r.jum2 = jum2;
+        r.imp2 = imp2;
+        return r;
+      }
+
+      // Keluk S₂ (kuantiti sebagai fungsi harga)
+      function S2Q(p) {
+        var v = st.v[st.d];
+        if (st.d === "tarif") return p >= 10 + v ? 2.6 * p - 26 - 1.6 * v : NaN;
+        if (st.d === "subsidi") return 2.6 * p - 26 + v;
+        return p - 10 + v;
+      }
+      // saiz dasar supaya keluk S₂ melalui titik (q, p) yang diseret
+      function magDariQ(q, p) {
+        if (st.d === "tarif") return (2.6 * p - 26 - q) / 1.6;
+        if (st.d === "subsidi") return q - 2.6 * p + 26;
+        return q - p + 10;
+      }
+      function setMag(v) {
+        var ds = DS[st.d];
+        st.v[st.d] = E.clamp(Math.round(v / ds.step) * ds.step, ds.min, ds.max);
+        julat.set(st.v[st.d]);
+        lukis();
+      }
+
+      var plot = G.plot(K.kanvas, {
+        x: [0, 95],
+        y: [0, 105],
+        nisbah: function (w) {
+          return w < 480 ? 1.2 : 0.72;
+        },
+        margin: { l: 80, b: 70 },
+        aria: "Graf kesan tarif, subsidi dan kuota import"
+      });
+
+      function labelPada(fQ, p, teks, kls) {
+        var q = fQ(p);
+        if (q > 0 && q <= 95 && p > 0 && p <= 105) plot.teks(q, p, teks, "g-teks " + kls, "start", "label", 6, 4);
+      }
+      function pHujung(fQ, pMaks) {
+        // harga tertinggi yang masih dalam julat x
+        for (var p = pMaks; p > 0; p -= 0.5) {
+          var q = fQ(p);
+          if (isFinite(q) && q <= 93) return p;
+        }
+        return pMaks;
+      }
+
+      function lukis() {
+        plot.kosong();
+        var kr = kereta();
+        plot.paksi({
+          tikX: [],
+          tikY: [0, 20, 40, 60, 80, 100],
+          labelX: null,
+          labelY: kr ? "Harga (RM ribu)" : "Harga (RM sepek)",
+          fmtTikY: kr
+            ? null
+            : function (v) {
+                return E.fmt(v / 10, 0);
+              },
+          grid: true
+        });
+        teksPx(plot, plot.kanan() + 8, plot.bawah() + 62, kr ? "Kuantiti kereta (ribu unit)" : "Kuantiti tepung gandum (ribu pek)", "g-label", "end", "paksi");
+        var r = kira(st.d, st.v[st.d]);
+        var v = st.v[st.d];
+        var D = function (p) {
+          return 100 - p;
+        };
+        var S0 = function (p) {
+          return p - 10;
+        };
+        var S1 = function (p) {
+          return 2.6 * (p - 10);
+        };
+
+        // kawasan hasil kerajaan (tarif): AE₂GH
+        if (st.d === "tarif" && r.imp2 > 0.2 && r.P2 - r.P1 > 0.2) {
+          plot.segi(r.dom2, r.P1, r.jum2, r.P2, "g-kawasan c4", "kawasan");
+          if (!plot.sempit || r.jum2 - r.dom2 > 14) plot.teks((r.dom2 + r.jum2) / 2, (r.P1 + r.P2) / 2, "Hasil kerajaan", "g-teks kecil", "middle", "label", 0, 4);
+        }
+
+        // keluk
+        plot.fungsiY(D, 5, 100, "g-lengkung d", "lengkung");
+        plot.fungsiY(S0, 10, 103, "g-lengkung s", "lengkung");
+        plot.fungsiY(S1, 10, pHujung(S1, 103), "g-lengkung c4", "lengkung");
+        if (st.d === "subsidi") {
+          var S0b = function (p) {
+            return p - 10 + v;
+          };
+          var pS0b = pHujung(S0b, 103);
+          plot.fungsiY(S0b, 10, pS0b, "g-lengkung c5 nipis", "hantu");
+          plot.teks(S0b(pS0b - 1), pS0b - 1, "S₀′", "g-teks c5", "end", "label", -8, -6);
+        }
+        var pBawah = st.d === "tarif" ? 10 + v : 10;
+        var pAtas = pHujung(S2Q, 103);
+        if (v > 0.001) plot.fungsiY(S2Q, pBawah, pAtas, "g-lengkung c3", "lengkung");
+        labelPada(D, 12, "D₀", "d");
+        labelPada(S0, 96, "S₀", "s");
+        labelPada(S1, pHujung(S1, 103) - 2, "S₁", "c4");
+        if (v > 0.001) {
+          var pL = pHujung(S2Q, 100) - 1;
+          plot.teks(S2Q(pL), pL, "S₂", "g-teks c3", "end", "label", -16, -10);
+        }
+
+        // garis harga P₀, P₁, P₂
+        plot.garis(0, r.P0, r.Q0, r.P0, "g-panduan", "panduan");
+        plot.garis(0, r.P1, r.jum1, r.P1, "g-panduan", "panduan");
+        if (Math.abs(r.P2 - r.P1) > 0.05) plot.garis(0, r.P2, Math.max(r.jum2, r.dom2), r.P2, "g-panduan", "panduan");
+
+        // garis kuantiti ke paksi
+        var qs = [
+          { q: r.Q0, p: r.P0, teks: "Q₀", kelas: "lemah" },
+          { q: r.dom1, p: r.P1, teks: "Q₁" },
+          { q: r.jum1, p: r.P1, teks: st.d === "subsidi" ? "Q₃" : "Q₄" }
+        ];
+        if (Math.abs(r.P2 - r.P1) > 0.05) {
+          qs.push({ q: r.dom2, p: st.d === "subsidi" ? r.P2 : r.P2, teks: "Q₂" });
+          qs.push({ q: r.jum2, p: r.P2, teks: st.d === "subsidi" ? "Q₄" : "Q₃" });
+        }
+        qs.forEach(function (o) {
+          plot.garis(o.q, o.p, o.q, 0, "g-panduan", "panduan");
+        });
+        cipBertingkat(
+          plot,
+          qs.map(function (o) {
+            return { px: plot.X(o.q), teks: o.teks, kelas: o.kelas };
+          }),
+          "x"
+        );
+        var ps = [
+          { p: r.P0, teks: "P₀", kelas: "lemah" },
+          { p: r.P1, teks: "P₁" }
+        ];
+        if (Math.abs(r.P2 - r.P1) > 0.05) ps.push({ p: r.P2, teks: "P₂" });
+        cipBertingkat(
+          plot,
+          ps.map(function (o) {
+            return { px: plot.Y(o.p), teks: o.teks, kelas: o.kelas };
+          }),
+          "y"
+        );
+
+        // kurungan import: segmen pada garis harga, label di atas atau di bawah
+        function kurungImport(qa, qb, p, kelas, teks, atas) {
+          if (qb - qa < 0.5) return;
+          plot.garis(qa, p, qb, p, "g-garis-kurung " + kelas, "tanda");
+          plot.garis(qa, p - 1.5, qa, p + 1.5, "g-garis-kurung " + kelas, "tanda");
+          plot.garis(qb, p - 1.5, qb, p + 1.5, "g-garis-kurung " + kelas, "tanda");
+          if (!plot.sempit || qb - qa > 12) plot.teks((qa + qb) / 2, p, teks, "g-teks kecil " + kelas, "middle", "label", 0, atas ? -7 : 16);
+        }
+        var ubah = Math.abs(r.P2 - r.P1) > 0.05;
+        var subsidi = st.d === "subsidi";
+        kurungImport(r.dom1, r.jum1, r.P1, "s", "Import " + E.fmt(r.imp1, 0), subsidi && ubah);
+        if (ubah) kurungImport(r.dom2, r.jum2, r.P2, "d", (st.d === "kuota" ? "Kuota " : "Import ") + E.fmt(r.imp2, 0), !subsidi);
+
+        // nod
+        plot.nod(r.Q0, r.P0, { r: 5, label: "E₀", kelasLabel: "lemah", dx: 8, dy: -8 });
+        plot.nod(r.jum1, r.P1, { r: 5.5, label: "E₁", dx: 8, dy: 16 });
+        plot.bulat(r.dom1, r.P1, 4, "g-nod isi s", "tanda");
+        if (ubah) {
+          plot.nod(r.jum2, r.P2, { kelas: "isi", r: 6, label: "E₂", dx: 8, dy: -8 });
+          plot.bulat(r.dom2, r.P2, 4, "g-nod isi c3", "tanda");
+          if (st.d === "tarif" && !plot.sempit) {
+            plot.teks(r.dom2, r.P2, "A", "g-teks kecil lemah", "end", "label", -5, -6);
+            plot.teks(r.dom2, r.P1, "H", "g-teks kecil lemah", "end", "label", -5, 14);
+            plot.teks(r.jum2, r.P1, "G", "g-teks kecil lemah", "start", "label", 5, 14);
+            plot.teks(r.dom1, r.P1, "B", "g-teks kecil lemah", "end", "label", -5, -6);
+          }
+        }
+
+        // pemegang di hujung atas keluk S₂ (atau S₁ jika dasar sifar)
+        var pH = pHujung(S2Q, 100) - 1;
+        var qH = S2Q(pH);
+        if (isFinite(qH)) pemegang(plot, plot.X(qH), plot.Y(pH), "s2", "c3", 7.5);
+
+        baca(r);
+      }
+
+      function baca(r) {
+        var d = st.d,
+          ds = DS[d],
+          v = st.v[d];
+        var brg = ds.barang;
+        var hasil, labelHasil;
+        if (d === "tarif") {
+          hasil = (r.P2 - r.P1) * r.imp2;
+          labelHasil = "Hasil tarif (AE₂GH)";
+        } else if (d === "subsidi") {
+          hasil = (v / 10) * r.dom2;
+          labelHasil = "Belanja subsidi";
+        }
+        var fmtHasil = function (x) {
+          return d === "tarif" ? "RM" + E.fmt(x, 0) + " juta" : "RM" + E.fmt(x, 1) + " ribu";
+        };
+        var bits = [
+          ["Harga", fmtP(r.P1) + " → " + fmtP(r.P2), r.P2 > r.P1 + 0.01 ? "s" : r.P2 < r.P1 - 0.01 ? "c3" : ""],
+          ["Penawaran tempatan", E.fmt(r.dom1, 1) + " → " + E.fmt(r.dom2, 1), "c3"],
+          ["Import", E.fmt(r.imp1, 1) + " → " + E.fmt(r.imp2, 1), "s"]
+        ];
+        if (hasil != null) bits.push([labelHasil, fmtHasil(hasil), "c4"]);
+
+        var jadual =
+          '<div class="jadual"><table><caption>' + ds.rajah + " · perbandingan sebelum dan selepas " + ds.nama.toLowerCase() + "</caption><thead><tr><th>Butiran</th><th class=\"n\">Sebelum (P₁)</th><th class=\"n\">Selepas (P₂)</th></tr></thead><tbody>" +
+          "<tr><td>Harga " + brg + '</td><td class="n">' + fmtP(r.P1) + '</td><td class="n">' + fmtP(r.P2) + "</td></tr>" +
+          "<tr><td>Jumlah kuantiti diminta</td><td class=\"n\">" + fmtQ(r.jum1) + '</td><td class="n">' + fmtQ(r.jum2) + "</td></tr>" +
+          "<tr><td>Penawaran pengeluar tempatan</td><td class=\"n\">" + fmtQ(r.dom1) + '</td><td class="n">' + fmtQ(r.dom2) + "</td></tr>" +
+          "<tr><td>Kuantiti diimport</td><td class=\"n\">" + fmtQ(r.imp1) + '</td><td class="n">' + fmtQ(r.imp2) + "</td></tr>" +
+          (d === "tarif" ? "<tr><td>Hasil kerajaan (tarif)</td><td class=\"n\">Tiada</td><td class=\"n\">" + fmtHasil(hasil) + "</td></tr>" : "") +
+          (d === "subsidi" ? "<tr><td>Perbelanjaan kerajaan (subsidi)</td><td class=\"n\">Tiada</td><td class=\"n\">" + fmtHasil(hasil) + "</td></tr>" : "") +
+          (d === "kuota" ? '<tr><td>Hasil kerajaan</td><td class="n">Tiada</td><td class="n">Tiada hasil cukai</td></tr>' : "") +
+          "</tbody></table></div>";
+
+        var ayat;
+        if (v <= 0.001 || Math.abs(r.P2 - r.P1) < 0.05) {
+          ayat =
+            (d === "subsidi" ? "S₀′ ialah penawaran pengeluar tempatan selepas subsidi. " : "") + "Selepas perdagangan antarabangsa, keluk penawaran <b>S₁S₁</b> (tempatan + import) bersilang dengan <b>D₀D₀</b> pada E₁. Pada harga P₁, pengeluar tempatan menawarkan 0Q₁ dan selebihnya, <b>" + fmtQ(r.imp1) + "</b>, diimport." +
+            (d === "kuota" ? " Kuota ini tidak mengikat kerana had import tidak kurang daripada kuantiti yang diimport." : " Naikkan saiz dasar untuk melihat kesannya.");
+        } else if (d === "tarif") {
+          ayat =
+            '<span class="status buruk">Tarif</span> Tarif sebanyak P₁P₂ menyebabkan keluk penawaran beralih ke kiri daripada S₁S₁ kepada <b>S₂S₂</b>. Harga ' + brg + " naik daripada " + fmtP(r.P1) + " kepada " + fmtP(r.P2) + ", jumlah kuantiti diminta turun kepada 0Q₃, penawaran tempatan naik kepada 0Q₂ dan import berkurang kepada Q₂Q₃ (" + fmtQ(r.imp2) + "). Kerajaan memperoleh hasil cukai import sebanyak kawasan <b>AE₂GH</b>.";
+        } else if (d === "subsidi") {
+          ayat =
+            '<span class="status baik">Subsidi</span> Subsidi mengurangkan kos pengeluar tempatan, maka penawaran tempatan bertambah (S₀ kepada S₀′) dan keluk penawaran beralih ke kanan daripada S₁S₁ kepada <b>S₂S₂</b>. Harga ' + brg + " turun daripada " + fmtP(r.P1) + " kepada " + fmtP(r.P2) + ", penawaran tempatan naik kepada " + fmtQ(r.dom2) + " dan import berkurang kepada " + fmtQ(r.imp2) + ". Kerajaan menanggung perbelanjaan subsidi.";
+        } else {
+          ayat =
+            '<span class="status buruk">Kuota import</span> Kuota mengehadkan import kepada Q₂Q₃ (' + fmtQ(r.imp2) + "), maka keluk penawaran beralih ke kiri daripada S₁S₁ kepada <b>S₂S₂</b>. Harga " + brg + " naik daripada " + fmtP(r.P1) + " kepada " + fmtP(r.P2) + " dan penawaran tempatan naik kepada 0Q₂. Berbeza dengan tarif, kerajaan <b>tidak</b> memperoleh hasil cukai.";
+        }
+
+        var kesan = [];
+        if (v > 0.001 && Math.abs(r.P2 - r.P1) >= 0.05) {
+          if (d === "tarif") {
+            kesan = [
+              "Harga " + brg + " diimport meningkat kerana pengimport memindahkan beban tarif kepada pengguna dengan menaikkan harga jualan.",
+              "Permintaan " + brg + " diimport menurun manakala permintaan terhadap " + brg + " keluaran tempatan meningkat kerana harganya secara relatif lebih rendah.",
+              "Penawaran " + brg + " oleh pengeluar tempatan meningkat.",
+              "Jumlah " + brg + " diimport berkurang, maka perbelanjaan negara atas " + brg + " import turut menurun.",
+              "Kerajaan memperoleh hasil daripada kutipan tarif.",
+              "Guna tenaga dalam negara meningkat kerana pengeluaran tempatan memerlukan lebih banyak buruh, maka kadar pengangguran menurun."
+            ];
+          } else if (d === "subsidi") {
+            kesan = [
+              "Harga " + brg + " keluaran tempatan menurun.",
+              "Permintaan terhadap " + brg + " keluaran tempatan meningkat kerana harganya secara relatif lebih murah daripada " + brg + " import.",
+              "Penawaran " + brg + " oleh pengeluar tempatan meningkat.",
+              "Jumlah " + brg + " diimport berkurang, maka perbelanjaan negara atas " + brg + " import menurun.",
+              "Guna tenaga dalam negara meningkat, maka kadar pengangguran menurun."
+            ];
+          } else {
+            kesan = [
+              "Harga " + brg + " diimport meningkat kerana penawaran " + brg + " import dalam pasaran tempatan berkurang.",
+              "Permintaan " + brg + " diimport menurun manakala permintaan terhadap " + brg + " keluaran tempatan meningkat.",
+              "Penawaran " + brg + " oleh pengeluar tempatan meningkat.",
+              "Jumlah " + brg + " diimport berkurang, maka perbelanjaan atas " + brg + " import turut menurun.",
+              "Guna tenaga dalam negara meningkat, maka kadar pengangguran menurun."
+            ];
+          }
+        }
+        K.baca.innerHTML =
+          G.nilai(bits) +
+          '<div class="ayat">' + ayat + ' <span class="teks-lemah">(Nilai contoh berdasarkan ' + ds.rajah + " buku teks.)</span></div>" +
+          (kesan.length ? '<div class="ayat"><b>Kesan ' + ds.nama.toLowerCase() + ":</b></div><ul>" + kesan.map(function (k) {
+            return "<li>" + k + "</li>";
+          }).join("") + "</ul>" : "") +
+          jadual;
+      }
+
+      G.interaksi(plot, {
+        seret: function (n, pt) {
+          if (n !== "s2" || pt.x == null) return;
+          setMag(magDariQ(pt.x, pt.y));
+        },
+        kekunci: function (k) {
+          // kanan: keluk S₂ ke kanan; atas: dasar diperbesar
+          var arah = k.dx ? (st.d === "tarif" ? -k.dx : k.dx) : k.dy;
+          if (!arah) return false;
+          setMag(st.v[st.d] + (arah > 0 ? 1 : -1) * DS[st.d].step);
+        }
+      });
+
+      lukis();
+      var henti = G.pantauSaiz(K.kanvas, function () {
+        plot.ukur();
+        lukis();
+      });
+      return { musnah: henti };
+    },
+    { tajuk: "Kesan tarif, subsidi dan kuota", bab: "t5-b2" }
+  );
+
+  /* =========================================================
+     BAB 2 · Penentuan kadar pertukaran asing (RM/USD)
+     Paksi tegak: RM bagi USD1; paksi mendatar: kuantiti USD
+     ========================================================= */
+  var FAKTOR_USD = [
+    {
+      label: "Permintaan USD bertambah (RM susut nilai)",
+      pilihan: [
+        ["D+import", "Import Malaysia meningkat"],
+        ["D+citarasa", "Rakyat Malaysia lebih gemar barang import"],
+        ["D+faedah", "Kadar faedah di Malaysia turun, modal portfolio keluar"],
+        ["D+spekulasi", "Spekulasi: nilai RM dijangka merosot"],
+        ["D+luar", "Rakyat Malaysia melabur atau melancong ke luar negara"]
+      ]
+    },
+    {
+      label: "Permintaan USD berkurang (RM naik nilai)",
+      pilihan: [["D-import", "Rakyat Malaysia membeli barang buatan tempatan, import berkurang"]]
+    },
+    {
+      label: "Penawaran USD bertambah (RM naik nilai)",
+      pilihan: [
+        ["S+eksport", "Eksport Malaysia meningkat"],
+        ["S+pelancong", "Pelancong asing ke Malaysia bertambah"],
+        ["S+faedah", "Kadar faedah di Malaysia naik, modal asing masuk"],
+        ["S+spekulasi", "Spekulasi: nilai RM dijangka meningkat"],
+        ["S+fdi", "Pelaburan langsung asing masuk ke Malaysia"]
+      ]
+    },
+    {
+      label: "Penawaran USD berkurang (RM susut nilai)",
+      pilihan: [["S-eksport", "Eksport Malaysia merosot"]]
+    }
+  ];
+  var SEBAB_USD = {
+    "D+import": "Pengimport Malaysia menjual RM untuk mendapatkan USD bagi membayar pengeksport asing",
+    "D+citarasa": "Lebih banyak barang import dibeli, maka lebih banyak USD diperlukan",
+    "D+faedah": "Pulangan simpanan di Malaysia rendah, pelabur memindahkan modal portfolio ke luar negara",
+    "D+spekulasi": "Orang ramai menjual RM dan membeli USD sebelum nilai RM jatuh",
+    "D+luar": "Pelabur dan pelancong Malaysia perlu memperoleh mata wang asing",
+    "D-import": "Kurang barang import dibeli, maka kurang USD diperlukan",
+    "S+eksport": "Pembeli asing menukar USD kepada RM untuk membayar pengeksport Malaysia",
+    "S+pelancong": "Pelancong asing menukar USD kepada RM untuk berbelanja di Malaysia",
+    "S+faedah": "Pulangan simpanan di Malaysia tinggi, modal portfolio asing mengalir masuk",
+    "S+spekulasi": "Orang ramai membeli RM sekarang sebelum nilainya naik",
+    "S+fdi": "Pelabur asing menukar USD kepada RM untuk membina kilang di Malaysia",
+    "S-eksport": "Kurang pembeli asing memerlukan RM, maka kurang USD ditawarkan"
+  };
+
+  G.daftar(
+    "kadar-pertukaran",
+    function (host, opt) {
+      var K = G.kad(host, {
+        tajuk: opt.tajuk || "Penentuan kadar pertukaran Ringgit Malaysia dengan Dolar Amerika",
+        petunjuk: "Seret garis kadar pertukaran atau pilih satu peristiwa"
+      });
+      var A = 5.75,
+        B = 0.025,
+        C = 3.25,
+        ANJAK = 16;
+      var st = { dqD: 0, dqS: 0, r: 4.5, kod: "" };
+      var tD = null,
+        tS = null,
+        tR = null;
+
+      var pil = G.pilih(K.kawalan, {
+        label: "Pilih peristiwa",
+        kumpulan: [{ pilihan: [["", "— pilih —"]] }].concat(FAKTOR_USD),
+        ubah: function (v) {
+          st.kod = v;
+          var d = 0,
+            s = 0;
+          if (v) {
+            var arah = v.charAt(1) === "+" ? 1 : -1;
+            if (v.charAt(0) === "D") d = arah * ANJAK;
+            else s = arah * ANJAK;
+          }
+          anim(d, s);
+        }
+      });
+      G.butang(K.kawalan, "USD1 = RM5.00", function () {
+        animR(5);
+      });
+      G.butang(K.kawalan, "USD1 = RM4.00", function () {
+        animR(4);
+      });
+      G.butang(K.kawalan, E.ikon("tangan") + " Biarkan pasaran menyesuaikan", function () {
+        animR(eq().p, 1200);
+      });
+      G.butang(K.kawalan, E.ikon("ulang") + " Set semula", function () {
+        pil.set("");
+        st.kod = "";
+        anim(0, 0);
+      });
+
+      var plot = G.plot(K.kanvas, {
+        x: [0, 100],
+        y: [3, 6],
+        tikX: [0, 20, 40, 60, 80, 100],
+        tikY: [3, 3.5, 4, 4.5, 5, 5.5, 6],
+        labelX: "Kuantiti Dolar Amerika (USD juta)",
+        labelY: "RM / USD",
+        asalan: false,
+        fmtTikY: function (v) {
+          return E.fmt(v, 2, true);
+        },
+        nisbah: function (w) {
+          return w < 480 ? 0.95 : 0.62;
+        },
+        aria: "Graf penentuan kadar pertukaran asing"
+      });
+
+      function Dk(dq) {
+        return G.kelukD(A, B, dq);
+      }
+      function Sk(dq) {
+        return G.kelukS(C, B, dq);
+      }
+      function eq() {
+        return G.silang(Dk(st.dqD), Sk(st.dqS));
+      }
+      function anim(d, s) {
+        if (tD) tD();
+        if (tS) tS();
+        var e1 = G.silang(Dk(d), Sk(s));
+        tD = G.tween(st.dqD, d, 560, function (x) {
+          st.dqD = x;
+          lukis();
+        });
+        tS = G.tween(st.dqS, s, 560, function (x) {
+          st.dqS = x;
+          lukis();
+        });
+        animR(e1.p, 560);
+      }
+      function animR(v, ms) {
+        if (tR) tR();
+        tR = G.tween(st.r, v, ms || 700, function (x) {
+          st.r = x;
+          lukis();
+        });
+      }
+
+      function lukis() {
+        plot.kosong();
+        plot.paksi();
+        var d0 = Dk(0),
+          s0 = Sk(0),
+          d1 = Dk(st.dqD),
+          s1 = Sk(st.dqS);
+        var adaD = Math.abs(st.dqD) > 0.2,
+          adaS = Math.abs(st.dqS) > 0.2;
+        if (adaD) plot.fungsi(d0.P, 0, 100, "g-lengkung d hantu", "hantu");
+        if (adaS) plot.fungsi(s0.P, 0, 100, "g-lengkung s hantu", "hantu");
+        plot.fungsi(d1.P, 0, 100, "g-lengkung d", "lengkung");
+        plot.fungsi(s1.P, 0, 100, "g-lengkung s", "lengkung");
+        var qd = Math.min(94, d1.Q(3.35)),
+          qs = Math.min(94, s1.Q(5.85));
+        if (qd > 0) plot.teks(qd, d1.P(qd), adaD ? "D₁" : "DD", "g-teks d", "end", "label", -6, -8);
+        if (qs > 0) plot.teks(qs, s1.P(qs), adaS ? "S₁" : "SS", "g-teks s", "end", "label", -6, 16);
+        var E0 = G.silang(d0, s0),
+          e1 = G.silang(d1, s1);
+        var ubah = adaD || adaS;
+        if (ubah) {
+          plot.panduanKePaksi(E0.q, E0.p, { labelY: "RM" + E.fmt(E0.p, 2, true), kelasCip: "lemah" });
+          plot.nod(E0.q, E0.p, { r: 5, label: "E₀", kelasLabel: "lemah", dx: -22, dy: -8 });
+          if (adaD) plot.panah(d0.Q(5.3), 5.3, d1.Q(5.3), 5.3, "d", "tanda", 9);
+          if (adaS) plot.panah(s0.Q(3.6), 3.6, s1.Q(3.6), 3.6, "s", "tanda", 9);
+        }
+        plot.panduanKePaksi(e1.q, e1.p, { keY: Math.abs(st.r - e1.p) > 0.01 });
+        plot.nod(e1.q, e1.p, { kelas: "isi", r: 6, label: ubah ? "E₁" : "E", dx: 10, dy: -10 });
+
+        // garis kadar pertukaran
+        var r = st.r;
+        var qD = d1.Q(r),
+          qS = s1.Q(r);
+        var beza = qD - qS;
+        var py = plot.Y(r);
+        if (Math.abs(beza) > 0.6) {
+          var qa = Math.min(qD, qS),
+            qb = Math.max(qD, qS);
+          var kls = beza > 0 ? "d" : "s";
+          var h = beza > 0 ? -0.07 : 0.07;
+          plot.segi(qa, r, qb, r + h * 1.6, "g-kawasan " + kls, "kawasan");
+          plot.garis(qa, r + h, qb, r + h, "g-garis-kurung " + kls, "tanda");
+          plot.garis(qa, r, qa, r + h, "g-garis-kurung " + kls, "tanda");
+          plot.garis(qb, r, qb, r + h, "g-garis-kurung " + kls, "tanda");
+          plot.cip(plot.X((qa + qb) / 2), plot.Y(r + h * 3), (beza > 0 ? "Lebihan permintaan USD " : "Lebihan penawaran USD ") + E.fmt(Math.abs(beza), 0), { anchor: "middle", warna: beza > 0 ? "var(--c-d)" : "var(--c-s)" });
+          plot.bulat(qD, r, 5, "g-nod isi d", "tanda");
+          plot.bulat(qS, r, 5, "g-nod isi s", "tanda");
+          if (qa > 1 && !plot.sempit) {
+            plot.teks(qa, 3, beza > 0 ? "Q₁" : "Q₁", "g-teks kecil lemah", "middle", "label", 0, -6);
+            plot.teks(qb, 3, "Q₂", "g-teks kecil lemah", "middle", "label", 0, -6);
+          }
+          plot.panahPx(plot.kiri() + 16, py + (beza > 0 ? 14 : -14), plot.kiri() + 16, py + (beza > 0 ? -22 : 22), "aksen", "tanda", 8);
+        }
+        svgEl("line", { x1: plot.kiri(), y1: py, x2: plot.kanan(), y2: py, class: "g-garis-harga" }, plot.lapis.panduan);
+        var g = svgEl("g", { "data-pegang": "kadar", class: "g-pemegang", style: "touch-action:none" }, plot.lapis.pemegang);
+        svgEl("line", { x1: plot.kiri(), y1: py, x2: plot.kanan(), y2: py, class: "g-garis-hit" }, g);
+        svgEl("circle", { cx: plot.kanan() - 6, cy: py, r: 15, class: "g-nod-halo" }, g);
+        svgEl("circle", { cx: plot.kanan() - 6, cy: py, r: 8, class: "g-nod" }, g);
+        plot.cip(plot.kanan() - 22, py - 16, "USD1 = RM" + E.fmt(r, 2, true), { anchor: "end" });
+        baca(E0, e1, r, qD, qS, beza);
+      }
+
+      function baca(E0, e1, r, qD, qS, beza) {
+        var bits = [
+          ["Kadar semasa", "USD1 = RM" + E.fmt(r, 2, true), ""],
+          ["Diminta", "USD" + E.fmt(qD, 1) + " juta", "d"],
+          ["Ditawarkan", "USD" + E.fmt(qS, 1) + " juta", "s"],
+          ["Keseimbangan", "RM" + E.fmt(e1.p, 2, true), "c3"]
+        ];
+        var ayat = "";
+        if (Math.abs(beza) > 0.6) {
+          if (beza < 0) {
+            ayat =
+              '<span class="status merah">Lebihan penawaran USD</span> Pada USD1 = RM' + E.fmt(r, 2, true) + " (lebih tinggi daripada keseimbangan), Ringgit Malaysia mengalami <b>kejatuhan nilai</b>. Kuantiti USD yang ditawarkan melebihi kuantiti yang diminta sebanyak <b>USD" + E.fmt(-beza, 1) + " juta</b>, maka kadar pertukaran cenderung <b>turun</b> sehingga keseimbangan dicapai semula pada E.";
+          } else {
+            ayat =
+              '<span class="status biru">Lebihan permintaan USD</span> Pada USD1 = RM' + E.fmt(r, 2, true) + " (lebih rendah daripada keseimbangan), Ringgit Malaysia mengalami <b>kenaikan nilai</b>. Kuantiti USD yang diminta melebihi kuantiti yang ditawarkan sebanyak <b>USD" + E.fmt(beza, 1) + " juta</b>, maka kadar pertukaran cenderung <b>naik</b> sehingga keseimbangan dicapai semula pada E.";
+          }
+        } else {
+          ayat =
+            '<span class="status baik">Keseimbangan</span> Keluk DD bersilang dengan keluk SS, iaitu kuantiti USD diminta sama dengan kuantiti USD ditawarkan. Kadar pertukaran ialah <b>USD1 = RM' + E.fmt(e1.p, 2, true) + "</b>.";
+        }
+        var ubah = Math.abs(e1.p - E0.p) > 0.005;
+        if (st.kod && ubah) {
+          var susut = e1.p > E0.p;
+          var nama = labelPilihan(FAKTOR_USD, st.kod);
+          ayat +=
+            ' <span class="status ' + (susut ? "buruk" : "baik") + '">' + (susut ? "RM susut nilai" : "RM naik nilai") + "</span> <b>" + nama + ".</b> " + (SEBAB_USD[st.kod] || "") + ", maka keluk " + (st.kod.charAt(0) === "D" ? "permintaan" : "penawaran") + " USD beralih ke " + (st.kod.charAt(1) === "+" ? "kanan" : "kiri") + ". Kadar pertukaran berubah daripada RM" + E.fmt(E0.p, 2, true) + " kepada <b>RM" + E.fmt(e1.p, 2, true) + "</b> bagi USD1.";
+          var x0 = 950000 / E0.p,
+            x1 = 950000 / e1.p,
+            m0 = 450000 * E0.p,
+            m1 = 450000 * e1.p;
+          ayat +=
+            '</div><div class="ayat"><b>Kesan terhadap eksport:</b> getah asli bernilai RM950 000 kini berharga <b>USD' + E.fmt(x1, 2, true) + "</b> kepada pengimport Amerika Syarikat (sebelum ini USD" + E.fmt(x0, 2, true) + "), maka eksport Malaysia menjadi " + (susut ? "lebih murah dan <b>meningkat</b>" : "lebih mahal dan <b>menurun</b>") + ".</div>" +
+            '<div class="ayat"><b>Kesan terhadap import:</b> barang kosmetik bernilai USD450 000 kini berharga <b>RM' + E.fmt(m1, 0) + "</b> kepada pengimport Malaysia (sebelum ini RM" + E.fmt(m0, 0) + "), maka import menjadi " + (susut ? "lebih mahal dan <b>menurun</b>. Imbangan dagangan cenderung <b>baik</b>." : "lebih murah dan <b>meningkat</b>. Imbangan dagangan cenderung <b>merosot</b>.");
+        }
+        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + ' <span class="teks-lemah">(Kadar contoh berdasarkan rajah 2.4.4 buku teks.)</span></div>';
+      }
+
+      G.interaksi(plot, {
+        seret: function (n, pt, fasa) {
+          if (n !== "kadar" || pt.y == null) return;
+          if (fasa === "mula" && tR) tR();
+          st.r = E.clamp(Math.round(pt.y * 100) / 100, 3.1, 5.9);
+          lukis();
+        },
+        kekunci: function (k) {
+          st.r = E.clamp(st.r + (k.dy || k.dx) * 0.05, 3.1, 5.9);
+          lukis();
+        }
+      });
+
+      lukis();
+      var henti = G.pantauSaiz(K.kanvas, function () {
+        plot.ukur();
+        lukis();
+      });
+      return {
+        musnah: function () {
+          henti();
+          [tD, tS, tR].forEach(function (t) {
+            if (t) t();
+          });
+        }
+      };
+    },
+    { tajuk: "Kadar pertukaran asing", bab: "t5-b2" }
   );
 })();

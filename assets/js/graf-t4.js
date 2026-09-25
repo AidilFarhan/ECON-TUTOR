@@ -1596,8 +1596,33 @@
         c2.lukis();
       });
 
+      var pilihan = 4;
+      function keadaan(x) {
+        if (x === 0) return "Output sifar: TC = FC";
+        return MC[x] < AC[x] ? "MC &lt; AC: AC menurun" : MC[x] > AC[x] ? "MC &gt; AC: AC meningkat" : "MC = AC: AC minimum";
+      }
+      function jadualPenuh(x) {
+        var rm = function (v, dp) {
+          return v == null ? "–" : E.fmt(v, dp == null ? 1 : dp);
+        };
+        return (
+          '<div class="jadual jadual-kos"><table><caption>Semua baris Jadual 4.3 (RM). Klik satu baris untuk memilih output itu pada graf.</caption>' +
+          '<thead><tr><th class="n">Q</th><th class="n">FC</th><th class="n">VC</th><th class="n">TC</th><th class="n">AFC</th><th class="n">AVC</th><th class="n">AC</th><th class="n">MC</th><th>Keadaan</th></tr></thead><tbody>' +
+          Q.map(function (q) {
+            return (
+              '<tr data-q="' + q + '" tabindex="0"' + (q === x ? ' class="aktif" aria-current="true"' : "") + ">" +
+              '<td class="n"><b>' + q + '</b></td><td class="n">100</td><td class="n">' + VC[q] + '</td><td class="n">' + TC[q] + "</td>" +
+              '<td class="n">' + (q ? rm(100 / q) : "–") + '</td><td class="n">' + rm(AVC[q]) + '</td><td class="n">' + rm(AC[q]) + '</td><td class="n">' + rm(MC[q], 0) + "</td>" +
+              "<td>" + keadaan(q) + "</td></tr>"
+            );
+          }).join("") +
+          "</tbody></table></div>"
+        );
+      }
+
       function baca(x) {
         if (x == null) return;
+        pilihan = x;
         var bits = [
           ["Output", x + " unit", ""],
           ["FC", "RM100", ""],
@@ -1608,14 +1633,32 @@
         if (x === 0) {
           ayat = "Pada output sifar, kos berubah = 0 tetapi firma tetap menanggung <b>kos tetap RM100</b> (contohnya sewa bangunan, premium insurans), maka TC = FC.";
         } else {
-          bits.push(["AC", E.rm(AC[x], 1), "d"], ["AVC", E.rm(AVC[x], 1), "c3"], ["MC", "RM" + MC[x], "c4"]);
+          bits.push(["AFC", E.rm(100 / x, 1), ""], ["AVC", E.rm(AVC[x], 1), "c3"], ["AC", E.rm(AC[x], 1), "d"], ["MC", "RM" + MC[x], "c4"]);
           ayat =
-            "TC = FC + VC = RM100 + RM" + VC[x] + " = <b>RM" + TC[x] + "</b>. AC = TC ÷ Q = RM" + TC[x] + " ÷ " + x + " = <b>" + E.rm(AC[x], 1) + "</b>. MC = ΔTC ÷ ΔQ = (RM" + TC[x] + " − RM" + TC[x - 1] + ") ÷ 1 = <b>RM" + MC[x] + "</b>. " +
+            "TC = FC + VC = RM100 + RM" + VC[x] + " = <b>RM" + TC[x] + "</b>. AC = TC ÷ Q = RM" + TC[x] + " ÷ " + x + " = <b>" + E.rm(AC[x], 1) + "</b> (AFC " + E.rm(100 / x, 1) + " + AVC " + E.rm(AVC[x], 1) + "). MC = ΔTC ÷ ΔQ = (RM" + TC[x] + " − RM" + TC[x - 1] + ") ÷ 1 = <b>RM" + MC[x] + "</b>. " +
             (MC[x] < AC[x] ? '<span class="status biru">MC &lt; AC</span> maka AC sedang <b>menurun</b>.' : '<span class="status merah">MC &gt; AC</span> maka AC sedang <b>meningkat</b>.') +
-            " MC memotong AC pada titik minimum AC.";
+            " MC memotong AC pada titik minimum AC. AFC sentiasa menurun kerana FC yang sama dibahagi dengan output yang semakin besar.";
         }
-        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + "</div>";
+        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + "</div>" + jadualPenuh(x);
       }
+
+      // klik, ketik atau Enter pada baris jadual memilih output itu
+      function pilihBaris(e) {
+        var tr = e.target.closest ? e.target.closest("tr[data-q]") : null;
+        if (!tr) return;
+        var x = parseInt(tr.getAttribute("data-q"), 10);
+        if (x === pilihan) return;
+        c1.set(x); // carta kedua dan bacaan dikemas kini melalui panggilan balik
+        var baru = K.baca.querySelector('tr[data-q="' + x + '"]');
+        if (baru && e.type === "keydown") baru.focus();
+      }
+      K.baca.addEventListener("click", pilihBaris);
+      K.baca.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          pilihBaris(e);
+        }
+      });
       baca(4);
 
       var henti = G.pantauSaiz(K.kanvas, function () {
