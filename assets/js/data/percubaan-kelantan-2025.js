@@ -536,7 +536,16 @@
     panah: [{ dari: [7.3, 6.6], ke: [5.9, 6.6], kelas: "s" }]
   };
 
-  E.kertas2 = [
+  E.daftarK2({
+    id: "kel25",
+    k1: "kel25-k1",
+    nama: "Kelantan 2025",
+    label: "Kertas Percubaan SPM Kelantan 2025",
+    sumber: "Modul Koleksi Item Peperiksaan Percubaan SPM 2025 (Kelantan)",
+    bahagianA: "Bahagian A (3 soalan wajib, 60 markah)",
+    bahagianB: "Bahagian B (pilih 2 daripada 4, 40 markah)",
+    kunciLama: true,
+    soalan: [
     /* ---------------- SOALAN 1 ---------------- */
     {
       no: 1,
@@ -1346,5 +1355,6 @@
         }
       ]
     }
-  ];
+    ]
+  });
 })();

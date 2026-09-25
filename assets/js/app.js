@@ -146,9 +146,9 @@
     } else if (h === "percubaan") {
       nav = "percubaan";
       pPercubaan();
-    } else if (h === "k2") {
+    } else if (h === "k2" || h.indexOf("k2-") === 0) {
       nav = "percubaan";
-      pK2();
+      pK2(h.slice(3));
     } else {
       pUtama();
     }
@@ -246,7 +246,7 @@
       "<div>" +
       '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5</span>' +
       "<h1>Buku teks Ekonomi yang <em>boleh disentuh</em>.</h1>" +
-      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, dan kuiz mengikut bab. Termasuk Kertas Percubaan SPM Kelantan 2025 bersama skema.</p>' +
+      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, dan kuiz mengikut bab. Termasuk Kertas Percubaan SPM Kelantan 2025 dan MPP3 Terengganu 2025 bersama skema.</p>' +
       '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : "t4-b1") + '">' + (akhir ? "Sambung " + esc("Bab " + akhir.no + " T" + akhir.tingkatan) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
       '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span></div>" +
       "</div>" +
@@ -269,7 +269,7 @@
       alat("graf", "graf", "Makmal graf", "Semua keluk interaktif dalam satu tempat.") +
       alat("kad", "kad", "Kad study", "Hafal istilah dan rumus. Tandakan kad yang dah diingat.") +
       alat("kuiz", "kuiz", "Kuiz mengikut bab", "Soalan objektif dengan penerangan untuk setiap jawapan.") +
-      alat("percubaan", "kertas", "Kertas Percubaan 2025", "Kertas 1 dan Kertas 2 Kelantan bersama skema pemarkahan.") +
+      alat("percubaan", "kertas", "Kertas Percubaan 2025", "Kertas 1 dan Kertas 2 Kelantan serta MPP3 Terengganu, bersama skema pemarkahan.") +
       "</div></section>";
     html += "</div>";
     app.innerHTML = html;
@@ -950,46 +950,58 @@
 
   /* ---------- PERCUBAAN ---------- */
   function pPercubaan() {
-    var k1 = E.setKuiz[0];
-    var d = E.data();
-    var rek = k1 ? d.kuiz[k1.id] : null;
-    var k2 = E.kertas2 || [];
-    var bil = 0;
-    k2.forEach(function (s) {
-      bil += s.bahagian.length;
-    });
-    app.innerHTML =
-      '<div class="bekas pandangan">' +
-      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Percubaan</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kertas Percubaan SPM Kelantan 2025</h1><p>Modul Koleksi Item Peperiksaan Percubaan SPM 2025 · Ekonomi 3767. Soalan ditaip semula daripada kertas asal, dengan jawapan mengikut peraturan pemarkahan.</p></div></div>' +
-      '<div class="kuiz-pilih">' +
-      '<a class="set-kuiz kaca" href="#kuiz-' + (k1 ? k1.id : "") + '" style="--warna-bab:var(--bab-rm100)"><span class="atas"><span class="lencana-bab">1</span><b>Kertas 1 (3767/1)</b></span><span>40 soalan objektif mengikut susunan asal. Jawab satu demi satu, penerangan dipaparkan selepas setiap jawapan.</span><span class="skor-terbaik">' + (rek ? '<span class="status baik">Terbaik ' + rek.terbaik + "/" + rek.jumlah + "</span>" : '<span class="status neutral">Belum dicuba</span>') + "</span></a>" +
-      '<a class="set-kuiz kaca" href="#k2" style="--warna-bab:var(--bab-rm50)"><span class="atas"><span class="lencana-bab">2</span><b>Kertas 2 (3767/2)</b></span><span>Bahagian A (4 soalan wajib) dan Bahagian B (pilih 2 daripada 3). Tulis jawapan, kemudian semak dengan skema dan tandakan isi yang anda tulis.</span><span class="skor-terbaik"><span class="status neutral">' + bil + " bahagian soalan</span></span></a>" +
-      "</div>" +
-      '<div class="kotak tip" style="margin-top:18px"><span class="kotak-label">Tip menjawab Kertas 2</span><p>Skema memberi 1 markah bagi setiap <b>fakta (F)</b> dan 1 markah bagi setiap <b>huraian (H)</b>. Untuk soalan “bezakan”, tulis perbandingan berpasangan (1+1). Untuk Bahagian B, markah ditentukan melalui tahap (1 hingga 3): nyatakan pendirian, huraikan dua sisi, sertakan rajah jika sesuai dan buat rumusan.</p></div>' +
-      "</div>";
-  }
-
-  function pK2() {
-    var k2 = E.kertas2 || [];
     var d = E.data();
     var html =
       '<div class="bekas pandangan">' +
-      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#percubaan">Percubaan</a><span>/</span><span>Kertas 2</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(28px,4vw,40px)">Kertas 2 · Latihan struktur &amp; esei</h1><p>Jawapan anda disimpan dalam pelayar ini sahaja. Tekan <b>Tunjuk skema</b>, tandakan isi yang anda tulis dan lihat anggaran markah.</p></div></div>' +
+      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Percubaan</span></nav>' +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kertas Percubaan SPM 2025</h1><p>Ekonomi 3767. Soalan ditaip semula daripada kertas asal, dengan jawapan mengikut peraturan pemarkahan (skema) setiap negeri.</p></div></div>';
+    E.kertas2Set.forEach(function (k) {
+      var k1 = setKuiz(k.k1);
+      var rek = k1 ? d.kuiz[k1.id] : null;
+      var bil = 0;
+      k.soalan.forEach(function (s) {
+        bil += s.bahagian.length;
+      });
+      html +=
+        '<section class="bahagian" style="margin-top:22px"><div class="bahagian-kepala"><div><h2>' + esc(k.label) + "</h2>" + (k.sumber ? '<p class="teks-lemah" style="margin:4px 0 0">' + esc(k.sumber) + "</p>" : "") + "</div></div>" +
+        '<div class="kuiz-pilih">' +
+        (k1
+          ? '<a class="set-kuiz kaca" href="#kuiz-' + k1.id + '" style="--warna-bab:var(--bab-rm100)"><span class="atas"><span class="lencana-bab">1</span><b>Kertas 1 (3767/1)</b></span><span>' + k1.soalan.length + ' soalan objektif mengikut susunan asal. Penerangan dipaparkan selepas setiap jawapan.</span><span class="skor-terbaik">' + (rek ? '<span class="status baik">Terbaik ' + rek.terbaik + "/" + rek.jumlah + "</span>" : '<span class="status neutral">Belum dicuba</span>') + "</span></a>"
+          : "") +
+        '<a class="set-kuiz kaca" href="#k2-' + k.id + '" style="--warna-bab:var(--bab-rm50)"><span class="atas"><span class="lencana-bab">2</span><b>Kertas 2 (3767/2)</b></span><span>' + esc((k.bahagianA || "Bahagian A") + " dan " + (k.bahagianB || "Bahagian B")) + '. Tulis jawapan, kemudian semak dengan skema.</span><span class="skor-terbaik"><span class="status neutral">' + bil + " bahagian soalan</span></span></a>" +
+        "</div></section>";
+    });
+    html +=
+      '<div class="kotak tip" style="margin-top:18px"><span class="kotak-label">Tip menjawab Kertas 2</span><p>Skema memberi 1 markah bagi setiap <b>fakta (F)</b> dan 1 markah bagi setiap <b>huraian (H)</b>. Untuk soalan “bezakan”, tulis perbandingan berpasangan (1+1). Untuk Bahagian B, markah ditentukan melalui tahap (1 hingga 3): nyatakan pendirian, huraikan dua sisi, sertakan rajah jika sesuai dan buat rumusan.</p></div>' +
+      "</div>";
+    app.innerHTML = html;
+  }
+
+  function pK2(idKertas) {
+    var kertas = E.kertas2Ikut(idKertas);
+    var k2 = kertas ? kertas.soalan : [];
+    var d = E.data();
+    // Kunci storan: kertas pertama (Kelantan) kekal dengan format lama.
+    function kunciK2(no, bi) {
+      return kertas && kertas.kunciLama ? "k2-" + no + "-" + bi : "k2-" + kertas.id + "-" + no + "-" + bi;
+    }
+    var html =
+      '<div class="bekas pandangan">' +
+      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#percubaan">Percubaan</a><span>/</span><span>Kertas 2' + (kertas ? " · " + esc(kertas.nama) : "") + '</span></nav>' +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(28px,4vw,40px)">Kertas 2 · Latihan struktur &amp; esei</h1><p>' + (kertas ? "<b>" + esc(kertas.label) + ".</b> " : "") + 'Jawapan anda disimpan dalam pelayar ini sahaja. Tekan <b>Tunjuk skema</b>, tandakan isi yang anda tulis dan lihat anggaran markah.</p></div></div>' +
       '<div style="display:grid;gap:16px">';
     k2.forEach(function (s) {
       html +=
-        '<article class="struktur-soalan kaca-pekat" id="k2-' + s.no + '">' +
+        '<article class="struktur-soalan kaca-pekat" id="soalan-k2-' + s.no + '">' +
         '<span class="label-kecil">Bahagian ' + s.seksyen + (s.seksyen === "B" ? " · pilih mana-mana dua" : " · wajib") + "</span>" +
         "<h3>Soalan " + s.no + (s.tajuk ? ": " + esc(s.tajuk) : "") + "</h3>" +
         (s.konteks ? '<div class="konteks">' + s.konteks + "</div>" : "");
       s.bahagian.forEach(function (b, bi) {
-        var kunci = "k2-" + s.no + "-" + bi;
+        var kunci = kunciK2(s.no, bi);
         var simpan = d.k2[kunci] || {};
         var bb = E.babIkut[b.bab];
         html +=
-          '<div class="bahagian-soalan" data-kunci="' + kunci + '">' +
+          '<div class="bahagian-soalan" data-kunci="' + kunci + '" data-s="' + s.no + '" data-b="' + bi + '">' +
           (b.konteks ? '<div class="konteks">' + b.konteks + "</div>" : "") +
           '<div class="kepala"><p><b>' + esc(b.kod) + "</b> " + b.s + '</p><span class="markah">' + b.m + " markah</span></div>" +
           (bb ? '<span class="teks-lemah" style="font-size:12.5px;font-weight:700">Topik: T' + bb.tingkatan + " Bab " + bb.no + " · " + esc(bb.tajuk) + (b.topik ? " · " + esc(b.topik) : "") + "</span>" : "") +
@@ -1005,11 +1017,10 @@
 
     app.querySelectorAll(".bahagian-soalan").forEach(function (el) {
       var kunci = el.getAttribute("data-kunci");
-      var parts = kunci.split("-");
       var s = k2.filter(function (x) {
-        return String(x.no) === parts[1];
+        return String(x.no) === el.getAttribute("data-s");
       })[0];
-      var b = s.bahagian[parseInt(parts[2], 10)];
+      var b = s.bahagian[parseInt(el.getAttribute("data-b"), 10)];
       var ta = el.querySelector("textarea");
       var t = null;
       ta.addEventListener("input", function () {
@@ -1059,6 +1070,7 @@
     var simpan = (E.data().k2[kunci] || {}).tanda || [];
     var html = '<div class="skema"><div class="tajuk"><span>Peraturan pemarkahan</span><span class="jumlah"></span></div>';
     if (b.rajah) html += '<div class="rajah" style="display:grid;justify-items:center">' + G.statik(b.rajah) + "</div>";
+    if (b.contoh) html += '<div class="contoh-skema">' + b.contoh + "</div>";
     var i = 0;
     (b.skema || []).forEach(function (kump) {
       if (kump.label) html += '<b style="font-size:13.5px;margin-top:4px">' + kump.label + "</b>";

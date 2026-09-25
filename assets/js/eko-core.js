@@ -30,6 +30,16 @@ window.EKO = (function () {
     E.setKuiz.push(s);
   };
 
+  // Kertas 2 bagi setiap kertas percubaan: { id, k1, nama, label, sumber, soalan }
+  E.kertas2Set = [];
+  E.daftarK2 = function (k) {
+    E.kertas2Set.push(k);
+  };
+  E.kertas2Ikut = function (id) {
+    for (var i = 0; i < E.kertas2Set.length; i++) if (E.kertas2Set[i].id === id) return E.kertas2Set[i];
+    return E.kertas2Set[0] || null;
+  };
+
   E.babTingkatan = function (t) {
     return E.bab.filter(function (b) {
       return b.tingkatan === t;
