@@ -755,6 +755,7 @@
           "</div>";
       } else out += G.statik(q.g);
     }
+    if (q.gambar) out += E.gambar(q.gambar);
     if (q.kapsyen) out += '<span class="kapsyen">' + q.kapsyen + "</span>";
     return out ? '<div class="rajah">' + out + "</div>" : "";
   }
@@ -814,6 +815,7 @@
         (sumber ? '<div class="sumber-soalan">' + esc(sumber) + "</div>" : "") +
         '<div class="stem">' + q.s + "</div>" +
         rajahSoalan(q) +
+        (q.s2 ? '<div class="stem">' + q.s2 + "</div>" : "") +
         '<div class="pilihan" role="group" aria-label="Pilihan jawapan">' +
         q.p
           .map(function (p, i) {
@@ -912,7 +914,7 @@
           ? '<div class="semakan"><b>Semak jawapan yang salah</b>' +
             salah
               .map(function (q) {
-                return '<div class="item"><div class="s">' + q.s.replace(/<(?!\/?(b|i|em|strong|br)\b)[^>]+>/g, " ") + '</div><div class="j"><span class="status baik">Jawapan ' + "ABCD"[q.j] + "</span> " + q.p[q.j] + "</div>" + (q.e ? '<div class="teks-lemah">' + q.e + "</div>" : "") + "</div>";
+                return '<div class="item"><div class="s">' + (q.s + (q.s2 ? " " + q.s2 : "")).replace(/<(?!\/?(b|i|em|strong|br)\b)[^>]+>/g, " ") + '</div><div class="j"><span class="status baik">Jawapan ' + "ABCD"[q.j] + "</span> " + q.p[q.j] + "</div>" + (q.e ? '<div class="teks-lemah">' + q.e + "</div>" : "") + "</div>";
               })
               .join("") +
             "</div>"
@@ -1003,7 +1005,8 @@
         '<article class="struktur-soalan kaca-pekat" id="soalan-k2-' + s.no + '">' +
         '<span class="label-kecil">Bahagian ' + s.seksyen + (s.seksyen === "B" ? " · pilih mana-mana dua" : " · wajib") + "</span>" +
         "<h3>Soalan " + s.no + (s.tajuk ? ": " + esc(s.tajuk) : "") + "</h3>" +
-        (s.konteks ? '<div class="konteks">' + s.konteks + "</div>" : "");
+        (s.konteks ? '<div class="konteks">' + s.konteks + "</div>" : "") +
+        E.gambar(s.gambar);
       s.bahagian.forEach(function (b, bi) {
         var kunci = kunciK2(s.no, bi);
         var simpan = d.k2[kunci] || {};
@@ -1011,6 +1014,7 @@
         html +=
           '<div class="bahagian-soalan" data-kunci="' + kunci + '" data-s="' + s.no + '" data-b="' + bi + '">' +
           (b.konteks ? '<div class="konteks">' + b.konteks + "</div>" : "") +
+          E.gambar(b.gambar) +
           '<div class="kepala"><p><b>' + esc(b.kod) + "</b> " + b.s + '</p><span class="markah">' + b.m + " markah</span></div>" +
           (bb ? '<span class="teks-lemah" style="font-size:12.5px;font-weight:700">Topik: T' + bb.tingkatan + " Bab " + bb.no + " · " + esc(bb.tajuk) + (b.topik ? " · " + esc(b.topik) : "") + "</span>" : "") +
           '<textarea placeholder="Tulis jawapan anda di sini…" aria-label="Jawapan ' + esc(s.no + " " + b.kod) + '">' + esc(simpan.teks || "") + "</textarea>" +
@@ -1078,6 +1082,7 @@
     var simpan = (E.data().k2[kunci] || {}).tanda || [];
     var html = '<div class="skema"><div class="tajuk"><span>Peraturan pemarkahan</span><span class="jumlah"></span></div>';
     if (b.rajah) html += '<div class="rajah" style="display:grid;justify-items:center">' + G.statik(b.rajah) + "</div>";
+    if (b.gambarSkema) html += E.gambar(b.gambarSkema);
     if (b.contoh) html += '<div class="contoh-skema">' + b.contoh + "</div>";
     var i = 0;
     (b.skema || []).forEach(function (kump) {

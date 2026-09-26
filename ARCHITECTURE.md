@@ -68,7 +68,9 @@ assets/js/graf-t4.js          Form 4 graph widgets + chart helpers (G.carta, G.l
 assets/js/graf-t5.js          Form 5 graph widgets
 assets/js/data/t4-bab1.js …   One file per chapter: notes, flashcards, quiz
 assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 questions, marking scheme)
+assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
 assets/js/data/percubaan-terengganu-2025.js   Same shape; not loaded and not deployed (hidden)
+assets/img/percubaan/<paper>/   Figures cropped from the original PDFs (WebP, 200 dpi)
 assets/js/app.js              Router + all views
 assets/js/akaun.js            Account button + sign-out in the header
 assets/js/masuk.js            Login page logic (ES module)
@@ -170,20 +172,21 @@ EKO.daftarBab({
   kuiz: [{ s: "Stem", p: ["A", "B", "C", "D"], j: 1, e: "Explanation" }]
 });
 
-EKO.daftarSet({ id: "kel25-k1", label: "…", labelPendek: "Kelantan K1", soalan: [{ bab: "t4-b2", s, p, j, e, rajah? }] });
+EKO.daftarSet({ id: "kel25-k1", label: "…", labelPendek: "Kelantan K1", soalan: [{ bab: "t4-b2", s, p, j, e, g?, gambar?, s2?, kapsyen? }] });
 
 EKO.daftarK2({
   id: "kel25", k1: "kel25-k1", nama, label, sumber, bahagianA, bahagianB, kunciLama?,
   soalan: [{ no, seksyen: "A" | "B", tajuk, konteks?, bahagian: [{
-    kod: "(a)(i)", s, m /* marks */, bab, topik, rajah?, contoh?,
+    kod: "(a)(i)", s, m /* marks */, bab, topik, gambar?, gambarSkema?, rajah?, contoh?,
     skema: [{ label?, isi: [[kod, teks, markah?]] }], nota?, rubrik?: [[tahap, [...]]]
   }] }]
 });
 ```
 
 - `j` is the index of the correct option. Chapter quiz options are shuffled, except numbered options and I/II/III combinations.
-- Quiz diagrams (`rajah`) are `G.statik` specs rendered as static SVG.
-- Current volume: 6 chapters, 263 flashcards, 178 chapter questions, 36 graphs in the notes, and 2 trial papers (Kelantan live, Terengganu hidden).
+- Question figures come in two forms. `g` (K1) and `rajah` (K2 scheme) are `G.statik` specs rendered as SVG. `gambar` holds images cropped from the original PDF: `{ src, alt, w, h, kapsyen }` or an array, rendered by `EKO.gambar()` (use `EKO.gambar(g, true)` inside answer options). `s2` is question text shown after the figure. In Kertas 2, `gambar` can sit on a question or a part, and `gambarSkema` shows the scheme's answer diagram.
+- Images live under `assets/img/percubaan/<paper>/` and are gated by the middleware like any other content file.
+- Current volume: 6 chapters, 263 flashcards, 178 chapter questions, 36 graphs in the notes, and 4 trial papers (Kelantan 2025, Seberang Perai 2025 and Perak 2024 live; Terengganu hidden).
 
 ### 3.6 Persistence
 

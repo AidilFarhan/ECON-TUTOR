@@ -3507,3 +3507,63 @@ ol.roman > li::before {
 .akaun-menu .btn {
   width: 100%;
 }
+
+/* ---------- gambar daripada kertas asal (soalan, pilihan, skema) ---------- */
+.gambar-soalan {
+  margin: 12px 0 4px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.gambar-soalan img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line);
+  background: #fff; /* rajah asal hitam di atas putih; kekal putih dalam mod gelap */
+}
+.gambar-soalan .kapsyen-gambar {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink-3);
+  text-align: center;
+}
+.rajah .gambar-soalan {
+  margin-top: 4px;
+}
+/* gambar dalam pilihan jawapan kuiz */
+.pilihan .gambar-soalan {
+  margin: 8px 0 2px;
+  justify-items: start;
+}
+.pilihan .gambar-soalan img {
+  max-width: min(100%, 260px);
+  padding: 4px;
+}
+.skema .gambar-soalan {
+  margin: 4px 0 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gambar-soalan img {
+    filter: brightness(0.92);
+  }
+}
+:root[data-theme="dark"] .gambar-soalan img {
+  filter: brightness(0.92);
+}
+@media (max-width: 480px) {
+  .konteks .jadual th,
+  .konteks .jadual td {
+    padding: 8px 7px;
+    font-size: 13.5px;
+  }
+  .konteks .jadual caption {
+    padding: 10px 8px 2px;
+  }
+  .struktur-soalan .konteks {
+    padding: 12px;
+  }
+}

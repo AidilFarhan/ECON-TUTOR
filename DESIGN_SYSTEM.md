@@ -225,6 +225,7 @@ The **brand mark** (`EKO.tandaJenama()`) is a dark rounded square with a blue de
 The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then controls (`.graf-kawalan`: sliders `.julat`, segmented `G.pilih`, buttons, legend chips), then canvas (`.graf-kanvas` > SVG), then reading panel (`.graf-baca`, `aria-live="polite"`: value chips `.nilai`, explanation `.ayat`, optional table).
 
 ### 9.5 Study and assessment
+- **Question image** (`.gambar-soalan`): a figure cropped from the original paper, shown at its print size (max 100% width) inside a white rounded frame with a hairline border. The frame stays white in dark mode (slightly dimmed) because the originals are black on white. The caption (`.kapsyen-gambar`) is small muted text. Inside answer options the frame is smaller (max 260 px) and aligned left.
 - **Flashcard** (`.kad-flip` > `.dalam` > `.muka.depan` / `.muka.belakang`): a 0.6 s 3D flip on tap or `Space`. Buttons `.btn-ulang` ("Ulang lagi") and `.btn-ingat` ("Dah ingat"), with a keyboard hint row of `kbd` elements.
 - **Quiz**: a glass header (`.kuiz-kepala`) with question count, score, timer and progress bar. After answering, options turn green (`.betul`) or red (`.salah`) and an explanation (`.penerangan`) appears. The results screen shows a review list.
 - **Kertas 2**: question cards with a `textarea` answer, a "Tunjuk skema" reveal, and checkable scheme points (`data-m` marks) that give an estimated score. Rubric tables show levels.
