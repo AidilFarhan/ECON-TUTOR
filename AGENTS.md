@@ -2,6 +2,8 @@
 
 Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive SPM Economics (KSSM Form 4 and 5) study site. It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google or email sign-in with an allowlist.
 
+Claude Code loads this file through [CLAUDE.md](CLAUDE.md), which adds a few Claude-specific notes.
+
 Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) (how it looks) · [PRD.md](PRD.md) (what it must do) · [README.md](README.md) (owner-facing guide, in Malay).
 
 ---

@@ -22,6 +22,7 @@ Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Seni bina: modul, laluan, enjin graf, model data, log masuk, deployment |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Sistem reka bentuk: token warna, tipografi, komponen, bahasa graf, aksesibiliti |
 | [AGENTS.md](AGENTS.md) | Peraturan dan resipi untuk ejen AI serta penyumbang kod |
+| [CLAUDE.md](CLAUDE.md) | Dibaca automatik oleh Claude Code; mengimport AGENTS.md dan menambah nota khusus Claude |
 
 ## Cara guna
 
