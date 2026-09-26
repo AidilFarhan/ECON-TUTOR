@@ -223,7 +223,6 @@ Measuring these automatically needs the planned progress sync (§10).
 
 | Priority | Item | Notes |
 | --- | --- | --- |
-| High | Delete the duplicate Vercel project `econ-tutor` | `econwebsite` is the primary project; both deploy from `main` |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
 | Medium | Self-service allowlist page for the teacher | Avoids editing env vars and redeploying |
 | Medium | Progress sync and teacher dashboard | Firestore in the existing Firebase project, keyed by verified email; needs a privacy note for students |

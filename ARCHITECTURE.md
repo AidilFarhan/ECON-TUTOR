@@ -302,15 +302,14 @@ Possible outcomes of `POST /api/sesi`: `200 ok`, `401 token`, `403 belum_sah` (e
 flowchart LR
   B[feature branch] -->|PR| MAIN[main]
   MAIN -->|Git integration| V1[Vercel project econwebsite<br/>econwebsite.vercel.app]
-  MAIN -->|Git integration| V2[Vercel project econ-tutor<br/>econ-tutor-two.vercel.app]
 ```
 
 - **Build.** Vercel runs `vercel build` with framework "Other". It uploads the static files, bundles `middleware.js` for Edge and `api/sesi.js` as a Node function. No install or build command is needed.
 - **Excluded files.** `.vercelignore` removes `*.pdf` and `assets/js/data/percubaan-terengganu-2025.js` before the build.
-- **Env vars per project.**
+- **Env vars.**
   - `RAHSIA_SESI` (sensitive; production + preview)
   - `EMAIL_DIBENARKAN` (encrypted; all environments)
-- **Primary domain.** `econwebsite.vercel.app` is the only domain in Firebase **Authorized domains**, so Google sign-in works there. The second project is a duplicate created during setup. It is gated too, but Google sign-in fails on it until its domain is authorised or the project is deleted.
+- **Domain.** `econwebsite.vercel.app` is the only production domain and the only one in Firebase **Authorized domains**, so Google sign-in works there. (A duplicate project, `econ-tutor`, created during setup has been deleted.) A new custom domain must be added to Firebase Authorized domains before Google sign-in works on it.
 - **Previews.** Preview deployments sit behind Vercel SSO (Standard Protection). Production domains are public and gated by the middleware.
 
 ---
