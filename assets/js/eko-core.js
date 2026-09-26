@@ -234,7 +234,8 @@ window.EKO = (function () {
     mata: '<path d="M2.5 12S6 5.2 12 5.2 21.5 12 21.5 12 18 18.8 12 18.8 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
     bintang: '<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
     pensel: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
-    kotak: '<rect x="4" y="4" width="16" height="16" rx="3"/>'
+    kotak: '<rect x="4" y="4" width="16" height="16" rx="3"/>',
+    kalkulator: '<rect x="5" y="2.8" width="14" height="18.4" rx="2.6"/><path d="M8.5 6.4h7v3.2h-7z"/><path d="M8.7 13.2h.01M12 13.2h.01M15.3 13.2h.01M8.7 17h.01M12 17h.01M15.3 17h.01"/>'
   };
 
   E.ikon = function (nama, kelas) {

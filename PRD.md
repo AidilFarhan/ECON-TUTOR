@@ -28,10 +28,11 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 1. Cover **every chapter** of the Form 4 and Form 5 textbooks with complete notes in textbook order and wording.
 2. Make every important diagram **interactive**. Students drag curves, price lines and nodes, and immediately see values and reasoning.
 3. Support **active recall**: flashcards and quizzes per chapter and per form, with explanations.
-4. Provide **exam practice** with state trial papers: Kertas 1 as a timed quiz, and Kertas 2 with answer boxes and self-marking against the scheme.
-5. Work well on **phones**, in light and dark mode, including slow connections.
-6. Restrict access to **students the teacher approves** (Google or email sign-in with an allowlist).
-7. Stay **free to run** and **easy for the teacher to maintain**, with no build tools and content in plain files.
+4. Let students **practise every syllabus calculation** with a calculator that shows the formula, the answer and the worked steps.
+5. Provide **exam practice** with state trial papers: Kertas 1 as a timed quiz, and Kertas 2 with answer boxes and self-marking against the scheme.
+6. Work well on **phones**, in light and dark mode, including slow connections.
+7. Restrict access to **students the teacher approves** (Google or email sign-in with an allowlist).
+8. Stay **free to run** and **easy for the teacher to maintain**, with no build tools and content in plain files.
 
 ### Non-goals (v1)
 - Student accounts with synced progress across devices, and a teacher dashboard of student results.
@@ -63,6 +64,7 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 | U9 | student | sign in with my Google account or email | I can get in quickly without another password to remember |
 | U10 | teacher | allow only my students' emails | the materials stay within my class |
 | U11 | teacher | add a new trial paper or fix a note by editing one file | I can maintain the site myself |
+| U12 | student | enter the numbers from a question (Ed, PBG, IHP, KDNK…) and see the answer with the working | I can check my own calculation and learn the steps the scheme expects |
 
 ## 5. Functional requirements
 
@@ -144,6 +146,19 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-33** Manage access by editing `EMAIL_DIBENARKAN` in Vercel, then redeploying.
 - **FR-34** Add or correct content by editing one data file (documented in the README and AGENTS.md).
 
+### 5.9 Economics calculator (Kalkulator Ekonomi): ✅
+- **FR-35** A **Kalkulator** tab (`#kalkulator`) holds 39 calculators covering every formula and calculation in the T4 and T5 syllabus, grouped by chapter:
+  - T4 Bab 1: opportunity cost on the PPC.
+  - T4 Bab 2: market demand/supply, equilibrium and surpluses, Ed with total revenue, Es, finding Q₁ or P₁ from a given elasticity, tax burden, subsidy benefit.
+  - T4 Bab 3: personal income, real wage, disposable income, taxable income and income tax (YA 2016 table in the textbook), personal budget, hire purchase instalment, savings and investment return.
+  - T4 Bab 4: TP/AP/MP with production stages, short-run cost table (TC, VC, AFC, AVC, AC, MC), total revenue and profit, economic profit, productivity, social cost and benefit.
+  - T5 Bab 1: price index, weighted and unweighted CPI, inflation rate, cost-push pricing, real income, unemployment rate and LFPR, GDP (expenditure), real GDP, growth rate, national budget balance, progressive/regressive/proportional tax, company tax, statutory reserve ratio.
+  - T5 Bab 2: comparative advantage, specific and ad valorem tariffs, current account, currency conversion (buying/selling rates), effect of exchange-rate changes on exports and imports.
+- **FR-36** Each calculator shows the formula, live answers, numbered worked steps (*jalan kira*) and an interpretation. Invalid or missing input shows a clear message instead of a wrong number.
+- **FR-37** Initial values are the textbook's worked examples and reproduce the textbook answers. Some calculators offer several example chips.
+- **FR-38** Table calculators (market, equilibrium, TP/AP/MP, cost, CPI) allow editing cells and adding or removing rows; tapping a row shows that row's working.
+- **FR-39** Filter by form or chapter and search by keyword. Deep links: `#kalkulator-<chapterId>` and `#kalkulator-<calculatorId>`. Each chapter page has a "Kalkulator (n)" button.
+
 ## 6. Non-functional requirements
 
 | Area | Requirement |
@@ -169,6 +184,8 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 | T5 Bab 1 · Ekonomi dan Kerajaan | 3 | 71 | 42 | 11 |
 | T5 Bab 2 · Malaysia dan Ekonomi Global | 4 | 64 | 45 | 5 |
 | **Total** | **16** | **263** | **178** | **36** |
+
+Calculators: 39 (T4 Bab 1: 1 · Bab 2: 7 · Bab 3: 7 · Bab 4: 6 · T5 Bab 1: 13 · Bab 2: 5).
 
 Trial papers:
 - **Kelantan 2025** (live): K1 40 MCQs and K2 7 questions.
@@ -200,6 +217,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-26 | Cost graph: continuous tracker with decimal values (PR #2) |
 | 2026-09-26 | Sign-in page (Google or email), server-side gate and email allowlist (PR #3) |
 | 2026-09-26 | Trial papers Seberang Perai 2025 and Perak 2024 with images from the original papers |
+| 2026-09-26 | Home title "Buku Teks Ekonomi Interaktif"; Kalkulator Ekonomi tab with 39 calculators |
 
 ## 10. Roadmap and open questions
 
