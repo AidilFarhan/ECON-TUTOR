@@ -77,6 +77,8 @@
   /* ---------- carta siri (garis licin + penjejak menegak) ---------- */
   // cfg: x, y, tikX, tikY, labelX, labelY, siri:[{id,nama,kelas,warna,label,data:[[x,y]],licin,titik,tunjuk}],
   //      nilaiX:[...], xAwal, fmtX, zon:[{dari,ke,kelas,label}], anotasi(plot,x)
+  //      selanjar: true → penjejak bergerak licin sepanjang keluk (nilai perpuluhan), bukan melompat antara nod
+  //      labelNilai(s, y) → teks nilai di sebelah setiap nod penjejak
   G.carta = function (plotHost, cfg, apabila) {
     var plot = G.plot(plotHost, {
       x: cfg.x,
@@ -100,8 +102,9 @@
     var st = { x: cfg.xAwal != null ? cfg.xAwal : null };
     var fungsi = {};
     cfg.siri.forEach(function (s) {
-      fungsi[s.id] =
-        s.licin === false
+      fungsi[s.id] = s.f
+        ? s.f
+        : s.licin === false
           ? null
           : G.monoton(
               s.data.map(function (p) {
@@ -115,7 +118,34 @@
 
     function nilaiPada(s, x) {
       for (var i = 0; i < s.data.length; i++) if (Math.abs(s.data[i][0] - x) < 1e-9) return s.data[i][1];
+      if (!cfg.selanjar || x < s.data[0][0] || x > s.data[s.data.length - 1][0]) return null;
+      if (fungsi[s.id]) return fungsi[s.id](x);
+      for (var j = 1; j < s.data.length; j++) {
+        var a = s.data[j - 1],
+          b = s.data[j];
+        if (x <= b[0]) return E.lerp(a[1], b[1], (x - a[0]) / (b[0] - a[0]));
+      }
       return null;
+    }
+
+    // label nilai di sebelah nod; disusun supaya tidak bertindih
+    function labelNod(senarai) {
+      if (!senarai.length) return;
+      var px = plot.X(st.x);
+      var kanan = px < plot.kanan() - 96;
+      senarai.sort(function (a, b) {
+        return a.py - b.py;
+      });
+      var jarak = 15;
+      for (var i = 1; i < senarai.length; i++) senarai[i].py = Math.max(senarai[i].py, senarai[i - 1].py + jarak);
+      var lebih = senarai[senarai.length - 1].py - (plot.bawah() - 6);
+      if (lebih > 0)
+        senarai.forEach(function (l) {
+          l.py -= lebih;
+        });
+      senarai.forEach(function (l) {
+        plot.teksPx(px + (kanan ? 11 : -11), l.py + 4, l.teks, "g-teks g-teks-nilai " + (l.kelas || ""), kanan ? "start" : "end", "atas");
+      });
     }
 
     function lukis() {
@@ -146,18 +176,31 @@
       if (cfg.anotasi) cfg.anotasi(plot, st.x);
       if (st.x != null) {
         plot.garisPx(plot.X(st.x), plot.atas(), plot.X(st.x), plot.bawah(), "g-garis-silang", "panduan");
+        var label = [];
         cfg.siri.forEach(function (s) {
           if (s.tunjuk === false) return;
           var v = nilaiPada(s, st.x);
           if (v == null) return;
           plot.nod(st.x, v, { kelas: s.kelas || "", r: 6, lapis: "atas" });
+          if (cfg.labelNilai) label.push({ py: plot.Y(v), teks: cfg.labelNilai(s, v), kelas: s.kelas });
         });
+        labelNod(label);
         plot.cip(plot.X(st.x), plot.bawah() + 12, cfg.fmtX ? cfg.fmtX(st.x) : String(st.x), { anchor: "middle" });
       }
       if (apabila) apabila(st.x);
     }
 
+    var xMin = cfg.nilaiX[0],
+      xMax = cfg.nilaiX[cfg.nilaiX.length - 1];
+
     function snap(v) {
+      if (cfg.selanjar) {
+        v = E.clamp(v, xMin, xMax);
+        // tarikan kecil ke nod jadual supaya nilai integer mudah dipilih
+        var n = Math.round(v);
+        if (cfg.nilaiX.indexOf(n) !== -1 && Math.abs(plot.X(v) - plot.X(n)) <= 4) return n;
+        return Math.round(v * 100) / 100;
+      }
       var terbaik = cfg.nilaiX[0];
       var jarak = Infinity;
       cfg.nilaiX.forEach(function (n) {
@@ -177,15 +220,38 @@
       }
     }
 
+    // mod selanjar: lukis sekali setiap bingkai walaupun penuding bergerak laju
+    var tunggu = null,
+      bingkai = 0;
+    function keLicin(v) {
+      if (!cfg.selanjar) return ke(v);
+      tunggu = v;
+      if (bingkai) return;
+      bingkai = requestAnimationFrame(function () {
+        bingkai = 0;
+        ke(tunggu);
+      });
+    }
+
     G.interaksi(plot, {
       hover: function (pt) {
-        ke(snap(pt.x));
+        keLicin(snap(pt.x));
       },
       tekan: function (pt) {
-        ke(snap(pt.x));
+        keLicin(snap(pt.x));
       },
       tekanSeret: true,
       kekunci: function (k) {
+        if (cfg.selanjar) {
+          var x0 = st.x == null ? xMin : st.x;
+          if (k.kunci === "Home") return ke(xMin);
+          if (k.kunci === "End") return ke(xMax);
+          var arah = k.dx || k.dy;
+          if (!arah) return;
+          // anak panah: 0.1 unit; Shift + anak panah: ke output integer seterusnya
+          var baru = Math.abs(arah) > 1 ? (arah > 0 ? Math.floor(x0 + 1e-9) + 1 : Math.ceil(x0 - 1e-9) - 1) : Math.round((x0 + (arah > 0 ? 0.1 : -0.1)) * 10) / 10;
+          return ke(E.clamp(baru, xMin, xMax));
+        }
         var i = cfg.nilaiX.indexOf(st.x);
         var d = k.dx || k.dy;
         i = i < 0 ? 0 : E.clamp(i + (d > 0 ? 1 : d < 0 ? -1 : 0), 0, cfg.nilaiX.length - 1);
@@ -1468,7 +1534,7 @@
   G.daftar(
     "kos",
     function (host, opt) {
-      var K = G.kad(host, { tajuk: opt.tajuk || "Kos pengeluaran jangka pendek", petunjuk: "Gerakkan tetikus atau ketik pada output" });
+      var K = G.kad(host, { tajuk: opt.tajuk || "Kos pengeluaran jangka pendek", petunjuk: "Gerakkan tetikus atau seret sepanjang keluk" });
       var Q = [0, 1, 2, 3, 4, 5, 6, 7, 8];
       var VC = [0, 50, 95, 130, 160, 195, 245, 315, 395];
       var TC = VC.map(function (v) {
@@ -1477,6 +1543,17 @@
       var AC = [null, 150, 97.5, 76.7, 65, 59, 57.5, 59.3, 61.9];
       var AVC = [null, 50, 47.5, 43.3, 40, 39, 40.8, 45, 49.4];
       var MC = [null, 50, 45, 35, 30, 35, 50, 70, 80];
+      var fVC = G.monoton(Q, VC);
+      var fTC = function (x) {
+        return fVC(x) + 100;
+      };
+      // AC dan AVC dikira terus daripada keluk TC dan VC supaya AC = TC ÷ Q pada setiap output, termasuk perpuluhan
+      var fAC = function (x) {
+        return fTC(x) / x;
+      };
+      var fAVC = function (x) {
+        return fVC(x) / x;
+      };
       function d(arr) {
         var h = [];
         arr.forEach(function (v, i) {
@@ -1503,13 +1580,11 @@
         }
       ];
       var S2 = [
-        { id: "ac", nama: "AC", label: "AC", kelas: "d", warna: "c-d", data: d(AC) },
-        { id: "avc", nama: "AVC", label: "AVC", kelas: "c3", warna: "c-3", data: d(AVC) },
+        { id: "ac", nama: "AC", label: "AC", kelas: "d", warna: "c-d", data: d(AC), f: fAC },
+        { id: "avc", nama: "AVC", label: "AVC", kelas: "c3", warna: "c-3", data: d(AVC), f: fAVC },
         { id: "mc", nama: "MC", label: "MC", kelas: "c4", warna: "c-4", data: d(MC) }
       ];
       var Q1 = [1, 2, 3, 4, 5, 6, 7, 8];
-      var fAC = G.monoton(Q1, AC.slice(1));
-      var fAVC = G.monoton(Q1, AVC.slice(1));
       var fMC = G.monoton(Q1, MC.slice(1));
       function silang(f, g, a, b) {
         var v0 = f(a) - g(a);
@@ -1526,8 +1601,14 @@
         return w < 480 ? 0.72 : 0.44;
       };
       var fmtX = function (v) {
-        return "Q = " + v;
+        return "Q = " + E.fmt(v, 2);
       };
+      var labelNilai = function (s, v) {
+        return s.nama + " " + E.rm(v, 1);
+      };
+      function bulat(x) {
+        return Math.abs(x - Math.round(x)) < 1e-9;
+      }
       var c1 = null,
         c2 = null;
       c1 = G.carta(
@@ -1543,15 +1624,22 @@
           nilaiX: Q,
           xAwal: 4,
           fmtX: fmtX,
+          selanjar: true,
+          labelNilai: labelNilai,
           nisbah: nisbah,
           aria: "Keluk jumlah kos, kos berubah dan kos tetap",
           anotasi: function (plot, x) {
             if (x == null || S1[0].tunjuk === false || S1[1].tunjuk === false) return;
-            var xo = x + 0.22;
-            plot.garis(xo, VC[x], xo, TC[x], "g-garis-kurung", "tanda");
-            plot.garis(xo - 0.08, VC[x], xo + 0.08, VC[x], "g-garis-kurung", "tanda");
-            plot.garis(xo - 0.08, TC[x], xo + 0.08, TC[x], "g-garis-kurung", "tanda");
-            plot.teks(xo, (VC[x] + TC[x]) / 2, "FC", "g-teks", "start", "label", 7, 4);
+            // kurungan FC diletakkan bertentangan dengan label nilai penjejak
+            var kiri = plot.X(x) < plot.kanan() - 96;
+            var xo = kiri ? x - 0.22 : x + 0.22;
+            var vc = fVC(x),
+              tc = fTC(x);
+            if (xo < 0.15) return;
+            plot.garis(xo, vc, xo, tc, "g-garis-kurung", "tanda");
+            plot.garis(xo - 0.08, vc, xo + 0.08, vc, "g-garis-kurung", "tanda");
+            plot.garis(xo - 0.08, tc, xo + 0.08, tc, "g-garis-kurung", "tanda");
+            plot.teks(xo, (vc + tc) / 2, "FC", "g-teks", kiri ? "end" : "start", "label", kiri ? -7 : 7, 4);
           }
         },
         function (x) {
@@ -1572,16 +1660,22 @@
           nilaiX: Q,
           xAwal: 4,
           fmtX: fmtX,
+          selanjar: true,
+          labelNilai: labelNilai,
           nisbah: nisbah,
           aria: "Keluk kos purata, kos berubah purata dan kos marginal",
-          anotasi: function (plot) {
+          anotasi: function (plot, x) {
+            // label titik persilangan disorok apabila penjejak cukup dekat, supaya tidak bertindih dengan label nilai
+            var dekat = function (xs) {
+              return x != null && Math.abs(plot.X(x) - plot.X(xs)) < 110;
+            };
             if (xAC != null && S2[0].tunjuk !== false && S2[2].tunjuk !== false) {
               plot.bulat(xAC, fAC(xAC), 7, "g-nod", "tanda");
-              plot.teks(xAC, fAC(xAC), "MC = AC", "g-teks", "end", "label", -10, -10);
+              if (!dekat(xAC)) plot.teks(xAC, fAC(xAC), "MC = AC", "g-teks", "end", "label", -10, -10);
             }
             if (xAVC != null && S2[1].tunjuk !== false && S2[2].tunjuk !== false) {
               plot.bulat(xAVC, fAVC(xAVC), 7, "g-nod", "tanda");
-              plot.teks(xAVC, fAVC(xAVC), "MC = AVC", "g-teks lemah", "start", "label", 8, 22);
+              if (!dekat(xAVC)) plot.teks(xAVC, fAVC(xAVC), "MC = AVC", "g-teks lemah", "start", "label", 8, 22);
             }
           }
         },
@@ -1610,7 +1704,7 @@
           '<thead><tr><th class="n">Q</th><th class="n">FC</th><th class="n">VC</th><th class="n">TC</th><th class="n">AFC</th><th class="n">AVC</th><th class="n">AC</th><th class="n">MC</th><th>Keadaan</th></tr></thead><tbody>' +
           Q.map(function (q) {
             return (
-              '<tr data-q="' + q + '" tabindex="0"' + (q === x ? ' class="aktif" aria-current="true"' : "") + ">" +
+              '<tr data-q="' + q + '" tabindex="0"' + (q === x ? ' class="aktif" aria-current="true"' : Math.abs(q - x) < 1 ? ' class="hampir"' : "") + ">" +
               '<td class="n"><b>' + q + '</b></td><td class="n">100</td><td class="n">' + VC[q] + '</td><td class="n">' + TC[q] + "</td>" +
               '<td class="n">' + (q ? rm(100 / q) : "–") + '</td><td class="n">' + rm(AVC[q]) + '</td><td class="n">' + rm(AC[q]) + '</td><td class="n">' + rm(MC[q], 0) + "</td>" +
               "<td>" + keadaan(q) + "</td></tr>"
@@ -1620,9 +1714,47 @@
         );
       }
 
+      // output perpuluhan: nilai dibaca terus daripada keluk
+      function bacaKeluk(x) {
+        var vc = fVC(x),
+          tc = fTC(x);
+        var q0 = Math.floor(x),
+          q1 = q0 + 1;
+        var bits = [
+          ["Output", E.fmt(x, 2) + " unit", ""],
+          ["FC", "RM100", ""],
+          ["VC", E.rm(vc, 1), "s"],
+          ["TC", E.rm(tc, 1), "c5"],
+          ["AFC", E.rm(100 / x, 1), ""]
+        ];
+        var ayat =
+          "Q = " + E.fmt(x, 2) + " terletak antara baris Q = " + q0 + " dan Q = " + q1 + " dalam Jadual 4.3, jadi nilai ini <b>dibaca daripada keluk</b>. " +
+          "TC = FC + VC = RM100 + " + E.rm(vc, 1) + " = <b>" + E.rm(tc, 1) + "</b>. AFC = RM100 ÷ " + E.fmt(x, 2) + " = <b>" + E.rm(100 / x, 1) + "</b>. ";
+        if (x < 1) {
+          ayat += "Keluk AVC, AC dan MC bermula pada Q = 1, iaitu baris pertama jadual yang mempunyai kos seunit.";
+        } else {
+          var ac = fAC(x),
+            mc = fMC(x);
+          bits.push(["AVC", E.rm(fAVC(x), 1), "c3"], ["AC", E.rm(ac, 1), "d"], ["MC", E.rm(mc, 1), "c4"]);
+          ayat +=
+            "AC = TC ÷ Q = " + E.rm(tc, 1) + " ÷ " + E.fmt(x, 2) + " = <b>" + E.rm(ac, 1) + "</b>. MC dibaca pada keluk MC. " +
+            (Math.abs(mc - ac) < 0.5
+              ? '<span class="status baik">MC ≈ AC</span> maka AC berada di sekitar <b>titik minimum</b>.'
+              : mc < ac
+                ? '<span class="status biru">MC &lt; AC</span> maka AC sedang <b>menurun</b>.'
+                : '<span class="status merah">MC &gt; AC</span> maka AC sedang <b>meningkat</b>.');
+        }
+        ayat += " Pengiraan tepat MC = ΔTC ÷ ΔQ menggunakan output integer dalam jadual; klik satu baris untuk melihatnya.";
+        return G.nilai(bits) + '<div class="ayat">' + ayat + "</div>";
+      }
+
       function baca(x) {
         if (x == null) return;
         pilihan = x;
+        if (!bulat(x)) {
+          K.baca.innerHTML = bacaKeluk(x) + jadualPenuh(x);
+          return;
+        }
         var bits = [
           ["Output", x + " unit", ""],
           ["FC", "RM100", ""],
