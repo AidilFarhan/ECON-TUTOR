@@ -134,7 +134,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Add a trial paper** | New `assets/js/data/percubaan-<state>-<year>.js`: `EKO.daftarSet` for K1 (tag each question with `bab`) and `EKO.daftarK2` for K2 (unique `id`, and **no** `kunciLama`). Add the script tag. Home, Percubaan and Kuiz update automatically. Check every K1 answer against the scheme PDF |
 | **Pictures from a paper** | Crop each figure from the PDF with PyMuPDF at 200 dpi (`page.get_pixmap(dpi=200, clip=rect)`), trim white margins, save as WebP in `assets/img/percubaan/<paper>/`. Reference it with `gambar: { src, alt, w, h, kapsyen }` (w and h in pixels), put question text that comes after the figure in `s2`, and use `EKO.gambar(g, true)` for images inside answer options. Always write a meaningful `alt` |
 | **Show the Terengganu paper** | Only when the owner confirms permission: (1) add its script tag after the Kelantan one; (2) remove its line from `.vercelignore`; (3) update the footer and meta description in `index.html` |
-| **Allow a student** | Vercel → project **econwebsite** → Settings → Environment Variables → `EMAIL_DIBENARKAN` (comma-separated; `@domain` for a whole domain) → Redeploy. Do the same on the duplicate `econ-tutor` project while it exists |
+| **Allow a student** | Vercel → project **econwebsite** → Settings → Environment Variables → `EMAIL_DIBENARKAN` (comma-separated; `@domain` for a whole domain) → Redeploy |
 | **Sign everyone out** | Change `RAHSIA_SESI` (random, at least 32 characters) in Vercel → Redeploy |
 | **Update the Firebase SDK** | Bundle the exports used by `masuk.js` with esbuild into `assets/js/vendor/firebase-auth-<version>.js`, update the import path, and delete the old bundle (see the README) |
 | **New sign-in domain** | Add it in Firebase → Authentication → Settings → Authorized domains (owner action) |
@@ -143,9 +143,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 
 ## 6. Git and deployment
 
-- Work on a feature branch and open a PR into `main`. **Merging to `main` deploys to production** on two Vercel projects:
-  - `econwebsite`: the primary project, `econwebsite.vercel.app`, and the only domain authorised in Firebase.
-  - `econ-tutor`: a duplicate, `econ-tutor-two.vercel.app`, planned for deletion.
+- Work on a feature branch and open a PR into `main`. **Merging to `main` deploys to production** on the Vercel project `econwebsite` (`econwebsite.vercel.app`), the only domain authorised in Firebase.
 - Preview deployments (branches) sit behind Vercel SSO, and Google sign-in does not work on preview domains because they are not authorised in Firebase.
 - Env var changes apply only to **new** deployments, so redeploy after editing.
 - Commit messages and PR titles are in Malay, in the imperative ("Tambah…", "Betulkan…", "Tulis semula…"). Put a short summary on the first line and bullets for details.
