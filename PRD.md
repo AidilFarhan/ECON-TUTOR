@@ -218,6 +218,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-26 | Sign-in page (Google or email), server-side gate and email allowlist (PR #3) |
 | 2026-09-26 | Trial papers Seberang Perai 2025 and Perak 2024 with images from the original papers |
 | 2026-09-26 | Home title "Buku Teks Ekonomi Interaktif"; Kalkulator Ekonomi tab with 39 calculators |
+| 2026-09-26 | Home title renamed to "Nota Ekonomi Interaktif" (matches the promo video) |
 
 ## 10. Roadmap and open questions
 

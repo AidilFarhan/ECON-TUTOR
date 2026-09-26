@@ -254,7 +254,7 @@
       '<section class="wira">' +
       "<div>" +
       '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5</span>' +
-      "<h1>Buku Teks Ekonomi <em>Interaktif</em></h1>" +
+      "<h1>Nota Ekonomi <em>Interaktif</em></h1>" +
       '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
       '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : "t4-b1") + '">' + (akhir ? "Sambung " + esc("Bab " + akhir.no + " T" + akhir.tingkatan) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
       '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span><span><b>" + E.kalkulator.senarai.length + "</b>kalkulator</span></div>" +

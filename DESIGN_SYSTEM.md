@@ -60,7 +60,7 @@ Dark tokens are declared twice: under `@media (prefers-color-scheme: dark) { :ro
 | `--good` / `--good-soft` | `#1d8a52` | `#4ccb86` | Correct answer, success, "dah ingat" |
 | `--bad` / `--bad-soft` | `#c23f2d` | `#f07b63` | Wrong answer, errors |
 | `--warn` / `--warn-soft` | `#a86b12` | `#e7b24a` | Warnings, tips, "no access" icon |
-| `--hijau` | `#1f9254` | `#4fd18b` | The green word in the home title (*Buku Teks Ekonomi **Interaktif***). Display text only |
+| `--hijau` | `#1f9254` | `#4fd18b` | The green word in the home title (*Nota Ekonomi **Interaktif***). Display text only |
 
 ### 3.3 Graph palette
 
