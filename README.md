@@ -10,7 +10,7 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), dibina d
 | **Graf interaktif** | 36 rajah SVG dalam nota. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
 | **Kad study** | 263 kad fakta. Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
 | **Kuiz** | 178 soalan mengikut bab (termasuk Latihan Sumatif buku teks T5), set campuran T4, T5 dan T4 + T5. Setiap jawapan ada penerangan |
-| **Percubaan SPM 2025** | Kelantan dan MPP3 Terengganu: setiap satu Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap) |
+| **Percubaan SPM 2025** | Kelantan: Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
 
 Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
 
@@ -28,7 +28,21 @@ Kemajuan kad, skor kuiz dan jawapan Kertas 2 disimpan dalam `localStorage` pelay
 3. Di bahagian **Build and deployment**, pilih **Deploy from a branch**, kemudian `main` dan folder `/ (root)`. Tekan **Save**.
 4. Selepas satu atau dua minit, laman boleh dibuka di `https://<nama-pengguna>.github.io/<nama-repo>/`. Kongsi pautan itu dengan pelajar.
 
-Laman ini juga boleh dihoskan di Netlify atau Vercel dengan memuat naik folder yang sama; tiada tetapan *build* diperlukan.
+## Hosting dengan Vercel
+
+Projek Vercel disambungkan terus ke repo ini. Setiap kali `main` dikemas kini, Vercel menerbitkan semula laman secara automatik. Tiada tetapan *build* diperlukan (Framework Preset: **Other**, tiada *build command*, *output directory* ialah root).
+
+Fail `.vercelignore` menghalang fail PDF (buku teks, nota guru, kertas peperiksaan) daripada diterbitkan.
+
+### Menyorok atau memaparkan kertas Terengganu
+
+Kertas MPP3 Terengganu disorok daripada laman. Untuk memaparkannya:
+
+1. Tambah `<script src="assets/js/data/percubaan-terengganu-2025.js" defer></script>` dalam `index.html`, selepas baris skrip Kelantan.
+2. Buang baris `assets/js/data/percubaan-terengganu-2025.js` daripada `.vercelignore`.
+3. Kemas kini teks kaki laman dan `<meta name="description">` dalam `index.html` jika perlu.
+
+Halaman utama, halaman Percubaan dan senarai kuiz akan menyenaraikan kertas itu secara automatik.
 
 ## Struktur fail
 
@@ -42,7 +56,7 @@ assets/js/graf-t4.js            graf T4 (KKP, sistem ekonomi, kos, TP/AP/MP, unt
 assets/js/graf-t5.js            graf T5 (IHP, AD-AS, pengangguran, KDNK, belanjawan, cukai, faedah berbanding, tarif/subsidi/kuota, akaun semasa, penukaran mata wang, kadar pertukaran)
 assets/js/data/t4-bab1.js ...   nota, kad dan kuiz setiap bab
 assets/js/data/percubaan-kelantan-2025.js     Kertas 1 dan Kertas 2 percubaan Kelantan
-assets/js/data/percubaan-terengganu-2025.js   Kertas 1 dan Kertas 2 MPP3 Terengganu
+assets/js/data/percubaan-terengganu-2025.js   Kertas 1 dan Kertas 2 MPP3 Terengganu (disorok)
 assets/js/app.js                penghala halaman (#nota, #graf, #kad, #kuiz, #percubaan, #k2-<id>)
 ```
 

@@ -246,7 +246,7 @@
       "<div>" +
       '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5</span>' +
       "<h1>Buku teks Ekonomi yang <em>boleh disentuh</em>.</h1>" +
-      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, dan kuiz mengikut bab. Termasuk Kertas Percubaan SPM Kelantan 2025 dan MPP3 Terengganu 2025 bersama skema.</p>' +
+      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, dan kuiz mengikut bab. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
       '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : "t4-b1") + '">' + (akhir ? "Sambung " + esc("Bab " + akhir.no + " T" + akhir.tingkatan) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
       '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span></div>" +
       "</div>" +
@@ -269,10 +269,18 @@
       alat("graf", "graf", "Makmal graf", "Semua keluk interaktif dalam satu tempat.") +
       alat("kad", "kad", "Kad study", "Hafal istilah dan rumus. Tandakan kad yang dah diingat.") +
       alat("kuiz", "kuiz", "Kuiz mengikut bab", "Soalan objektif dengan penerangan untuk setiap jawapan.") +
-      alat("percubaan", "kertas", "Kertas Percubaan 2025", "Kertas 1 dan Kertas 2 Kelantan serta MPP3 Terengganu, bersama skema pemarkahan.") +
+      alat("percubaan", "kertas", "Kertas Percubaan 2025", "Kertas 1 dan Kertas 2 " + esc(senaraiKertas(true)) + ", bersama skema pemarkahan.") +
       "</div></section>";
     html += "</div>";
     app.innerHTML = html;
+  }
+
+  // Nama kertas percubaan yang dimuatkan, contoh "Kelantan 2025 dan MPP3 Terengganu 2025"
+  function senaraiKertas(pendek) {
+    var n = E.kertas2Set.map(function (k) {
+      return pendek ? k.nama : k.label;
+    });
+    return n.length > 1 ? n.slice(0, -1).join(", ") + " dan " + n[n.length - 1] : n[0] || "kertas percubaan";
   }
 
   function alat(href, ikon, tajuk, teks) {

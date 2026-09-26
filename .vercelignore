@@ -1,0 +1,4 @@
+# Fail sumber asal (buku teks, nota guru, kertas peperiksaan) tidak diterbitkan.
+*.pdf
+# Kertas MPP3 Terengganu disorok sehingga kebenaran diperoleh.
+assets/js/data/percubaan-terengganu-2025.js
