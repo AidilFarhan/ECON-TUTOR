@@ -2,6 +2,7 @@
    Econ Tutor · aplikasi (penghala & pandangan)
    Laluan hash: #utama, #nota, #t4-b1 (bab), #graf, #kad, #kad-t4-b1,
    #kuiz, #kuiz-t4-b1, #kuiz-t4, #kuiz-t5, #kuiz-semua, #kuiz-k1,
+   #kalkulator, #kalkulator-t4, #kalkulator-t4-b2, #kalkulator-ed,
    #percubaan, #k2
    ========================================================= */
 (function () {
@@ -51,8 +52,12 @@
     ["graf", "Graf", "graf"],
     ["kad", "Kad Study", "kad"],
     ["kuiz", "Kuiz", "kuiz"],
+    ["kalkulator", "Kalkulator", "kalkulator"],
     ["percubaan", "Percubaan", "kertas"]
   ];
+
+  // Label pendek untuk bar bawah telefon (6 tab perlu muat pada lebar 360px)
+  var LABEL_BAWAH = { kad: "Kad", kalkulator: "Kira" };
 
   function binaNavigasi() {
     var atas = document.getElementById("nav-atas");
@@ -67,7 +72,7 @@
         return n[0] !== "percubaan";
       })
         .map(function (n) {
-          return '<a href="#' + n[0] + '" data-nav="' + n[0] + '">' + E.ikon(n[2]) + "<span>" + (n[0] === "kad" ? "Kad" : n[1]) + "</span></a>";
+          return '<a href="#' + n[0] + '" data-nav="' + n[0] + '">' + E.ikon(n[2]) + "<span>" + (LABEL_BAWAH[n[0]] || n[1]) + "</span></a>";
         })
         .join("");
     }
@@ -143,6 +148,10 @@
     } else if (h.indexOf("kuiz-") === 0) {
       nav = "kuiz";
       pKuizMula(h.slice(5));
+    } else if (h === "kalkulator" || h.indexOf("kalkulator-") === 0) {
+      nav = "kalkulator";
+      E.kalkulator.papar(app, h.slice(11));
+      tajuk = "Kalkulator Ekonomi · Econ Tutor";
     } else if (h === "percubaan") {
       nav = "percubaan";
       pPercubaan();
@@ -245,10 +254,10 @@
       '<section class="wira">' +
       "<div>" +
       '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5</span>' +
-      "<h1>Buku teks Ekonomi yang <em>boleh disentuh</em>.</h1>" +
-      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, dan kuiz mengikut bab. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
+      "<h1>Buku Teks Ekonomi <em>Interaktif</em></h1>" +
+      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
       '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : "t4-b1") + '">' + (akhir ? "Sambung " + esc("Bab " + akhir.no + " T" + akhir.tingkatan) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
-      '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span></div>" +
+      '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span><span><b>" + E.kalkulator.senarai.length + "</b>kalkulator</span></div>" +
       "</div>" +
       '<figure class="wira-graf" data-graf="keseimbangan" data-opt=\'{"preset":"wira"}\'></figure>' +
       "</section>";
@@ -269,6 +278,7 @@
       alat("graf", "graf", "Makmal graf", "Semua keluk interaktif dalam satu tempat.") +
       alat("kad", "kad", "Kad study", "Hafal istilah dan rumus. Tandakan kad yang dah diingat.") +
       alat("kuiz", "kuiz", "Kuiz mengikut bab", "Soalan objektif dengan penerangan untuk setiap jawapan.") +
+      alat("kalkulator", "kalkulator", "Kalkulator Ekonomi", "Semua rumus dan pengiraan silibus, dengan jalan kira langkah demi langkah.") +
       alat("percubaan", "kertas", "Kertas Percubaan 2025", "Kertas 1 dan Kertas 2 " + esc(senaraiKertas(true)) + ", bersama skema pemarkahan.") +
       "</div></section>";
     html += "</div>";
@@ -309,6 +319,7 @@
     var sebelum = semua[idx - 1];
     var selepas = semua[idx + 1];
     var nKuiz = E.soalanBab(b.id).length;
+    var nKalk = E.kalkulator.bilanganBab(b.id);
     var html =
       '<div class="bekas pandangan" style="--warna-bab:' + b.warna + '">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#nota">Nota</a><span>/</span><span>Tingkatan ' + b.tingkatan + "</span></nav>" +
@@ -319,6 +330,7 @@
       '<div class="tindakan">' +
       '<a class="btn btn-utama" href="#kad-' + b.id + '">' + E.ikon("kad") + " Kad study (" + b.kad.length + ")</a>" +
       '<a class="btn" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz bab (" + nKuiz + ")</a>" +
+      (nKalk ? '<a class="btn" href="#kalkulator-' + b.id + '">' + E.ikon("kalkulator") + " Kalkulator (" + nKalk + ")</a>" : "") +
       "</div></header>" +
       '<div class="bab-susun">' +
       '<aside class="isi-kandungan kaca" id="toc"></aside>' +

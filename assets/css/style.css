@@ -54,6 +54,9 @@
   --bab-rm50: #1b7f8c;
   --bab-rm100: #7a50b5;
 
+  /* hijau tajuk wira ("Interaktif") */
+  --hijau: #1f9254;
+
   --blob-1: #a7ddd2;
   --blob-2: #b2cbef;
   --blob-3: #f6c9b3;
@@ -119,6 +122,7 @@
     --bab-rm20: #eab050;
     --bab-rm50: #45b9c7;
     --bab-rm100: #b18ef0;
+    --hijau: #4fd18b;
     --blob-1: #0f4d45;
     --blob-2: #163a67;
     --blob-3: #4f2a22;
@@ -170,6 +174,7 @@
   --bab-rm20: #eab050;
   --bab-rm50: #45b9c7;
   --bab-rm100: #b18ef0;
+  --hijau: #4fd18b;
   --blob-1: #0f4d45;
   --blob-2: #163a67;
   --blob-3: #4f2a22;
@@ -471,7 +476,8 @@ p {
     max-width: 520px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     padding: 6px;
     border-radius: 24px;
   }
@@ -674,7 +680,7 @@ main {
 
 .wira h1 em {
   font-style: normal;
-  color: var(--accent);
+  color: var(--hijau);
 }
 
 .wira .pengenalan {
@@ -3565,5 +3571,362 @@ ol.roman > li::before {
   }
   .struktur-soalan .konteks {
     padding: 12px;
+  }
+}
+
+/* ---------- kalkulator ekonomi ---------- */
+.kalk-penapis {
+  margin: 16px 0 26px;
+}
+
+.grid-kalk {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* Tanpa backdrop-filter: 39 kad kabur serentak berat untuk telefon */
+.kalk {
+  --warna-bab: var(--accent);
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  background: var(--glass-3);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  scroll-margin-top: calc(var(--bar-h) + 16px);
+  transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.kalk.lebar {
+  grid-column: 1 / -1;
+}
+
+.kalk.sorot {
+  border-color: var(--warna-bab);
+  box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-2);
+}
+
+.kalk-kepala {
+  display: grid;
+  gap: 6px;
+}
+
+.kalk-kepala h3 {
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.kalk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.kalk-tag i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warna-bab);
+}
+
+.kalk .kotak.rumus {
+  padding: 12px 14px;
+}
+
+.kalk .kotak.rumus > * + * {
+  margin-top: 6px;
+}
+
+.kalk .rumus-baris {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.kalk-petunjuk {
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.kalk-contoh {
+  align-items: center;
+}
+
+.kalk-contoh > span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kalk-medan {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
+}
+
+.kalk-pilihan {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 11.5px;
+  opacity: 0.8;
+}
+
+.kalk-jadual table {
+  width: auto;
+  min-width: 100%;
+}
+
+.kalk-jadual th {
+  padding: 9px 8px;
+}
+
+.kalk-jadual th.hasil {
+  color: var(--accent);
+}
+
+.kalk-jadual td {
+  padding: 5px 6px;
+  vertical-align: middle;
+}
+
+.kalk-jadual input.sel {
+  display: block;
+  width: 100%;
+  min-width: 68px;
+  max-width: 120px;
+  margin-left: auto;
+  min-height: 36px;
+  padding: 0 8px;
+  border-radius: 9px;
+  border: 1px solid var(--line-2);
+  background: var(--glass-2);
+  color: var(--ink);
+  font-weight: 650;
+  font-size: 14.5px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.kalk-jadual input.sel.teks {
+  min-width: 150px;
+  max-width: 240px;
+  margin-left: 0;
+  text-align: left;
+}
+
+.kalk-leret {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+
+.kalk-leret .ikon {
+  width: 15px;
+  height: 15px;
+}
+
+.kalk-jadual td.hasil {
+  padding-inline: 10px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kalk-jadual tr.dipilih td {
+  background: var(--accent-soft);
+}
+
+.kalk-jadual tr.dipilih td:first-child {
+  box-shadow: inset 3px 0 0 var(--warna-bab);
+}
+
+.kalk-baris .cip[disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.kalk-hasil {
+  display: grid;
+  gap: 12px;
+}
+
+.kalk-jawapan {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 8px;
+}
+
+.kalk-nilai {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+}
+
+.kalk-nilai span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.kalk-nilai b {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.kalk-nilai small {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.kalk-nilai b.status {
+  justify-self: start;
+  font-family: var(--font);
+  font-size: 13.5px;
+  line-height: 1.3;
+  padding: 4px 11px;
+}
+
+.kalk-nilai b.status.baik {
+  color: var(--good);
+}
+
+.kalk-nilai b.status.buruk {
+  color: var(--bad);
+}
+
+.kalk-nilai b.status.amaran {
+  color: var(--warn);
+}
+
+.kalk-nilai b.status.neutral {
+  color: var(--accent);
+}
+
+.kalk-nilai b.status.biru {
+  color: var(--c-d);
+}
+
+.kalk-nilai b.status.merah {
+  color: var(--c-s);
+}
+
+.kalk-langkah {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px dashed var(--line-2);
+}
+
+.kalk-sub {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-3);
+}
+
+.kalk-langkah ol {
+  margin: 0;
+  padding-left: 1.3em;
+  display: grid;
+  gap: 4px;
+  font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.kalk-langkah li::marker {
+  color: var(--ink-3);
+  font-weight: 700;
+}
+
+.kalk-nota {
+  padding-left: 12px;
+  border-left: 3px solid var(--warna-bab);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.kalk-ralat {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bad-soft);
+  color: var(--bad);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.kalk-ralat.amaran {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.kalk-ralat .ikon {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+
+.kalk-kaki {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.kalk-tiada {
+  padding: 40px 0;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .kalk {
+    padding: 14px;
+  }
+
+  /* 16px elak iOS zum masuk ketika menaip */
+  .kalk .medan input,
+  .kalk .medan select,
+  .kalk-jadual input.sel {
+    font-size: 16px;
+  }
+
+  .kalk-jadual input.sel {
+    min-width: 58px;
+  }
+
+  .kalk-jadual input.sel.teks {
+    min-width: 116px;
+  }
+
+  .kalk-nilai b {
+    font-size: 18px;
   }
 }

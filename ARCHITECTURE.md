@@ -71,6 +71,7 @@ assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 qu
 assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
 assets/js/data/percubaan-terengganu-2025.js   Same shape; not loaded and not deployed (hidden)
 assets/img/percubaan/<paper>/   Figures cropped from the original PDFs (WebP, 200 dpi)
+assets/js/kalkulator.js       EKO.kalkulator: 39 formula calculators with worked steps + the #kalkulator view
 assets/js/app.js              Router + all views
 assets/js/akaun.js            Account button + sign-out in the header
 assets/js/masuk.js            Login page logic (ES module)
@@ -91,8 +92,9 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 1. `eko-core.js` creates `window.EKO` (alias `E`).
 2. `graf.js`, `graf-t4.js`, `graf-t5.js` attach `EKO.graf` (alias `G`) and register graph widgets.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
-4. `app.js` builds navigation, reads the hash and renders the first view.
-5. `akaun.js` asks `/api/sesi` who is signed in and adds the account button.
+4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
+5. `app.js` builds navigation, reads the hash and renders the first view.
+6. `akaun.js` asks `/api/sesi` who is signed in and adds the account button.
 
 Every file is an IIFE that reads and extends `window.EKO`. No file uses `import`, except the login page scripts.
 
@@ -123,6 +125,7 @@ Routing is **hash-based** (`location.hash`), so the site works from `file://`, a
 | `#kuiz` | `pKuizSenarai` | Quiz picker with best scores |
 | `#kuiz-<id>` | `pKuizMula` | `id` = chapter id, `t4`, `t5`, `semua`, or a set id such as `kel25-k1`; timer, per-question explanation, review |
 | `#percubaan` | `pPercubaan` | One section per registered paper (K1 + K2 cards) |
+| `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = `t4`, `t5` or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
 | `#k2`, `#k2-<paperId>` | `pK2` | Kertas 2 with answer boxes, self-marking against the scheme, level rubrics |
 
 `papar()` is the single render entry point. Before each render, `bersih()` tears down the previous view: it calls `G.tanggal()` (destroys graph widgets), disconnects the TOC observer, clears the quiz timer and removes view-level key listeners. After rendering, `G.pasang(app)` mounts any graph placeholders in the new HTML.
@@ -159,7 +162,38 @@ flowchart TB
 - **Series charts.** `G.carta` (in `graf-t4.js`) draws line charts with a vertical tracker. With `selanjar: true` the tracker moves continuously (0.01 unit) along the curves and shows value labels. The short-run cost graph uses this.
 - **Lifecycle.** Each widget returns `{ musnah }` to disconnect observers and timers. `G.tanggal()` calls them all on navigation.
 
-### 3.5 Content model
+### 3.5 Economics calculator (`EKO.kalkulator`)
+
+`kalkulator.js` holds every formula and calculation in the syllabus as a declarative definition plus a pure `kira(x)` function. The engine renders the inputs, parses them, calls `kira` on every keystroke and paints the result.
+
+```js
+tambah({
+  id: "ed", bab: "t4-b2", no: "2.2.2", tajuk: "…", kunci: "search keywords",
+  rumus: ["Ed = " + frac("%ΔQ", "%ΔP")],          // formula lines (HTML)
+  petunjuk: "optional hint",
+  medan: [
+    { k: "p0", l: "Harga asal P₀ (RM)" },                     // number (default)
+    { k: "h1", l: "…", opsyenal: true },                       // may be blank → null
+    { k: "nama", l: "…", teks: true },                         // free text
+    { k: "cari", jenis: "pilih", l: "Cari", pilihan: [["q1", "…"], ["p1", "…"]], ubah?: fn(state, value) },
+    { k: "q1", l: "…", bila: function (x) { return x.cari === "q1"; } },   // conditional field
+    { k: "j", jenis: "jadual", pilihBaris: 4, lajur: [{ k: "l", l: "Buruh (L)" }, { k: "ap", l: "AP", hasil: true }] }
+  ],
+  contoh: [{ n: "RM5 → RM6", v: { p0: 5, … } }],            // chips; the first one is the initial state
+  kira: function (x) {                                       // x: parsed values, x._baris[tableKey] = selected row
+    return { hasil: [H(label, value, statusClass?, subLabel?)], langkah: ["worked step", …],
+             nota?, amaran?, ralat?, sel?: { columnKey: ["cell", …] } };
+  }
+});
+```
+
+- **Parsing.** Inputs are `type="text" inputmode="decimal"`. Spaces, commas, a leading `RM` and a trailing `%` are stripped; blank required fields or non-numbers produce an error message instead of calling `kira`.
+- **Rendering.** A `pilih` change or a new example re-renders only that card (`lukisSemula`); typing only repaints the result block and computed table cells, so focus is never lost. Focusing or clicking a table row selects it and `kira` shows that row's working.
+- **State.** Per card, in memory only (`keadaan[id]`), reset on navigation. Nothing is stored in `localStorage`.
+- **Integration.** `EKO.kalkulator.bilanganBab(id)` feeds the "Kalkulator (n)" button in each chapter header; `senarai.length` feeds the home statistics.
+- **Sources.** Initial values are the worked examples in the notes (textbook). The income tax calculator uses the textbook's YA 2016 table up to RM100 000 chargeable income.
+
+### 3.6 Content model
 
 Content lives in JavaScript data files so it works offline and from `file://`, with no fetch and no CORS.
 
@@ -186,9 +220,9 @@ EKO.daftarK2({
 - `j` is the index of the correct option. Chapter quiz options are shuffled, except numbered options and I/II/III combinations.
 - Question figures come in two forms. `g` (K1) and `rajah` (K2 scheme) are `G.statik` specs rendered as SVG. `gambar` holds images cropped from the original PDF: `{ src, alt, w, h, kapsyen }` or an array, rendered by `EKO.gambar()` (use `EKO.gambar(g, true)` inside answer options). `s2` is question text shown after the figure. In Kertas 2, `gambar` can sit on a question or a part, and `gambarSkema` shows the scheme's answer diagram.
 - Images live under `assets/img/percubaan/<paper>/` and are gated by the middleware like any other content file.
-- Current volume: 6 chapters, 263 flashcards, 178 chapter questions, 36 graphs in the notes, and 4 trial papers (Kelantan 2025, Seberang Perai 2025 and Perak 2024 live; Terengganu hidden).
+- Current volume: 6 chapters, 263 flashcards, 178 chapter questions, 36 graphs in the notes, 39 calculators, and 4 trial papers (Kelantan 2025, Seberang Perai 2025 and Perak 2024 live; Terengganu hidden).
 
-### 3.6 Persistence
+### 3.7 Persistence
 
 All learning progress is **per browser** in `localStorage["econtutor:v1"]`:
 
@@ -314,4 +348,5 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | New chapter | New `assets/js/data/<id>.js` calling `EKO.daftarBab`, plus a `<script>` tag in `index.html` before `app.js` |
 | New graph | `G.daftar("name", fn, {tajuk, bab})` in the relevant `graf*.js`, then `<figure data-graf="name">` in notes |
 | New trial paper | Data file with `daftarSet` (K1) and `daftarK2` (K2) plus a script tag; the home page, Percubaan and Kuiz list it automatically |
+| New calculator | `tambah({...})` in `assets/js/kalkulator.js` under the chapter's heading (see §3.5); page, search, chapter button and home count update automatically |
 | Central progress / teacher dashboard (future) | Firestore in the same Firebase project, keyed by the verified email from `/api/sesi` |

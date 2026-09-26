@@ -42,6 +42,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `assets/js/eko-core.js` | `window.EKO`: registries, storage, formatting, icons |
 | `assets/js/graf.js` | `EKO.graf` SVG engine + market graphs |
 | `assets/js/graf-t4.js`, `graf-t5.js` | Form 4 / Form 5 graph widgets |
+| `assets/js/kalkulator.js` | `EKO.kalkulator`: every syllabus formula as a calculator with worked steps, plus the `#kalkulator` view |
 | `assets/js/app.js` | Hash router and all views |
 | `assets/js/akaun.js` | Header account button and sign-out |
 | `assets/js/data/*.js` | Content: one file per chapter, one per trial paper |
@@ -55,7 +56,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 
 ### Browser scripts (`assets/js/*.js` except `masuk.js`)
 - Each file is a classic script wrapped in an IIFE with `"use strict"`, and extends `window.EKO` (`var E = window.EKO; var G = E.graf;`).
-- **ES5 style:** `var`, `function`, string concatenation. No arrow functions, `let`/`const`, classes or template literals in `app.js`, `eko-core.js` or the `graf*.js` files. Template literals are allowed in data files for long `html` strings.
+- **ES5 style:** `var`, `function`, string concatenation. No arrow functions, `let`/`const`, classes or template literals in `app.js`, `eko-core.js`, `kalkulator.js` or the `graf*.js` files. Template literals are allowed in data files for long `html` strings.
 - Formatting: 2-space indent, double quotes, semicolons, about 120-character lines.
 - Views build HTML strings and set `innerHTML`. Anything a view attaches (observers, timers, key listeners) must be torn down in `bersih()`. Graph widgets return `{ musnah }` to clean up their own.
 
@@ -70,7 +71,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 - Mobile first means checking 360 px. The important breakpoint is 860 px (bottom navigation).
 
 ### Content (`assets/js/data/*.js`)
-- Chapter shape: `EKO.daftarBab({ id, tingkatan, no, tajuk, warna, ringkas, seksyen[], kad[], kuiz[] })`. See ARCHITECTURE §3.5 for every schema.
+- Chapter shape: `EKO.daftarBab({ id, tingkatan, no, tajuk, warna, ringkas, seksyen[], kad[], kuiz[] })`. See ARCHITECTURE §3.6 for every schema (§3.5 for calculators).
 - Quiz: `j` is the index of the correct option (0 = A). Always give an explanation `e`. Keep answer positions varied across a chapter.
 - Note HTML uses the existing components: `kotak def/rumus/tip/contoh/fokus/info`, `kira`, `jadual`, `aliran`, `grid-2/3` with `kad-mini`, `istilah`, and `<figure data-graf="…">` for graphs.
 - Keep subtopic numbering exactly as the textbook (e.g. `t: "2.1.3"` on cards, `no: "2.1"` on sections).
@@ -100,6 +101,13 @@ const ctx = { console, document: { getElementById: () => null } }; ctx.window = 
   .forEach(f => vm.runInContext(fs.readFileSync("assets/js/" + f, "utf8"), ctx, { filename: f }));
 for (const b of ctx.EKO.bab) console.log(b.id, b.kad.length, "kad", b.kuiz.length, "kuiz",
   b.kuiz.filter(q => !(q.j >= 0 && q.j < q.p.length)).length, "bad answers");
+// Calculators: run every example through kira() and report errors
+vm.runInContext(fs.readFileSync("assets/js/kalkulator.js", "utf8"), ctx, { filename: "kalkulator.js" });
+for (const k of ctx.EKO.kalkulator.senarai) (k.contoh || [0]).forEach((c, i) => {
+  const o = ctx.EKO.kalkulator.kiraContoh(k.id, i);
+  if (o.ralat || !(o.hasil || o.sel)) console.log("CALC FAIL", k.id, i, o.ralat || "no result");
+});
+console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 ```
 
 **Browser check (manual or Playwright):**
@@ -122,6 +130,7 @@ for (const b of ctx.EKO.bab) console.log(b.id, b.kad.length, "kad", b.kuiz.lengt
 | **Fix or extend notes** | Edit the chapter's `assets/js/data/tX-babN.js` → verify the section renders → check the quiz and flashcard counts still load |
 | **Add a chapter** | New data file with `EKO.daftarBab` → add `<script src="assets/js/data/…" defer>` to `index.html` **before `app.js`** → pick a `--bab-rm*` colour → update counts in README and PRD |
 | **Add a graph** | In `graf-t4.js` / `graf-t5.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
+| **Add or fix a calculator** | In `assets/js/kalkulator.js`, add `tambah({ id, bab, no, tajuk, kunci, rumus[], medan[], contoh[], kira })` under the chapter's heading (ARCHITECTURE §3.5). Use the textbook's worked example as the first `contoh` and check the answer matches the notes. `kira` must be pure and return `ralat` instead of dividing by zero. Run the Node check in §4 |
 | **Add a trial paper** | New `assets/js/data/percubaan-<state>-<year>.js`: `EKO.daftarSet` for K1 (tag each question with `bab`) and `EKO.daftarK2` for K2 (unique `id`, and **no** `kunciLama`). Add the script tag. Home, Percubaan and Kuiz update automatically. Check every K1 answer against the scheme PDF |
 | **Pictures from a paper** | Crop each figure from the PDF with PyMuPDF at 200 dpi (`page.get_pixmap(dpi=200, clip=rect)`), trim white margins, save as WebP in `assets/img/percubaan/<paper>/`. Reference it with `gambar: { src, alt, w, h, kapsyen }` (w and h in pixels), put question text that comes after the figure in `s2`, and use `EKO.gambar(g, true)` for images inside answer options. Always write a meaningful `alt` |
 | **Show the Terengganu paper** | Only when the owner confirms permission: (1) add its script tag after the Kelantan one; (2) remove its line from `.vercelignore`; (3) update the footer and meta description in `index.html` |
@@ -176,6 +185,7 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | `percubaan`, `K1`, `K2`, `skema`, `rubrik`, `markah` | trial exam, Paper 1 (MCQ), Paper 2 (structured/essay), marking scheme, level rubric, marks |
 | `papar`, `pergi`, `laluan`, `bersih` | render, navigate, current route, tear down |
 | `pUtama`, `pNota`, `pBab`, `pGraf`, `pKad`, `pKuizSenarai`, `pKuizMula`, `pPercubaan`, `pK2` | view functions (home, notes list, chapter, graph lab, flashcards, quiz list, quiz run, trial papers, Kertas 2) |
+| `kalkulator`, `tambah`, `rumus`, `medan`, `contoh`, `kira`, `hasil`, `langkah`, `jalan kira` | calculator, register, formula, input field, worked example, compute, answer boxes, steps, worked solution |
 | `pasang` / `tanggal` / `musnah` | mount graphs / unmount all / destroy one widget |
 | `plot`, `lapis`, `paksi`, `keluk`, `nod`, `pegang`/`seret`, `panduan`, `cip` | plot, layers, axis, curve, node, handle/drag, guide line, chip |
 | `baca`/`bacaan`, `julat`, `pilih`, `butang`, `legenda`, `carta`, `selanjar` | reading panel, slider, segmented control, button, legend, series chart, continuous tracker |

@@ -60,6 +60,7 @@ Dark tokens are declared twice: under `@media (prefers-color-scheme: dark) { :ro
 | `--good` / `--good-soft` | `#1d8a52` | `#4ccb86` | Correct answer, success, "dah ingat" |
 | `--bad` / `--bad-soft` | `#c23f2d` | `#f07b63` | Wrong answer, errors |
 | `--warn` / `--warn-soft` | `#a86b12` | `#e7b24a` | Warnings, tips, "no access" icon |
+| `--hijau` | `#1f9254` | `#4fd18b` | The green word in the home title (*Buku Teks Ekonomi **Interaktif***). Display text only |
 
 ### 3.3 Graph palette
 
@@ -183,7 +184,7 @@ Don't nest glass inside glass more than once. Inner cards use `--glass-2` or `--
 `EKO.ikon(name)` returns inline 24 × 24 stroke icons: 1.8–2 px strokes, round caps and joins, with `currentColor`, `aria-hidden`, and a 20 px display size (`.ikon`).
 
 Available names:
-- Navigation: `rumah`, `buku`, `graf`, `kad`, `kuiz`, `kertas`
+- Navigation: `rumah`, `buku`, `graf`, `kad`, `kuiz`, `kalkulator`, `kertas`
 - Theme: `matahari`, `bulan`, `sistem`
 - Arrows and actions: `kanan`, `kiri`, `kocok`, `ulang`, `cari`, `betul`, `salah`, `senarai`, `tangan`, `jam`, `mata`, `bintang`, `pensel`, `kotak`
 
@@ -195,7 +196,7 @@ The **brand mark** (`EKO.tandaJenama()`) is a dark rounded square with a blue de
 
 ### 9.1 Navigation
 - **Top bar** (`.bar-atas` > `.bar-dalam.kaca`): a sticky glass pill with the brand (`.jenama` + `SPM` chip), nav links (`.nav-atas a`, where the current page is an inverted ink pill), the theme button (`.ikon-btn`, 40 px round) and the account button (`.akaun-btn`, a 40 px accent circle with the initial).
-- **Bottom bar** (`.bar-bawah`, ≤ 860 px) is a floating glass pill with icon + label tabs and respects `safe-area-inset-bottom`.
+- **Bottom bar** (`.bar-bawah`, ≤ 860 px) is a floating glass pill with icon + label tabs and respects `safe-area-inset-bottom`. It shows six equal columns (Utama, Nota, Graf, Kad, Kuiz, Kira); Percubaan is reached from the home page. Long labels get a short form (`LABEL_BAWAH` in `app.js`: "Kad", "Kira") so six tabs fit at 360 px.
 - **Breadcrumbs** (`.remah`) sit above page titles.
 
 ### 9.2 Buttons
@@ -231,6 +232,20 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 - **Kertas 2**: question cards with a `textarea` answer, a "Tunjuk skema" reveal, and checkable scheme points (`data-m` marks) that give an estimated score. Rubric tables show levels.
 - **Status pills** (`.status.baik | .buruk | .amaran | .neutral | .biru | .merah`) are 12.5 px, weight 750 pills.
 - **Toast** (`#toast`) is an ink pill at the bottom centre (above the bottom bar on phones) that shows for 2.2 s.
+
+### 9.5a Calculator card (`.kalk`)
+- **Surface:** `.kalk.kaca-pekat` with a solid `--glass-3` fill and **no backdrop blur** (39 cards on one page). `--warna-bab` colours the tag dot, the selected table row and the interpretation rule. Cards sit in `.grid-kalk` (two columns from about 900 px, one on phones); cards with a table (`.kalk.lebar`) span the full width.
+- **Anatomy, top to bottom:**
+  - tag (`.kalk-tag`: dot + "T4 · 2.2.2") and title (`h3`, 18 px)
+  - formula box (`.kotak.rumus` with `.rumus-baris` and `.pecahan`)
+  - example chips (`.kalk-contoh` > `.cip[aria-pressed]`) and an optional hint (`.kalk-petunjuk`)
+  - inputs: `.grid-medan.kalk-medan` of `.medan` fields (text inputs with `inputmode="decimal"`; 16 px on phones so iOS does not zoom), optional fields marked *pilihan*
+  - editable table (`.kalk-jadual.jadual`): right-aligned input cells (max 120 px), computed columns in accent (`th.hasil`, `td.hasil`), the selected row tinted with a left bar; a "Leret jadual" hint appears only when the table overflows
+  - answers (`.kalk-jawapan` > `.kalk-nilai`): accent-soft tiles with a small label, a 20 px display value (or a status pill) and an optional `small` note
+  - worked steps (`.kalk-langkah`): dashed box, "JALAN KIRA" label in `--c-3`, numbered list with tabular numbers
+  - interpretation (`.kalk-nota`, left rule), warning (`.kalk-ralat.amaran`) or error (`.kalk-ralat`)
+  - footer (`.kalk-kaki`): *Set semula* and a link to the chapter notes
+- **Deep link highlight:** `.kalk.sorot` adds a chapter-coloured border and ring for 1.8 s.
 
 ### 9.6 Login (`masuk.html`)
 - **Card:** a centred `.masuk-kad.kaca` (max 420 px, `--radius-xl`) on the aurora background.

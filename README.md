@@ -10,6 +10,7 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), dibina d
 | **Graf interaktif** | 36 rajah SVG dalam nota. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
 | **Kad study** | 263 kad fakta. Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
 | **Kuiz** | 178 soalan mengikut bab (termasuk Latihan Sumatif buku teks T5), set campuran T4, T5 dan T4 + T5. Setiap jawapan ada penerangan |
+| **Kalkulator Ekonomi** | 39 kalkulator untuk semua rumus dan pengiraan dalam silibus T4 dan T5 (kos lepas, Ed/Es, beban cukai, PBG, cukai pendapatan, sewa beli, TP/AP/MP, kos, untung, IHP, inflasi, pengangguran, KDNK, belanjawan negara, faedah berbanding, akaun semasa, pertukaran asing dan lain-lain). Setiap satu memaparkan jawapan, jalan kira langkah demi langkah dan tafsiran. Nilai awal ialah contoh buku teks |
 | **Kertas percubaan** | Kelantan 2025, Seberang Perai 2025 dan Perak 2024 (Modul Gempur SPM): setiap satu Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Rajah dan gambar dalam kertas asal dipaparkan terus. Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
 
 Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
@@ -122,7 +123,8 @@ assets/js/data/percubaan-seberang-perai-2025.js  Kertas 1 dan Kertas 2 percubaan
 assets/js/data/percubaan-perak-2024.js        Kertas 1 dan Kertas 2 percubaan Perak (Modul Gempur SPM 2024)
 assets/js/data/percubaan-terengganu-2025.js   Kertas 1 dan Kertas 2 MPP3 Terengganu (disorok)
 assets/img/percubaan/<kertas>/               rajah dan gambar yang dipotong daripada PDF kertas asal (WebP)
-assets/js/app.js                penghala halaman (#nota, #graf, #kad, #kuiz, #percubaan, #k2-<id>)
+assets/js/kalkulator.js         Kalkulator Ekonomi: 39 kalkulator rumus, jalan kira dan halaman #kalkulator
+assets/js/app.js                penghala halaman (#nota, #graf, #kad, #kuiz, #kalkulator, #percubaan, #k2-<id>)
 assets/js/akaun.js              butang akaun dan log keluar dalam bar atas
 assets/js/masuk.js              logik halaman log masuk
 assets/js/firebase-config.js    tetapan projek Firebase (awam)
@@ -147,9 +149,33 @@ EKO.daftarBab({
 - Untuk memasukkan graf ke dalam nota, tulis `<figure data-graf="keseimbangan" data-opt='{"preset":"kawalan"}'></figure>`. Senarai nama graf ada dalam fail `graf*.js` (cari `G.daftar(`).
 - Komponen nota yang tersedia: `kotak def`, `kotak rumus`, `kotak tip`, `kotak contoh`, `kotak info`, `grid-2`, `grid-3`, `kad-mini`, `jadual`, `aliran`, `kira` dan `istilah`.
 
+### Menambah kalkulator
+
+Kalkulator didaftarkan dalam `assets/js/kalkulator.js` dengan `tambah({...})`:
+
+```js
+tambah({
+  id: "inflasi", bab: "t5-b1", no: "1.2.2",
+  tajuk: "Kadar inflasi",
+  kunci: "kadar inflasi ihp deflasi",           // kata kunci carian
+  rumus: ["Kadar inflasi = " + frac("IHP semasa − IHP sebelumnya", "IHP sebelumnya") + " × 100"],
+  medan: [{ k: "i0", l: "IHP tahun sebelumnya" }, { k: "i1", l: "IHP tahun semasa" }],
+  contoh: [{ n: "IHP 120 → 123", v: { i0: 120, i1: 123 } }],   // contoh pertama = nilai awal
+  kira: function (x) {
+    var r = ((x.i1 - x.i0) / x.i0) * 100;
+    return { hasil: [H("Kadar inflasi", pc(r))], langkah: ["(" + nom(x.i1) + " − " + nom(x.i0) + ") ÷ " + nom(x.i0) + " × 100 = " + pc(r)] };
+  }
+});
+```
+
+- Jenis medan: nombor (lalai), `teks: true`, `opsyenal: true`, `jenis: "pilih"` (senarai pilihan) dan `jenis: "jadual"` (jadual yang boleh ditambah baris). `bila: function (x) {...}` menyorok medan mengikut pilihan.
+- `kira` memulangkan `hasil` (kotak jawapan), `langkah` (jalan kira), `nota`, `amaran`, `ralat` dan `sel` (nilai lajur hasil dalam jadual).
+- Butang **Kalkulator** dalam halaman bab dan kiraan di muka depan dikemas kini secara automatik.
+
 ## Sumber kandungan
 
 - Nota Tingkatan 4 berdasarkan buku teks Ekonomi Tingkatan 4 (KSSM) dalam repo ini.
 - Nota Tingkatan 5 berdasarkan buku teks Ekonomi Tingkatan 5 (KSSM) Bab 1 dan Bab 2 dalam repo ini, termasuk data, contoh pengiraan dan Latihan Sumatif. Nota guru BAB 1 T5 dan BAB 2 T5 digunakan sebagai rujukan sahaja.
 - Soalan dan skema percubaan daripada *Modul Koleksi Item Peperiksaan Percubaan SPM 2025 (Kelantan)*, *Peperiksaan Percubaan SPM 2025 (Seberang Perai)*, *Modul Gempur SPM 2024 (Perak)* dan *Modul Perkembangan Pembelajaran SPM 2025 MPP3 (Terengganu)*. Skema Soalan 5 Kertas 2 Seberang Perai dalam fail asal adalah untuk soalan lain, jadi isinya ditanda sebagai cadangan. Isi bertanda "cadangan" dalam Kertas 2 disediakan untuk latihan dan bukan sebahagian daripada skema rasmi.
 - Nilai berangka dalam graf dan contoh pengiraan ialah nilai contoh untuk latihan, bukan data rasmi.
+- Kalkulator cukai pendapatan individu menggunakan jadual kadar tahun taksiran 2016 seperti dalam buku teks (sehingga RM100 000 pendapatan boleh cukai), bukan kadar semasa LHDN.
