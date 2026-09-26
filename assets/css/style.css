@@ -3202,3 +3202,308 @@ ol.roman > li::before {
 .jadual-kos tbody tr.hampir td {
   background: color-mix(in srgb, var(--accent-soft) 45%, transparent);
 }
+
+/* =========================================================
+   Halaman log masuk
+   ========================================================= */
+.masuk-bekas {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: max(28px, env(safe-area-inset-top)) var(--gutter) max(28px, env(safe-area-inset-bottom));
+}
+.masuk-kad {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px 28px 24px;
+  border-radius: var(--radius-xl);
+  display: grid;
+  gap: 20px;
+}
+.masuk-jenama {
+  margin-right: 0;
+}
+.masuk-kepala {
+  display: grid;
+  gap: 6px;
+}
+.masuk-kepala h1 {
+  font-size: 30px;
+}
+.masuk-sub {
+  color: var(--ink-3);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.masuk-panel {
+  display: grid;
+  gap: 14px;
+}
+.masuk-panel > p {
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.masuk-panel b {
+  color: var(--ink);
+}
+.masuk-google {
+  width: 100%;
+  min-height: 48px;
+  background: var(--glass-3);
+}
+.masuk-google svg {
+  width: 20px;
+  height: 20px;
+}
+.masuk-atau {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-3);
+  font-size: 13px;
+  font-weight: 600;
+}
+.masuk-atau::before,
+.masuk-atau::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line-2);
+}
+.masuk-tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--line);
+}
+.masuk-tab button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 650;
+  font-size: 14px;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.masuk-tab button[aria-pressed="true"] {
+  background: var(--glass-3);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.masuk-borang {
+  display: grid;
+  gap: 14px;
+}
+.masuk-kad .medan {
+  gap: 6px;
+  color: var(--ink-2);
+}
+.masuk-kad .medan input {
+  min-height: 48px;
+  padding: 0 14px;
+  font-weight: 550;
+  font-size: 16px;
+}
+.masuk-kad .medan input:focus-visible {
+  outline-offset: 0;
+  border-color: var(--accent);
+}
+.medan-kata {
+  position: relative;
+  display: block;
+}
+.medan-kata input {
+  padding-right: 76px !important;
+}
+.btn-lihat {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 650;
+  font-size: 13px;
+}
+.btn-lihat:hover {
+  background: var(--accent-soft);
+}
+.medan-bantuan {
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.masuk-hantar {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 2px;
+}
+.masuk-pautan {
+  justify-self: center;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--accent);
+  font-weight: 650;
+  font-size: 14px;
+}
+.masuk-pautan:hover {
+  background: var(--accent-soft);
+}
+.masuk-panel .btn-utama {
+  width: 100%;
+  min-height: 48px;
+}
+.masuk-baris {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+.masuk-nota {
+  font-size: 13.5px !important;
+  color: var(--ink-3) !important;
+}
+.masuk-ikon-besar {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.masuk-ikon-besar.amaran {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.masuk-ikon-besar svg {
+  width: 26px;
+  height: 26px;
+}
+.masuk-muat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.pusing {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  border: 2.5px solid var(--accent-soft);
+  border-top-color: var(--accent);
+  animation: pusing 0.8s linear infinite;
+}
+@keyframes pusing {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pusing {
+    animation-duration: 2.4s;
+  }
+}
+.masuk-mesej {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--accent-soft);
+  color: var(--ink-2);
+}
+.masuk-mesej:empty {
+  display: none;
+}
+.masuk-mesej.ralat {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.masuk-mesej.baik {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.masuk-kaki {
+  max-width: 420px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+@media (max-width: 420px) {
+  .masuk-kad {
+    padding: 24px 20px 20px;
+    gap: 18px;
+  }
+  .masuk-kepala h1 {
+    font-size: 26px;
+  }
+}
+
+/* ---------- butang akaun dalam bar atas ---------- */
+.akaun {
+  position: relative;
+  flex: none;
+}
+.akaun-btn {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-d);
+  font-weight: 750;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.akaun-btn:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.akaun-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  width: min(280px, calc(100vw - 32px));
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  border-radius: var(--radius);
+  background: var(--glass-3);
+}
+.akaun-menu p {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.akaun-menu p b {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.akaun-menu .btn {
+  width: 100%;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "econ-tutor",
+  "private": true,
+  "type": "module",
+  "description": "Laman statik Econ Tutor. Tiada proses build; middleware.js dan api/ dijalankan oleh Vercel."
+}
