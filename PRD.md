@@ -113,14 +113,15 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-15** Mixed sets: Form 4 (20 questions), Form 5 (20) and Form 4 + 5 (25), drawn at random.
 - **FR-16** Options are shuffled, except numbered or I/II/III combinations. The quiz shows an instant right/wrong result with an explanation, a timer, a score and a review screen. The best score is saved per set.
 
-### 5.5 Trial papers: ✅ Kelantan · ⏸ Terengganu
-- **FR-17** Kertas 1: 40 MCQs in the original order, with question diagrams redrawn as SVG. Available as a quiz set (`kel25-k1`).
+### 5.5 Trial papers: ✅ Kelantan 2025 · ✅ Seberang Perai 2025 · ✅ Perak 2024 · ⏸ Terengganu
+- **FR-17** Kertas 1: 40 MCQs in the original order, available as a quiz set (`kel25-k1`, `sp25-k1`, `prk24-k1`). Diagrams are either redrawn as SVG (Kelantan) or shown as images cropped from the original paper (Seberang Perai, Perak), including answer options that are graphs.
 - **FR-18** Kertas 2 has 7 questions:
   - Section A: 3 compulsory questions.
   - Section B: choose 2 of 4.
 - **FR-19** Each Kertas 2 part has an answer box (auto-saved), a *Tunjuk skema* reveal, tickable scheme points that give an estimated mark, and level rubrics where the paper uses them.
 - **FR-20** Points that are not in the official scheme are labelled *cadangan*.
 - **FR-21** The system supports multiple papers (`EKO.daftarK2`). The home page, Percubaan page and Kuiz list update automatically.
+- **FR-21a** Pictures, diagrams and graphs in Kertas 2 questions are shown as images cropped from the original PDF, and answer diagrams from the marking scheme appear inside the scheme panel.
 - **FR-22** MPP3 Terengganu 2025 is complete but hidden until publication permission is confirmed. See the README for how to enable it.
 
 ### 5.6 Progress and personalisation: ✅
@@ -171,6 +172,8 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 
 Trial papers:
 - **Kelantan 2025** (live): K1 40 MCQs and K2 7 questions.
+- **Seberang Perai 2025** (live): K1 40 MCQs and K2 7 questions; 23 images.
+- **Perak 2024, Modul Gempur SPM** (live): K1 40 MCQs and K2 7 questions; 8 images.
 - **MPP3 Terengganu 2025** (hidden): K1 40 MCQs and K2 7 questions.
 
 ## 8. Success metrics
@@ -196,6 +199,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-26 | Flashcard layout fix; deployed to Vercel (PR #1) with PDFs excluded and the Terengganu paper hidden |
 | 2026-09-26 | Cost graph: continuous tracker with decimal values (PR #2) |
 | 2026-09-26 | Sign-in page (Google or email), server-side gate and email allowlist (PR #3) |
+| 2026-09-26 | Trial papers Seberang Perai 2025 and Perak 2024 with images from the original papers |
 
 ## 10. Roadmap and open questions
 

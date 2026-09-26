@@ -10,7 +10,7 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), dibina d
 | **Graf interaktif** | 36 rajah SVG dalam nota. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
 | **Kad study** | 263 kad fakta. Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
 | **Kuiz** | 178 soalan mengikut bab (termasuk Latihan Sumatif buku teks T5), set campuran T4, T5 dan T4 + T5. Setiap jawapan ada penerangan |
-| **Percubaan SPM 2025** | Kelantan: Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
+| **Kertas percubaan** | Kelantan 2025, Seberang Perai 2025 dan Perak 2024 (Modul Gempur SPM): setiap satu Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Rajah dan gambar dalam kertas asal dipaparkan terus. Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
 
 Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
 
@@ -118,7 +118,10 @@ assets/js/graf-t4.js            graf T4 (KKP, sistem ekonomi, kos, TP/AP/MP, unt
 assets/js/graf-t5.js            graf T5 (IHP, AD-AS, pengangguran, KDNK, belanjawan, cukai, faedah berbanding, tarif/subsidi/kuota, akaun semasa, penukaran mata wang, kadar pertukaran)
 assets/js/data/t4-bab1.js ...   nota, kad dan kuiz setiap bab
 assets/js/data/percubaan-kelantan-2025.js     Kertas 1 dan Kertas 2 percubaan Kelantan
+assets/js/data/percubaan-seberang-perai-2025.js  Kertas 1 dan Kertas 2 percubaan Seberang Perai
+assets/js/data/percubaan-perak-2024.js        Kertas 1 dan Kertas 2 percubaan Perak (Modul Gempur SPM 2024)
 assets/js/data/percubaan-terengganu-2025.js   Kertas 1 dan Kertas 2 MPP3 Terengganu (disorok)
+assets/img/percubaan/<kertas>/               rajah dan gambar yang dipotong daripada PDF kertas asal (WebP)
 assets/js/app.js                penghala halaman (#nota, #graf, #kad, #kuiz, #percubaan, #k2-<id>)
 assets/js/akaun.js              butang akaun dan log keluar dalam bar atas
 assets/js/masuk.js              logik halaman log masuk
@@ -148,5 +151,5 @@ EKO.daftarBab({
 
 - Nota Tingkatan 4 berdasarkan buku teks Ekonomi Tingkatan 4 (KSSM) dalam repo ini.
 - Nota Tingkatan 5 berdasarkan buku teks Ekonomi Tingkatan 5 (KSSM) Bab 1 dan Bab 2 dalam repo ini, termasuk data, contoh pengiraan dan Latihan Sumatif. Nota guru BAB 1 T5 dan BAB 2 T5 digunakan sebagai rujukan sahaja.
-- Soalan dan skema percubaan daripada *Modul Koleksi Item Peperiksaan Percubaan SPM 2025 (Kelantan)* dan *Modul Perkembangan Pembelajaran SPM 2025 MPP3 (Terengganu)*. Isi bertanda "cadangan" dalam Kertas 2 disediakan untuk latihan dan bukan sebahagian daripada skema rasmi.
+- Soalan dan skema percubaan daripada *Modul Koleksi Item Peperiksaan Percubaan SPM 2025 (Kelantan)*, *Peperiksaan Percubaan SPM 2025 (Seberang Perai)*, *Modul Gempur SPM 2024 (Perak)* dan *Modul Perkembangan Pembelajaran SPM 2025 MPP3 (Terengganu)*. Skema Soalan 5 Kertas 2 Seberang Perai dalam fail asal adalah untuk soalan lain, jadi isinya ditanda sebagai cadangan. Isi bertanda "cadangan" dalam Kertas 2 disediakan untuk latihan dan bukan sebahagian daripada skema rasmi.
 - Nilai berangka dalam graf dan contoh pengiraan ialah nilai contoh untuk latihan, bukan data rasmi.

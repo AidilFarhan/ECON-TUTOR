@@ -158,6 +158,27 @@ window.EKO = (function () {
       .replace(/"/g, "&quot;");
   };
 
+  // Gambar daripada kertas asal (dipotong dari PDF pada 200 dpi).
+  // g: "laluan" | { src, alt, w, h, kapsyen } | [ ... ]; w dan h dalam piksel asal.
+  // sebaris: guna <span> (contohnya dalam butang pilihan jawapan).
+  E.gambar = function (g, sebaris) {
+    if (!g) return "";
+    var bekas = sebaris ? "span" : "figure";
+    var kapsyen = sebaris ? "span" : "figcaption";
+    return (Array.isArray(g) ? g : [g])
+      .map(function (x) {
+        if (typeof x === "string") x = { src: x };
+        var saiz = x.w && x.h ? ' width="' + Math.round(x.w * 0.48) + '" height="' + Math.round(x.h * 0.48) + '"' : "";
+        return (
+          "<" + bekas + ' class="gambar-soalan">' +
+          '<img src="' + E.esc(x.src) + '" alt="' + E.esc(x.alt || "") + '" loading="lazy" decoding="async"' + saiz + ">" +
+          (x.kapsyen ? "<" + kapsyen + ' class="kapsyen-gambar">' + x.kapsyen + "</" + kapsyen + ">" : "") +
+          "</" + bekas + ">"
+        );
+      })
+      .join("");
+  };
+
   E.kocok = function (arr) {
     var a = arr.slice();
     for (var i = a.length - 1; i > 0; i--) {
