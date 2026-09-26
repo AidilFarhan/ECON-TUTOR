@@ -14,6 +14,15 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), dibina d
 
 Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
 
+## Dokumentasi
+
+| Fail | Isi |
+| --- | --- |
+| [PRD.md](PRD.md) | Keperluan produk: matlamat, pengguna, ciri, metrik, pelan hadapan |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Seni bina: modul, laluan, enjin graf, model data, log masuk, deployment |
+| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Sistem reka bentuk: token warna, tipografi, komponen, bahasa graf, aksesibiliti |
+| [AGENTS.md](AGENTS.md) | Peraturan dan resipi untuk ejen AI serta penyumbang kod |
+
 ## Cara guna
 
 - **Buka terus:** klik dua kali `index.html`. Laman berfungsi tanpa internet, kecuali fon Google.
