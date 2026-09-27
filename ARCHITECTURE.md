@@ -265,7 +265,7 @@ sequenceDiagram
   M-->>U: static content
 ```
 
-Possible outcomes of `POST /api/sesi`: `200 ok`, `401 token`, `403 belum_sah` (email not verified), `403 tiada_akses` (not on allowlist), `403 asal` (cross-origin), `500 konfigurasi` (missing secret), and `503 pelayan` (JWKS fetch failed).
+Possible outcomes of `POST /api/sesi`: `200 ok`, `401 token`, `403 belum_sah` (email not verified), `403 tiada_akses` (not on allowlist; the login page shows the "Tiada akses" panel with a "Hubungi cikgu" WhatsApp link, `wa.me/<WHATSAPP_CIKGU>?text=…` with the student's email, built in `masuk.js`), `403 asal` (cross-origin), `500 konfigurasi` (missing secret), and `503 pelayan` (JWKS fetch failed).
 
 ### 4.2 Session cookie
 

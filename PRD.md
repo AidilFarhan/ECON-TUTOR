@@ -136,7 +136,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-27** Sign-in methods:
   - **Google.**
   - **Email + password.** Includes registration, email verification and password reset.
-- **FR-28** Only emails on the teacher's allowlist (`EMAIL_DIBENARKAN`) can enter. Whole domains can be allowed with `@domain`. Others see a clear "Tiada akses" screen that tells them to ask the teacher.
+- **FR-28** Only emails on the teacher's allowlist (`EMAIL_DIBENARKAN`) can enter. Whole domains can be allowed with `@domain`. Others see a clear "Tiada akses" screen that tells them to ask the teacher, with a **Hubungi cikgu** button that opens WhatsApp with a ready message ("Saya nak akses Nota Interaktif Ekonomi" + their email).
 - **FR-29** Accounts that register with email and password must verify their email before entry.
 - **FR-30** The header shows the signed-in account and a *Log keluar* (sign-out) button.
 - **FR-31** A session lasts 12 hours and renews silently while the Firebase sign-in is still valid. Removing an email blocks that user after the next redeploy.

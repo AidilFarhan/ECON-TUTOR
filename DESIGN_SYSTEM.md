@@ -258,7 +258,7 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
   - fields (`.medan`, 48 px inputs, with a *Tunjuk/Sorok* toggle)
   - primary submit button
   - text link (`.masuk-pautan`)
-- **States** are separate panels: loading (`.pusing`), verify email (mail icon), no access (amber lock icon).
+- **States** are separate panels: loading (`.pusing`), verify email (mail icon), no access (amber lock icon). The no-access panel ends with `.btn-wa` ("Hubungi cikgu"): full width, 48 px, WhatsApp green `#25d366` with dark text `#053d20` for contrast, opening `wa.me` in a new tab.
 - **Messages** use `.masuk-mesej`, which is neutral by default, with `.ralat` (bad) and `.baik` (good) variants.
 
 ### 9.7 Account menu
