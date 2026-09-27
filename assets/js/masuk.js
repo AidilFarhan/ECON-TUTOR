@@ -36,6 +36,17 @@ const destinasi = (function () {
   }
 })();
 
+// Butang "Hubungi cikgu" pada skrin Tiada akses: buka WhatsApp cikgu dengan mesej siap.
+// Nombor dalam format antarabangsa tanpa "+" atau sengkang, contoh 60123456789.
+const WHATSAPP_CIKGU = "601160757145";
+const MESEJ_AKSES = "Saya nak akses Nota Interaktif Ekonomi";
+
+// Email pelajar disertakan supaya cikgu tahu email mana perlu ditambah dalam senarai akses.
+function pautanWhatsApp(email) {
+  const teks = MESEJ_AKSES + (email ? "\nEmail: " + email : "");
+  return "https://wa.me/" + WHATSAPP_CIKGU + "?text=" + encodeURIComponent(teks);
+}
+
 let mod = "masuk";
 let sedangProses = false;
 let auth = null;
@@ -142,6 +153,7 @@ async function teruskan(pengguna) {
 
 function papar(panel, email) {
   $(panel === "panel-sah" ? "email-sah" : "email-tiada-akses").textContent = email || "";
+  if (panel === "panel-tiada-akses") $("btn-hubungi").href = pautanWhatsApp(email);
   tunjuk(panel);
 }
 
