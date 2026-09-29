@@ -1,8 +1,6 @@
 /* =========================================================
    STPM Penggal 1 · Bab 1 · Pengenalan (Mikroekonomi)
    Sumber: Modul PdP Ekonomi Penggal 1 Mikroekonomi, Bab 1
-   Soalan kuiz 1–7 daripada "Soalan Pengayaan" modul (skema jawapan
-   tidak disertakan dalam modul; jawapan disemak semula oleh guru).
    ========================================================= */
 EKO.daftarBab({
   id: "stpm-p1-b1",
@@ -239,90 +237,6 @@ EKO.daftarBab({
     { d: "Lima <b>kelemahan pasaran bebas</b>", b: "Gagal mengeluarkan barang awam; ketidakstabilan ekonomi; ketidakadilan agihan pendapatan; mewujudkan monopoli; kesan luaran negatif.", t: "1.6" },
     { d: "Lima sebab <b>campur tangan kerajaan</b>", b: "Menyediakan barang awam; mengawal kuasa monopoli; mencapai kestabilan ekonomi; merapatkan jurang agihan pendapatan; mengawal kesan luaran negatif.", t: "1.6" }
   ],
-  kuiz: [
-    {
-      s: "Pernyataan berikut adalah benar tentang jenis barang yang terdapat dalam ekonomi <b>kecuali</b>",
-      p: ["barang percuma ialah barang yang tiada kos lepas", "barang awam ialah barang yang tiada prinsip pengecualian", "barang ekonomi ialah barang yang tertakluk kepada prinsip pengecualian", "barang perantaraan ialah barang yang telah diproses dan boleh digunakan terus oleh pengguna"],
-      j: 3,
-      e: "Barang perantaraan masih diproses untuk dijadikan barang siap dan berubah bentuk fizikal; ia belum boleh digunakan terus oleh pengguna."
-    },
-    {
-      s: "Masalah ekonomi merujuk kepada satu keadaan",
-      p: ["pilihan terpaksa dibuat tanpa wujudnya kos lepas", "masyarakat akan membuat pilihan bagi memenuhi semua kehendak mereka", "sumber ekonomi yang dimiliki adalah tidak terhad tetapi barang dan perkhidmatan yang dikehendaki adalah terhad", "sumber ekonomi yang dimiliki adalah terhad tetapi barang dan perkhidmatan yang dikehendaki adalah tidak terhad"],
-      j: 3,
-      e: "Masalah ekonomi wujud kerana sumber terhad manakala kehendak manusia tidak terhad."
-    },
-    {
-      s: "Sesebuah ekonomi mencapai kecekapan pengeluaran yang maksimum apabila ekonomi",
-      p: ["tidak dapat meningkatkan pengeluaran suatu barang tanpa mengurangkan pengeluaran barang lain", "dapat meningkatkan pengeluaran semua barang", "dapat meningkatkan pengeluaran suatu barang tanpa mengurangkan pengeluaran barang lain", "dapat mengurangkan pengeluaran semua barang"],
-      j: 0,
-      e: "Pada KKP, semua sumber digunakan dengan cekap; tambahan satu barang hanya boleh dibuat dengan mengurangkan barang lain."
-    },
-    {
-      s: "Akibat daripada masalah kekurangan dalam ekonomi menyebabkan",
-      p: ["pelaku ekonomi perlu membuat pilihan", "pertumbuhan ekonomi akan terjejas", "tiada barang percuma bagi pengguna", "kos lepas semakin meningkat"],
-      j: 0,
-      e: "Kekurangan menyebabkan isi rumah dan firma tidak dapat memenuhi semua kehendak, maka mereka perlu membuat pilihan."
-    },
-    {
-      s: "Setiap titik pada keluk kemungkinan pengeluaran menggambarkan kombinasi barang",
-      p: ["yang dapat dihasilkan dengan menggunakan sebahagian daripada sumber ekonomi", "maksimum yang dapat dihasilkan dengan menggunakan semua sumber dalam ekonomi", "maksimum yang dapat dihasilkan dengan menggunakan sebahagian daripada sumber ekonomi", "yang dapat dihasilkan dengan menggunakan semua sumber ekonomi"],
-      j: 1,
-      e: "Definisi KKP: kombinasi maksimum dua barang dengan menggunakan semua sumber pada tingkat teknologi tertentu."
-    },
-    {
-      s: "Bagi keluk kemungkinan pengeluaran yang mengalami kos lepas yang semakin meningkat, pertambahan satu unit barang pertanian akan menyebabkan",
-      p: ["pengurangan pengeluaran yang semakin kecil bagi barang industri", "pengurangan pengeluaran yang sama bagi barang industri", "pengurangan pengeluaran yang semakin besar bagi barang industri", "pertambahan pengeluaran yang semakin besar bagi barang industri"],
-      j: 2,
-      e: "Kos lepas meningkat bermaksud setiap tambahan satu unit barang pertanian mengorbankan barang industri yang semakin banyak (KKP cembung)."
-    },
-    {
-      s: "Antara berikut, yang manakah <b>bukan</b> kebaikan sistem kapitalis?",
-      p: ["Keputusan yang cepat dapat dilakukan melalui mekanisme harga", "Persaingan dapat meningkatkan kualiti barang yang dihasilkan", "Pekerja mempunyai dorongan untuk bekerja keras", "Barang awam dapat dikeluarkan"],
-      j: 3,
-      e: "Kegagalan mengeluarkan barang awam ialah kelemahan pasaran bebas kerana barang awam tidak menguntungkan."
-    },
-    {
-      s: "Ganjaran kepada faktor pengeluaran <b>modal</b> ialah",
-      p: ["sewa", "kadar bunga", "upah", "keuntungan"],
-      j: 1,
-      e: "Tanah: sewa. Buruh: upah / gaji. Modal: kadar bunga. Usahawan: keuntungan."
-    },
-    {
-      s: "Tepung gandum yang digunakan oleh kilang roti ialah contoh",
-      p: ["barang modal", "barang pengguna tahan lama", "barang perantaraan", "barang awam"],
-      j: 2,
-      e: "Tepung gandum masih diproses dan berubah bentuk fizikal untuk dijadikan roti, maka ia barang perantaraan."
-    },
-    {
-      s: "Jadual kombinasi: barang A 0, 2, 4, 6, 8 unit dan barang B 20, 19, 16, 10, 0 unit. Kos lepas seunit barang A apabila pengeluaran meningkat daripada 4 unit kepada 6 unit ialah",
-      p: ["1 unit barang B", "1.5 unit barang B", "5 unit barang B", "3 unit barang B"],
-      j: 3,
-      e: "Kos lepas = (16 − 10) ÷ (6 − 4) = 6 ÷ 2 = 3 unit barang B bagi setiap unit barang A."
-    },
-    {
-      s: "Berdasarkan jadual yang sama (barang A 0, 2, 4, 6, 8; barang B 20, 19, 16, 10, 0), kombinasi 4 unit barang A dan 14 unit barang B menunjukkan",
-      p: ["ekonomi mencapai guna tenaga penuh", "wujud pengangguran atau pembaziran sumber", "kombinasi yang tidak boleh dicapai", "pertumbuhan ekonomi"],
-      j: 1,
-      e: "Pada 4 unit barang A, maksimum barang B ialah 16 unit. 14 < 16, maka titik itu di dalam KKP: sumber tidak digunakan sepenuhnya."
-    },
-    {
-      s: "Kemajuan teknologi dalam pengeluaran <b>barang X sahaja</b> akan menyebabkan KKP",
-      p: ["beralih ke kanan secara selari dari AB ke A′B′", "beralih dari AB ke A′B", "beralih ke kiri secara selari", "beralih dari AB ke AB′"],
-      j: 3,
-      e: "Hanya pengeluaran barang X bertambah, maka pintasan pada paksi X sahaja beralih: AB ke AB′."
-    },
-    {
-      s: "Dalam sistem ekonomi perancangan pusat, masalah asas ekonomi diselesaikan oleh",
-      p: ["badan perancangan pusat kerajaan", "mekanisme harga", "pengguna dan pengeluar secara bersama", "kerajaan dan pihak swasta secara bersama"],
-      j: 0,
-      e: "Semua keputusan ekonomi dibuat oleh kerajaan melalui badan perancangan pusat; individu tidak berhak memilih."
-    },
-    {
-      s: "Kerajaan mengenakan cukai kepada golongan berpendapatan tinggi dan memberi subsidi kepada golongan berpendapatan rendah. Tujuan campur tangan ini ialah",
-      p: ["mengawal kuasa monopoli", "menyediakan barang awam", "merapatkan jurang agihan pendapatan", "mengawal kesan luaran negatif"],
-      j: 2,
-      e: "Cukai ke atas golongan kaya dan subsidi kepada golongan miskin menjadikan agihan pendapatan lebih setara."
-    }
-  ]
+  // Kuiz STPM belum dimasukkan buat masa ini (keputusan pemilik).
+  kuiz: []
 });

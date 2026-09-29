@@ -187,8 +187,10 @@
     var rkad = kad.length ? diingat / kad.length : 0;
     var q = d.kuiz[b.id];
     var rkuiz = q && q.jumlah ? q.terbaik / q.jumlah : 0;
+    // Bab tanpa kuiz: kemajuan dikira daripada bacaan dan kad sahaja.
+    var adaKuiz = E.soalanBab(b.id).length > 0;
     return {
-      peratus: Math.round((baca * 0.4 + rkad * 0.3 + rkuiz * 0.3) * 100),
+      peratus: Math.round((adaKuiz ? baca * 0.4 + rkad * 0.3 + rkuiz * 0.3 : (baca * 0.4 + rkad * 0.3) / 0.7) * 100),
       baca: !!baca,
       diingat: diingat,
       jumlahKad: kad.length,
@@ -214,7 +216,7 @@
       '<div class="kemajuan" aria-label="Kemajuan ' + k.peratus + '%"><span style="width:' + k.peratus + '%"></span></div>' +
       '<div class="bawah">' +
       '<a class="cip" href="#kad-' + b.id + '">' + E.ikon("kad") + " Kad · " + b.kad.length + "</a>" +
-      '<a class="cip" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz · " + nKuiz + "</a>" +
+      (nKuiz ? '<a class="cip" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz · " + nKuiz + "</a>" : "") +
       (k.baca ? '<span class="status baik">' + E.ikon("betul") + " Dibaca</span>" : "") +
       "</div></article>"
     );
@@ -345,7 +347,7 @@
       (b.ringkas ? '<p class="ringkas">' + b.ringkas + "</p>" : "") +
       '<div class="tindakan">' +
       '<a class="btn btn-utama" href="#kad-' + b.id + '">' + E.ikon("kad") + " Kad study (" + b.kad.length + ")</a>" +
-      '<a class="btn" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz bab (" + nKuiz + ")</a>" +
+      (nKuiz ? '<a class="btn" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz bab (" + nKuiz + ")</a>" : "") +
       (nKalk ? '<a class="btn" href="#kalkulator-' + b.id + '">' + E.ikon("kalkulator") + " Kalkulator (" + nKalk + ")</a>" : "") +
       "</div></header>" +
       '<div class="bab-susun">' +
@@ -368,10 +370,10 @@
     });
     var dibaca = !!d.dibaca[b.id];
     html +=
-      '<div class="selesai-kotak kaca"><div><b>' + (dibaca ? "Bab ini sudah ditandakan selesai" : "Dah habis baca?") + "</b><p>Uji kefahaman dengan kad study dan kuiz bab ini.</p></div>" +
+      '<div class="selesai-kotak kaca"><div><b>' + (dibaca ? "Bab ini sudah ditandakan selesai" : "Dah habis baca?") + "</b><p>Uji kefahaman dengan kad study" + (nKuiz ? " dan kuiz" : "") + " bab ini.</p></div>" +
       '<div class="baris-cip">' +
       '<button class="btn ' + (dibaca ? "" : "btn-utama") + '" id="btn-selesai" type="button">' + E.ikon("betul") + " " + (dibaca ? "Tandakan belum selesai" : "Tandakan selesai dibaca") + "</button>" +
-      '<a class="btn" href="#kuiz-' + b.id + '">Kuiz bab ' + E.ikon("kanan") + "</a></div></div>" +
+      (nKuiz ? '<a class="btn" href="#kuiz-' + b.id + '">Kuiz bab ' + E.ikon("kanan") + "</a>" : '<a class="btn" href="#kad-' + b.id + '">Kad study ' + E.ikon("kanan") + "</a>") + "</div></div>" +
       '<nav class="bab-navigasi">' +
       (sebelum ? '<a class="kaca" href="#' + sebelum.id + '"><span>' + E.ikon("kiri") + " Sebelum · " + esc(E.labelBab(sebelum)) + "</span><b>" + esc(sebelum.tajuk) + "</b></a>" : "<span></span>") +
       (selepas ? '<a class="kaca seterusnya" href="#' + selepas.id + '"><span>Seterusnya · ' + esc(E.labelBab(selepas)) + " " + E.ikon("kanan") + "</span><b>" + esc(selepas.tajuk) + "</b></a>" : "<span></span>") +
@@ -780,6 +782,7 @@
     // pulang {id, tajuk, soalan, kocok, label}
     if (E.babIkut[id]) {
       var b = E.babIkut[id];
+      if (!E.soalanBab(id).length) return null;
       return { id: id, tajuk: "Kuiz " + E.labelBab(b) + ": " + b.tajuk, soalan: E.soalanBab(id), kocok: true, bab: b };
     }
     var kump = E.babKumpulan(id);
@@ -788,6 +791,7 @@
       kump.forEach(function (b) {
         s = s.concat(E.soalanBab(b.id));
       });
+      if (!s.length) return null;
       return { id: id, tajuk: "Kuiz campuran " + E.labelKumpulan(kump[0]), soalan: s, kocok: true, had: 20 };
     }
     if (id === "semua") {
@@ -833,8 +837,13 @@
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Kuiz</span></nav>' +
       '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kuiz</h1><p>Pilih bab atau set campuran. Setiap jawapan disertakan penerangan supaya anda faham sebab jawapan itu betul.</p></div></div>';
     E.kumpulan().forEach(function (k) {
+      // Kumpulan tanpa soalan (contoh STPM buat masa ini) tidak dipaparkan.
+      var babAda = k.bab.filter(function (b) {
+        return E.soalanBab(b.id).length > 0;
+      });
+      if (!babAda.length) return;
       html += '<section class="bahagian" style="margin-top:22px"><div class="bahagian-kepala"><h2>' + esc(k.label) + '</h2></div><div class="kuiz-pilih">';
-      k.bab.forEach(function (b) {
+      babAda.forEach(function (b) {
         html += kad(b.id, esc(b.tajuk), esc(E.labelBab(b)), b.warna, b.no);
       });
       html += kad(k.kunci, "Campuran " + esc(k.label), "20 soalan rawak", null, null);
