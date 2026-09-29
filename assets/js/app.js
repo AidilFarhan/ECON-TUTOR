@@ -136,9 +136,9 @@
       nav = "nota";
       pBab(E.babIkut[h]);
       tajuk = E.babIkut[h].tajuk + " · Econ Tutor";
-    } else if (h === "graf") {
+    } else if (h === "graf" || h.indexOf("graf-") === 0) {
       nav = "graf";
-      pGraf();
+      pGraf(h.slice(5));
     } else if (h === "kad" || h.indexOf("kad-") === 0) {
       nav = "kad";
       pKad(h.slice(4) || "semua");
@@ -202,7 +202,7 @@
     var nKuiz = E.soalanBab(b.id).length;
     return (
       '<article class="kad-bab kaca" style="--warna-bab:' + b.warna + '">' +
-      '<div class="atas"><span class="lencana-bab">' + b.no + '</span><div class="meta">Tingkatan ' + b.tingkatan + " · Bab " + b.no + "</div></div>" +
+      '<div class="atas"><span class="lencana-bab">' + b.no + '</span><div class="meta">' + esc(E.labelKumpulan(b)) + " · Bab " + b.no + "</div></div>" +
       '<h3><a href="#' + b.id + '">' + esc(b.tajuk) + "</a></h3>" +
       '<div class="subtopik">' +
       b.seksyen
@@ -220,11 +220,21 @@
     );
   }
 
-  function gridTingkatan(t, tajuk, huraian) {
-    var senarai = E.babTingkatan(t);
+  // Tajuk dan huraian ringkas setiap kumpulan bab untuk halaman Utama.
+  var HURAIAN_KUMPULAN = {
+    t4: ["Asas mikroekonomi", "Konsep ekonomi, pasaran, wang dan pendapatan individu, serta pengeluaran firma."],
+    t5: ["Makroekonomi & ekonomi global", "Peranan kerajaan, penunjuk ekonomi, dasar fiskal dan kewangan, globalisasi, perdagangan antarabangsa serta pertukaran asing."],
+    p1: ["Mikroekonomi", "Ekonomi STPM (944) Penggal 1: masalah asas ekonomi, pasaran barang dan harga, teori pengeluaran dan kos, struktur pasaran serta pasaran faktor."],
+    p2: ["Makroekonomi", "Ekonomi STPM (944) Penggal 2: pendapatan negara, penentuan pendapatan, wang dan bank, dasar ekonomi serta ekonomi terbuka."],
+    p3: ["Isu ekonomi Malaysia", "Ekonomi STPM (944) Penggal 3: isu-isu ekonomi Malaysia."]
+  };
+
+  function gridKumpulan(kunci, tajuk, huraian) {
+    var senarai = E.babKumpulan(kunci);
+    if (!senarai.length) return "";
     return (
-      '<section class="bahagian">' +
-      '<div class="bahagian-kepala"><div><span class="label-kecil"><span class="titik"></span>Tingkatan ' + t + "</span><h2>" + tajuk + "</h2>" + (huraian ? "<p>" + huraian + "</p>" : "") + "</div></div>" +
+      '<section class="bahagian" id="kumpulan-' + kunci + '">' +
+      '<div class="bahagian-kepala"><div><span class="label-kecil"><span class="titik"></span>' + esc(E.labelKumpulan(senarai[0])) + "</span><h2>" + tajuk + "</h2>" + (huraian ? "<p>" + huraian + "</p>" : "") + "</div></div>" +
       '<div class="grid-bab">' + senarai.map(kadBab).join("") + "</div></section>"
     );
   }
@@ -253,10 +263,10 @@
       '<div class="bekas pandangan">' +
       '<section class="wira">' +
       "<div>" +
-      '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5</span>' +
+      '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5' + (E.babPeringkat("stpm").length ? " · STPM" : "") + "</span>" +
       "<h1>Nota Ekonomi <em>Interaktif</em></h1>" +
       '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
-      '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : "t4-b1") + '">' + (akhir ? "Sambung " + esc("Bab " + akhir.no + " T" + akhir.tingkatan) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
+      '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : E.bab[0] ? E.bab[0].id : "nota") + '">' + (akhir ? "Sambung " + esc(E.labelBab(akhir)) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
       '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span><span><b>" + E.kalkulator.senarai.length + "</b>kalkulator</span></div>" +
       "</div>" +
       '<figure class="wira-graf" data-graf="keseimbangan" data-opt=\'{"preset":"wira"}\'></figure>' +
@@ -266,16 +276,18 @@
       html +=
         '<a class="sambung kaca" href="#' + akhir.id + '" style="--warna-bab:' + akhir.warna + '">' +
         '<span class="lencana-bab">' + akhir.no + "</span>" +
-        '<span class="teks"><span>Sambung belajar · Tingkatan ' + akhir.tingkatan + "</span><b>" + esc(akhir.tajuk) + "</b></span>" +
+        '<span class="teks"><span>Sambung belajar · ' + esc(E.labelKumpulan(akhir)) + "</span><b>" + esc(akhir.tajuk) + "</b></span>" +
         '<span class="status neutral">' + k.peratus + "%</span>" + E.ikon("kanan") +
         "</a>";
     }
-    html += gridTingkatan(4, "Asas mikroekonomi", "Konsep ekonomi, pasaran, wang dan pendapatan individu, serta pengeluaran firma.");
-    html += gridTingkatan(5, "Makroekonomi & ekonomi global", "Peranan kerajaan, penunjuk ekonomi, dasar fiskal dan kewangan, globalisasi, perdagangan antarabangsa serta pertukaran asing.");
+    E.kumpulan().forEach(function (k) {
+      var h = HURAIAN_KUMPULAN[k.kunci] || [esc(k.label), ""];
+      html += gridKumpulan(k.kunci, h[0], h[1]);
+    });
     html +=
       '<section class="bahagian"><div class="bahagian-kepala"><div><span class="label-kecil"><span class="titik"></span>Alat belajar</span><h2>Ulang kaji dengan cara sendiri</h2></div></div>' +
       '<div class="grid-alat">' +
-      alat("graf", "graf", "Makmal graf", "Semua keluk interaktif dalam satu tempat.") +
+      alat("graf", "graf", "Makmal graf", "Keluk interaktif mengikut Tingkatan 4, Tingkatan 5 dan STPM.") +
       alat("kad", "kad", "Kad study", "Hafal istilah dan rumus. Tandakan kad yang dah diingat.") +
       alat("kuiz", "kuiz", "Kuiz mengikut bab", "Soalan objektif dengan penerangan untuk setiap jawapan.") +
       alat("kalkulator", "kalkulator", "Kalkulator Ekonomi", "Semua rumus dan pengiraan silibus, dengan jalan kira langkah demi langkah.") +
@@ -302,9 +314,12 @@
     app.innerHTML =
       '<div class="bekas pandangan">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Nota</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Nota mengikut bab</h1><p>Setiap bab mengikut susunan Standard Kandungan buku teks. Graf dalam nota boleh terus diseret.</p></div></div>' +
-      gridTingkatan(4, "Tingkatan 4") +
-      gridTingkatan(5, "Tingkatan 5") +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Nota mengikut bab</h1><p>Setiap bab mengikut susunan buku teks (SPM) atau sukatan pelajaran (STPM). Graf dalam nota boleh terus diseret.</p></div></div>' +
+      E.kumpulan()
+        .map(function (k) {
+          return gridKumpulan(k.kunci, esc(k.label));
+        })
+        .join("") +
       "</div>";
   }
 
@@ -314,7 +329,8 @@
       d.akhir = b.id;
     });
     var d = E.data();
-    var semua = E.bab;
+    // Sebelum/Seterusnya kekal dalam peringkat yang sama (SPM atau STPM).
+    var semua = E.babPeringkat(b.peringkat);
     var idx = semua.indexOf(b);
     var sebelum = semua[idx - 1];
     var selepas = semua[idx + 1];
@@ -322,9 +338,9 @@
     var nKalk = E.kalkulator.bilanganBab(b.id);
     var html =
       '<div class="bekas pandangan" style="--warna-bab:' + b.warna + '">' +
-      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#nota">Nota</a><span>/</span><span>Tingkatan ' + b.tingkatan + "</span></nav>" +
+      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#nota">Nota</a><span>/</span><span>' + esc(E.labelKumpulan(b)) + "</span></nav>" +
       '<header class="bab-kepala kaca">' +
-      '<div class="atas"><span class="lencana-bab">' + b.no + '</span><span class="label-kecil">Tingkatan ' + b.tingkatan + " · Bab " + b.no + "</span></div>" +
+      '<div class="atas"><span class="lencana-bab">' + b.no + '</span><span class="label-kecil">' + esc(E.labelKumpulan(b)) + " · Bab " + b.no + "</span></div>" +
       "<h1>" + esc(b.tajuk) + "</h1>" +
       (b.ringkas ? '<p class="ringkas">' + b.ringkas + "</p>" : "") +
       '<div class="tindakan">' +
@@ -357,8 +373,8 @@
       '<button class="btn ' + (dibaca ? "" : "btn-utama") + '" id="btn-selesai" type="button">' + E.ikon("betul") + " " + (dibaca ? "Tandakan belum selesai" : "Tandakan selesai dibaca") + "</button>" +
       '<a class="btn" href="#kuiz-' + b.id + '">Kuiz bab ' + E.ikon("kanan") + "</a></div></div>" +
       '<nav class="bab-navigasi">' +
-      (sebelum ? '<a class="kaca" href="#' + sebelum.id + '"><span>' + E.ikon("kiri") + " Sebelum · T" + sebelum.tingkatan + " Bab " + sebelum.no + "</span><b>" + esc(sebelum.tajuk) + "</b></a>" : "<span></span>") +
-      (selepas ? '<a class="kaca seterusnya" href="#' + selepas.id + '"><span>Seterusnya · T' + selepas.tingkatan + " Bab " + selepas.no + " " + E.ikon("kanan") + "</span><b>" + esc(selepas.tajuk) + "</b></a>" : "<span></span>") +
+      (sebelum ? '<a class="kaca" href="#' + sebelum.id + '"><span>' + E.ikon("kiri") + " Sebelum · " + esc(E.labelBab(sebelum)) + "</span><b>" + esc(sebelum.tajuk) + "</b></a>" : "<span></span>") +
+      (selepas ? '<a class="kaca seterusnya" href="#' + selepas.id + '"><span>Seterusnya · ' + esc(E.labelBab(selepas)) + " " + E.ikon("kanan") + "</span><b>" + esc(selepas.tajuk) + "</b></a>" : "<span></span>") +
       "</nav>";
     html += "</div></div></div>";
     app.innerHTML = html;
@@ -438,26 +454,106 @@
   }
 
   /* ---------- GRAF (galeri) ---------- */
-  function pGraf() {
+  // Makmal graf: pengguna pilih peringkat dahulu (Tingkatan 4, Tingkatan 5 atau STPM),
+  // kemudian hanya graf peringkat itu dipasang. Laluan: #graf, #graf-t4, #graf-t5, #graf-stpm
+  function pilihanGraf() {
+    var out = [];
+    E.kumpulan().forEach(function (k) {
+      var kunci = k.peringkat === "stpm" ? "stpm" : k.kunci;
+      var ada = null;
+      out.forEach(function (o) {
+        if (o.kunci === kunci) ada = o;
+      });
+      if (!ada) {
+        ada = { kunci: kunci, label: k.peringkat === "stpm" ? "STPM" : k.label, bab: [] };
+        out.push(ada);
+      }
+      ada.bab = ada.bab.concat(k.bab);
+    });
+    out.forEach(function (o) {
+      o.graf = o.bab.reduce(function (n, b) {
+        return n + kiraGraf(b);
+      }, 0);
+    });
+    return out;
+  }
+
+  function figGraf(b) {
+    var figs = [];
+    b.seksyen.forEach(function (s) {
+      var re = /<figure[^>]*data-graf="[^"]*"[^>]*><\/figure>/g;
+      var m;
+      while ((m = re.exec(s.html || ""))) figs.push(m[0]);
+    });
+    return figs;
+  }
+
+  function pGraf(kunci) {
+    var pilihan = pilihanGraf();
+    var dipilih = null;
+    pilihan.forEach(function (o) {
+      if (o.kunci === kunci) dipilih = o;
+    });
     var html =
       '<div class="bekas pandangan">' +
-      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Graf</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Makmal graf</h1><p>Semua rajah interaktif mengikut bab. Seret nod, garis harga atau keluk, dan perhati bacaan di bawah setiap graf.</p></div></div>';
-    E.bab.forEach(function (b) {
-      var figs = [];
-      b.seksyen.forEach(function (s) {
-        var re = /<figure[^>]*data-graf="[^"]*"[^>]*><\/figure>/g;
-        var m;
-        while ((m = re.exec(s.html || ""))) figs.push(m[0]);
-      });
+      '<nav class="remah"><a href="#utama">Utama</a><span>/</span>' +
+      (dipilih ? '<a href="#graf">Graf</a><span>/</span><span>' + esc(dipilih.label) + "</span>" : "<span>Graf</span>") +
+      "</nav>" +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Makmal graf</h1><p>' +
+      (dipilih
+        ? "Seret nod, garis harga atau keluk, dan perhati bacaan di bawah setiap graf."
+        : "Pilih peringkat dahulu. Graf interaktif bagi peringkat itu akan dipaparkan mengikut bab.") +
+      "</p></div></div>";
+
+    if (!dipilih) {
+      html +=
+        '<div class="grid-alat pilih-peringkat">' +
+        pilihan
+          .map(function (o) {
+            var no = o.bab.map(function (b) {
+              return b.no;
+            });
+            var bab = o.bab.length > 1 ? "Bab " + no[0] + "–" + no[no.length - 1] : "Bab " + no[0];
+            return (
+              '<a class="kad-alat kaca" href="#graf-' + o.kunci + '">' +
+              '<span class="ikon-bulat">' + E.ikon("graf") + "</span>" +
+              "<b>" + esc(o.label) + "</b>" +
+              "<span>" + bab + " · " + o.graf + " graf interaktif</span>" +
+              "</a>"
+            );
+          })
+          .join("") +
+        "</div></div>";
+      app.innerHTML = html;
+      return;
+    }
+
+    html +=
+      '<div class="penapis kaca" style="margin:16px 0 22px"><div class="baris"><b>Peringkat</b>' +
+      pilihan
+        .map(function (o) {
+          return '<button type="button" class="cip" data-peringkat="' + o.kunci + '" aria-pressed="' + (o === dipilih) + '">' + esc(o.label) + "</button>";
+        })
+        .join("") +
+      "</div></div>";
+    var kosong = true;
+    dipilih.bab.forEach(function (b) {
+      var figs = figGraf(b);
       if (!figs.length) return;
+      kosong = false;
       html +=
         '<section class="galeri-kumpulan" style="--warna-bab:' + b.warna + '">' +
-        '<h2><span class="lencana-bab" style="width:36px;height:36px;font-size:16px;border-radius:11px">' + b.no + "</span> T" + b.tingkatan + " · " + esc(b.tajuk) + ' <a class="cip" style="margin-left:auto" href="#' + b.id + '">Buka nota</a></h2>' +
+        '<h2><span class="lencana-bab" style="width:36px;height:36px;font-size:16px;border-radius:11px">' + b.no + "</span> " + esc(E.labelPendek(b)) + " · " + esc(b.tajuk) + ' <a class="cip" style="margin-left:auto" href="#' + b.id + '">Buka nota</a></h2>' +
         '<div class="galeri">' + figs.join("") + "</div></section>";
     });
+    if (kosong) html += '<p class="teks-lemah">Belum ada graf interaktif bagi peringkat ini.</p>';
     html += "</div>";
     app.innerHTML = html;
+    app.querySelectorAll("[data-peringkat]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        pergi("graf-" + btn.getAttribute("data-peringkat"));
+      });
+    });
   }
 
   /* ---------- KAD STUDY ---------- */
@@ -472,9 +568,7 @@
     function kadTapis() {
       var babs = E.bab.filter(function (b) {
         if (st.tapis === "semua") return true;
-        if (st.tapis === "t4") return b.tingkatan === 4;
-        if (st.tapis === "t5") return b.tingkatan === 5;
-        return b.id === st.tapis;
+        return b.id === st.tapis || E.kunciKumpulan(b) === st.tapis;
       });
       var kad = [];
       babs.forEach(function (b) {
@@ -485,7 +579,7 @@
 
     function babLabel(id) {
       var b = E.babIkut[id];
-      return b ? "T" + b.tingkatan + " Bab " + b.no : "";
+      return b ? E.labelBab(b) : "";
     }
 
     var dek = null;
@@ -493,7 +587,7 @@
     function rangka() {
       var pilihanBab = E.bab
         .map(function (b) {
-          return '<button type="button" class="cip" data-tapis="' + b.id + '" aria-pressed="' + (st.tapis === b.id) + '"><span class="titik" style="color:' + b.warna + '"></span>T' + b.tingkatan + " B" + b.no + "</button>";
+          return '<button type="button" class="cip" data-tapis="' + b.id + '" aria-pressed="' + (st.tapis === b.id) + '"><span class="titik" style="color:' + b.warna + '"></span>' + esc(E.labelPendek(b)) + " B" + b.no + "</button>";
         })
         .join("");
       app.innerHTML =
@@ -504,8 +598,11 @@
         '<div class="penapis kaca">' +
         '<div class="baris"><b>Pilih</b>' +
         '<button type="button" class="cip" data-tapis="semua" aria-pressed="' + (st.tapis === "semua") + '">Semua</button>' +
-        '<button type="button" class="cip" data-tapis="t4" aria-pressed="' + (st.tapis === "t4") + '">Tingkatan 4</button>' +
-        '<button type="button" class="cip" data-tapis="t5" aria-pressed="' + (st.tapis === "t5") + '">Tingkatan 5</button>' +
+        E.kumpulan()
+          .map(function (k) {
+            return '<button type="button" class="cip" data-tapis="' + k.kunci + '" aria-pressed="' + (st.tapis === k.kunci) + '">' + esc(k.label) + "</button>";
+          })
+          .join("") +
         pilihanBab +
         "</div>" +
         '<div class="baris"><b>Paparan</b>' +
@@ -683,19 +780,19 @@
     // pulang {id, tajuk, soalan, kocok, label}
     if (E.babIkut[id]) {
       var b = E.babIkut[id];
-      return { id: id, tajuk: "Kuiz T" + b.tingkatan + " Bab " + b.no + ": " + b.tajuk, soalan: E.soalanBab(id), kocok: true, bab: b };
+      return { id: id, tajuk: "Kuiz " + E.labelBab(b) + ": " + b.tajuk, soalan: E.soalanBab(id), kocok: true, bab: b };
     }
-    if (id === "t4" || id === "t5") {
-      var t = id === "t4" ? 4 : 5;
+    var kump = E.babKumpulan(id);
+    if (kump.length) {
       var s = [];
-      E.babTingkatan(t).forEach(function (b) {
+      kump.forEach(function (b) {
         s = s.concat(E.soalanBab(b.id));
       });
-      return { id: id, tajuk: "Kuiz campuran Tingkatan " + t, soalan: s, kocok: true, had: 20 };
+      return { id: id, tajuk: "Kuiz campuran " + E.labelKumpulan(kump[0]), soalan: s, kocok: true, had: 20 };
     }
     if (id === "semua") {
       var s2 = [];
-      E.bab.forEach(function (b) {
+      E.babPeringkat("spm").forEach(function (b) {
         s2 = s2.concat(E.soalanBab(b.id));
       });
       return { id: id, tajuk: "Kuiz campuran Tingkatan 4 & 5", soalan: s2, kocok: true, had: 25 };
@@ -735,12 +832,12 @@
       '<div class="bekas pandangan">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Kuiz</span></nav>' +
       '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kuiz</h1><p>Pilih bab atau set campuran. Setiap jawapan disertakan penerangan supaya anda faham sebab jawapan itu betul.</p></div></div>';
-    [4, 5].forEach(function (t) {
-      html += '<section class="bahagian" style="margin-top:22px"><div class="bahagian-kepala"><h2>Tingkatan ' + t + '</h2></div><div class="kuiz-pilih">';
-      E.babTingkatan(t).forEach(function (b) {
-        html += kad(b.id, esc(b.tajuk), "T" + b.tingkatan + " Bab " + b.no, b.warna, b.no);
+    E.kumpulan().forEach(function (k) {
+      html += '<section class="bahagian" style="margin-top:22px"><div class="bahagian-kepala"><h2>' + esc(k.label) + '</h2></div><div class="kuiz-pilih">';
+      k.bab.forEach(function (b) {
+        html += kad(b.id, esc(b.tajuk), esc(E.labelBab(b)), b.warna, b.no);
       });
-      html += kad("t" + t, "Campuran Tingkatan " + t, "20 soalan rawak", null, null);
+      html += kad(k.kunci, "Campuran " + esc(k.label), "20 soalan rawak", null, null);
       html += "</div></section>";
     });
     html += '<section class="bahagian" style="margin-top:22px"><div class="bahagian-kepala"><h2>Set khas</h2></div><div class="kuiz-pilih">';
@@ -811,7 +908,7 @@
 
     function labelBab(q) {
       var b = E.babIkut[q.bab || (set.bab && set.bab.id)];
-      return b ? "T" + b.tingkatan + " · Bab " + b.no : "";
+      return b ? E.labelPendek(b) + " · Bab " + b.no : "";
     }
 
     function paparSoalan() {
@@ -1028,7 +1125,7 @@
           (b.konteks ? '<div class="konteks">' + b.konteks + "</div>" : "") +
           E.gambar(b.gambar) +
           '<div class="kepala"><p><b>' + esc(b.kod) + "</b> " + b.s + '</p><span class="markah">' + b.m + " markah</span></div>" +
-          (bb ? '<span class="teks-lemah" style="font-size:12.5px;font-weight:700">Topik: T' + bb.tingkatan + " Bab " + bb.no + " · " + esc(bb.tajuk) + (b.topik ? " · " + esc(b.topik) : "") + "</span>" : "") +
+          (bb ? '<span class="teks-lemah" style="font-size:12.5px;font-weight:700">Topik: ' + esc(E.labelBab(bb)) + " · " + esc(bb.tajuk) + (b.topik ? " · " + esc(b.topik) : "") + "</span>" : "") +
           '<textarea placeholder="Tulis jawapan anda di sini…" aria-label="Jawapan ' + esc(s.no + " " + b.kod) + '">' + esc(simpan.teks || "") + "</textarea>" +
           '<div class="baris-cip"><button class="btn btn-kecil" type="button" data-skema>' + E.ikon("mata") + " Tunjuk skema</button></div>" +
           '<div class="skema-tempat"></div>' +

@@ -41,7 +41,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `api/sesi.js`, `lib/*.js` | Session API, signed cookie, allowlist, Firebase token verification |
 | `assets/js/eko-core.js` | `window.EKO`: registries, storage, formatting, icons |
 | `assets/js/graf.js` | `EKO.graf` SVG engine + market graphs |
-| `assets/js/graf-t4.js`, `graf-t5.js` | Form 4 / Form 5 graph widgets |
+| `assets/js/graf-t4.js`, `graf-t5.js`, `graf-stpm.js` | Form 4 / Form 5 / STPM graph widgets |
 | `assets/js/kalkulator.js` | `EKO.kalkulator`: every syllabus formula as a calculator with worked steps, plus the `#kalkulator` view |
 | `assets/js/app.js` | Hash router and all views |
 | `assets/js/akaun.js` | Header account button and sign-out |
@@ -97,7 +97,7 @@ python3 -m http.server 8765
 const fs = require("fs"), vm = require("vm");
 const ctx = { console, document: { getElementById: () => null } }; ctx.window = ctx; vm.createContext(ctx);
 ["eko-core.js", "data/t4-bab1.js", "data/t4-bab2.js", "data/t4-bab3.js", "data/t4-bab4.js",
- "data/t5-bab1.js", "data/t5-bab2.js", "data/percubaan-kelantan-2025.js"]
+ "data/t5-bab1.js", "data/t5-bab2.js", "data/stpm-p1-bab1.js", "data/percubaan-kelantan-2025.js"]
   .forEach(f => vm.runInContext(fs.readFileSync("assets/js/" + f, "utf8"), ctx, { filename: f }));
 for (const b of ctx.EKO.bab) console.log(b.id, b.kad.length, "kad", b.kuiz.length, "kuiz",
   b.kuiz.filter(q => !(q.j >= 0 && q.j < q.p.length)).length, "bad answers");

@@ -345,21 +345,43 @@
   G.daftar(
     "kkp",
     function (host, opt) {
+      // Lalai: Jadual 1.2 buku teks T4. Bab lain boleh beri jadual sendiri melalui data-opt:
+      // { data: [[x, y, "A"], …], rujuk: [[x, y, "H"], …] (titik dalam dahulu, kemudian luar),
+      //   namaX, namaY, unitX, unitY, x, y, tikX, tikY }
+      var C = {
+        data: opt.data || [
+          [0, 20, "R"],
+          [4, 19, "S"],
+          [8, 17, "T"],
+          [12, 13, "U"],
+          [16, 0, "V"]
+        ],
+        rujuk: opt.rujuk || [
+          [6, 8, "W"],
+          [13, 19, "Y"]
+        ],
+        namaX: opt.namaX || "Pakaian",
+        namaY: opt.namaY || "Makanan",
+        unitX: opt.unitX || "ribu helai",
+        unitY: opt.unitY || "tan metrik",
+        x: opt.x || [0, 22],
+        y: opt.y || [0, 27],
+        tikX: opt.tikX || [0, 4, 8, 12, 16, 20],
+        tikY: opt.tikY || [0, 5, 10, 15, 20, 25]
+      };
       var K = G.kad(host, {
         tajuk: opt.tajuk || "Keluk kemungkinan pengeluaran: pakaian dan makanan",
         petunjuk: "Seret titik X · pilih segmen untuk kos lepas"
       });
-      var DATA = [
-        [0, 20, "R"],
-        [4, 19, "S"],
-        [8, 17, "T"],
-        [12, 13, "U"],
-        [16, 0, "V"]
-      ];
-      var RUJUK = [
-        [6, 8, "W"],
-        [13, 19, "Y"]
-      ];
+      var DATA = C.data;
+      var RUJUK = C.rujuk;
+      var X_AKHIR = DATA[DATA.length - 1][0];
+      var X_MAKS = C.x[1] - (C.x[1] - C.x[0]) * 0.02;
+      var Y_MAKS = C.y[1] - (C.y[1] - C.y[0]) * 0.02;
+      var LANGKAH = (C.x[1] - C.x[0]) / 88;
+      var LANGKAH_Y = (C.y[1] - C.y[0]) / 108;
+      var dalam = RUJUK[0] ? RUJUK[0][2] : "",
+        luar = RUJUK[1] ? RUJUK[1][2] : "";
       var f0 = G.monoton(
         DATA.map(function (d) {
           return d[0];
@@ -369,24 +391,21 @@
         })
       );
       var SKALA = 1.3;
-      var st = { s: 1, tumbuh: false, seg: null, x: 7, y: 9, jejak: null };
+      var st = { s: 1, tumbuh: false, seg: null, x: opt.mula ? opt.mula[0] : 7, y: opt.mula ? opt.mula[1] : 9, jejak: null };
       var batal = null;
 
       function f(x) {
         return st.s * f0(x / st.s);
       }
       function hujung() {
-        return 16 * st.s;
+        return X_AKHIR * st.s;
       }
 
       var seg = G.segmen(
         K.kawalan,
-        [
-          ["0", "R → S"],
-          ["1", "S → T"],
-          ["2", "T → U"],
-          ["3", "U → V"]
-        ],
+        DATA.slice(1).map(function (d, i) {
+          return [String(i), DATA[i][2] + " → " + d[2]];
+        }),
         null,
         function (v) {
           var n = parseInt(v, 10);
@@ -412,12 +431,12 @@
       );
 
       var plot = G.plot(K.kanvas, {
-        x: [0, 22],
-        y: [0, 27],
-        tikX: [0, 4, 8, 12, 16, 20],
-        tikY: [0, 5, 10, 15, 20, 25],
-        labelX: "Pakaian (ribu helai)",
-        labelY: "Makanan (tan metrik)",
+        x: C.x,
+        y: C.y,
+        tikX: C.tikX,
+        tikY: C.tikY,
+        labelX: C.namaX + " (" + C.unitX + ")",
+        labelY: C.namaY + " (" + C.unitY + ")",
         nisbah: function (w) {
           return w < 480 ? 0.92 : 0.62;
         },
@@ -450,16 +469,16 @@
         plot.paksi();
         var tumbuh = st.s > 1.002;
         if (tumbuh) {
-          plot.fungsi(f0, 0, 16, "g-lengkung c3 hantu", "hantu", 140);
-          plot.teks(14.2, f0(14.2), "KKP₀", "g-teks lemah", "end", "label", -8, 4);
+          plot.fungsi(f0, 0, X_AKHIR, "g-lengkung c3 hantu", "hantu", 140);
+          plot.teks(X_AKHIR * 0.8875, f0(X_AKHIR * 0.8875), "KKP₀", "g-teks lemah", "end", "label", -8, 4);
           if (st.s > 1.06) {
-            var xa = 9,
+            var xa = X_AKHIR * 0.5625,
               ya = f0(9);
             plot.panah(xa + 0.3, ya + 0.35, xa * st.s - 0.3, ya * st.s - 0.35, "baik", "tanda", 9);
           }
         }
         plot.fungsi(f, 0, hujung(), "g-lengkung c3", "lengkung", 160);
-        var xl = 14.2 * st.s;
+        var xl = X_AKHIR * 0.8875 * st.s;
         plot.teks(xl, f(xl), tumbuh ? "KKP₁" : "KKP", "g-teks c3", "start", "label", 9, 2);
 
         if (st.seg != null) {
@@ -468,13 +487,13 @@
           plot.garis(a[0], a[1], b[0], a[1], "g-panduan", "panduan");
           plot.panah(a[0], a[1], b[0], a[1], "c4", "tanda", 8);
           plot.panah(b[0], a[1], b[0], b[1], "s", "tanda", 8);
-          plot.teks((a[0] + b[0]) / 2, a[1], "+" + (b[0] - a[0]) + " ribu helai", "g-teks c4", "middle", "label", 0, -9);
-          plot.teks(b[0], (a[1] + b[1]) / 2, "−" + (a[1] - b[1]) + " tan", "g-teks s", "start", "label", 8, 4);
+          plot.teks((a[0] + b[0]) / 2, a[1], "+" + (b[0] - a[0]) + " " + (opt.unitX ? "unit" : "ribu helai"), "g-teks c4", "middle", "label", 0, -9);
+          plot.teks(b[0], (a[1] + b[1]) / 2, "−" + (a[1] - b[1]) + " " + (opt.unitY ? "unit" : "tan"), "g-teks s", "start", "label", 8, 4);
         }
 
         DATA.forEach(function (d, i) {
           plot.bulat(d[0], d[1], 4.5, "g-nod isi c3", "tanda");
-          plot.teks(d[0], d[1], d[2], "g-teks c3", "start", "label", 8, i === 4 ? -10 : -9);
+          plot.teks(d[0], d[1], d[2], "g-teks c3", "start", "label", 8, i === DATA.length - 1 ? -10 : -9);
         });
         RUJUK.forEach(function (p) {
           plot.bulat(p[0], p[1], 4, "g-nod", "tanda");
@@ -494,30 +513,41 @@
 
       function baca(s) {
         var bits = [
-          ["Pakaian", E.fmt(st.x, 1) + " ribu helai", "c4"],
-          ["Makanan", E.fmt(st.y, 1) + " tan metrik", "s"]
+          [C.namaX, E.fmt(st.x, 1) + " " + C.unitX, "c4"],
+          [C.namaY, E.fmt(st.y, 1) + " " + C.unitY, "s"]
         ];
         var ayat;
         if (s === "cekap") {
           ayat =
-            '<span class="status baik">Pada keluk: cekap</span> Semua faktor pengeluaran digunakan sepenuhnya (guna tenaga penuh). Untuk menambah pakaian, sebahagian makanan mesti dikorbankan. Pergerakan di sepanjang KKP menggambarkan <b>masalah pilihan</b> dan <b>kos lepas</b>.';
+            '<span class="status baik">Pada keluk: cekap</span> Semua faktor pengeluaran digunakan sepenuhnya (guna tenaga penuh). Untuk menambah ' + C.namaX.toLowerCase() + ", sebahagian " + C.namaY.toLowerCase() + ' mesti dikorbankan. Pergerakan di sepanjang KKP menggambarkan <b>masalah pilihan</b> dan <b>kos lepas</b>.';
         } else if (s === "dalam") {
           ayat =
-            '<span class="status amaran">Di dalam keluk: tidak cekap</span> Kombinasi seperti titik W boleh dicapai tetapi ada faktor pengeluaran yang <b>menganggur</b> atau tidak digunakan sepenuhnya. Ekonomi boleh menambah kedua-dua barang tanpa mengorbankan mana-mana.';
+            '<span class="status amaran">Di dalam keluk: tidak cekap</span> Kombinasi seperti titik ' + dalam + ' boleh dicapai tetapi ada faktor pengeluaran yang <b>menganggur</b> atau tidak digunakan sepenuhnya. Ekonomi boleh menambah kedua-dua barang tanpa mengorbankan mana-mana.';
         } else {
           ayat =
-            '<span class="status buruk">Di luar keluk: tidak tercapai</span> Kombinasi seperti titik Y tidak dapat dihasilkan dengan faktor pengeluaran dan teknologi sedia ada. Inilah <b>masalah kekurangan</b> (ketidakupayaan ekonomi).' +
+            '<span class="status buruk">Di luar keluk: tidak tercapai</span> Kombinasi seperti titik ' + luar + ' tidak dapat dihasilkan dengan faktor pengeluaran dan teknologi sedia ada. Inilah <b>masalah kekurangan</b> (ketidakupayaan ekonomi).' +
             (st.tumbuh ? "" : " Tekan <b>Pertumbuhan ekonomi</b> untuk melihat KKP beralih ke kanan.");
         }
-        if (st.tumbuh) ayat += " Pertumbuhan ekonomi (pertambahan faktor pengeluaran atau kemajuan teknologi) menganjak KKP ke kanan, jadi titik Y kini boleh dicapai.";
+        if (st.tumbuh) ayat += " Pertumbuhan ekonomi (pertambahan faktor pengeluaran atau kemajuan teknologi) menganjak KKP ke kanan, jadi titik " + luar + " kini boleh dicapai.";
         if (st.seg != null) {
           var a = DATA[st.seg],
             b = DATA[st.seg + 1];
           var kl = (a[1] - b[1]) / (b[0] - a[0]);
-          bits.push(["Kos lepas " + a[2] + "→" + b[2], E.fmt(kl, 2, true) + " tan bagi 1 ribu helai", "c3"]);
+          var siri = DATA.slice(1).map(function (d, i) {
+            return E.fmt((DATA[i][1] - d[1]) / (d[0] - DATA[i][0]), 2, true);
+          });
+          var tetap = siri.every(function (v) {
+            return v === siri[0];
+          });
+          var uX = opt.unitX ? "unit" : "ribu helai",
+            uY = opt.unitY ? "unit" : "tan";
+          bits.push(["Kos lepas " + a[2] + "→" + b[2], E.fmt(kl, 2, true) + " " + uY + " bagi 1 " + uX, "c3"]);
           ayat +=
-            "<br>Dari " + a[2] + " ke " + b[2] + ": tambahan " + (b[0] - a[0]) + " ribu helai pakaian mengorbankan " + (a[1] - b[1]) + " tan metrik makanan. Kecerunan = (" + b[1] + " − " + a[1] + ") ÷ (" + b[0] + " − " + a[0] + ") = <b>−" + E.fmt(kl, 2, true) +
-            "</b>. Kos lepas semakin bertambah (0.25 → 0.50 → 1.00 → 3.25) kerana faktor pengeluaran tidak sesuai sepenuhnya untuk kedua-dua kegunaan, maka KKP <b>cembung ke titik asalan</b>.";
+            "<br>Dari " + a[2] + " ke " + b[2] + ": tambahan " + (b[0] - a[0]) + " " + C.unitX + " " + C.namaX.toLowerCase() + " mengorbankan " + (a[1] - b[1]) + " " + C.unitY + " " + C.namaY.toLowerCase() + ". Kecerunan = (" + b[1] + " − " + a[1] + ") ÷ (" + b[0] + " − " + a[0] + ") = <b>−" + E.fmt(kl, 2, true) +
+            "</b>. " +
+            (tetap
+              ? "Kos lepas <b>malar</b> (" + siri[0] + ") kerana faktor pengeluaran sama cekap untuk kedua-dua kegunaan, maka KKP berbentuk <b>garis lurus</b>."
+              : "Kos lepas semakin bertambah (" + siri.join(" → ") + ") kerana faktor pengeluaran tidak sesuai sepenuhnya untuk kedua-dua kegunaan, maka KKP <b>cembung ke titik asalan</b>.");
         }
         K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + "</div>";
       }
@@ -525,8 +555,8 @@
       G.interaksi(plot, {
         seret: function (n, pt) {
           if (n !== "X" || pt.x == null) return;
-          var x = E.clamp(pt.x, 0, 21.5),
-            y = E.clamp(pt.y, 0, 26.5);
+          var x = E.clamp(pt.x, 0, X_MAKS),
+            y = E.clamp(pt.y, 0, Y_MAKS);
           var t = terdekat(plot.X(x), plot.Y(y));
           if (t.jarak < 9) {
             x = t.x;
@@ -561,8 +591,8 @@
           }
         },
         kekunci: function (k) {
-          st.x = E.clamp(st.x + k.dx * 0.25, 0, 21.5);
-          st.y = E.clamp(st.y + k.dy * 0.25, 0, 26.5);
+          st.x = E.clamp(st.x + k.dx * LANGKAH, 0, X_MAKS);
+          st.y = E.clamp(st.y + k.dy * LANGKAH_Y, 0, Y_MAKS);
           lukis();
         }
       });

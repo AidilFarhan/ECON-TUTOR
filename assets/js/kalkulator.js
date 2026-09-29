@@ -82,34 +82,37 @@
       { n: "S → T", v: { x0: 4, y0: 19, x1: 8, y1: 17 } },
       { n: "U → V", v: { x0: 12, y0: 13, x1: 16, y1: 0 } }
     ],
-    kira: function (x) {
-      var dx = x.x1 - x.x0;
-      var dy = x.y1 - x.y0;
-      if (dx === 0) return { ralat: "Perubahan barang X tidak boleh sifar." };
-      var c = dy / dx;
-      var L = [
-        "Perubahan barang Y = " + nom(x.y1) + " − " + kr(x.y0) + " = " + nom(dy),
-        "Perubahan barang X = " + nom(x.x1) + " − " + kr(x.x0) + " = " + nom(dx),
-        "Kecerunan KKP = " + nom(dy) + " ÷ " + kr(dx) + " = <b>" + nom(c) + "</b>"
-      ];
-      var out = {
-        hasil: [H("Kecerunan KKP", nom(c)), H("Kos lepas 1 unit X", nom(Math.abs(c)) + " unit Y"), H("Kos lepas 1 unit Y", dy !== 0 ? nom(Math.abs(dx / dy)) + " unit X" : "–")],
-        langkah: L
-      };
-      if ((dx > 0 && dy < 0) || (dx < 0 && dy > 0)) {
-        var tambahX = dx > 0;
-        L.push(
-          tambahX
-            ? "Menambah " + nom(dx) + " unit X mengorbankan " + nom(-dy) + " unit Y, maka kos lepas 1 unit X = " + nom(-dy) + " ÷ " + nom(dx) + " = <b>" + nom(Math.abs(c)) + " unit Y</b>"
-            : "Menambah " + nom(dy) + " unit Y mengorbankan " + nom(-dx) + " unit X, maka kos lepas 1 unit Y = " + nom(-dx) + " ÷ " + nom(dy) + " = <b>" + nom(Math.abs(dx / dy)) + " unit X</b>"
-        );
-        out.nota = "Tanda negatif menunjukkan KKP mencerun ke bawah dari kiri ke kanan: untuk menambah satu barang, sebahagian barang lain terpaksa dikorbankan.";
-      } else {
-        out.amaran = "Kedua-dua barang tidak berubah secara bertentangan. Ini bukan pergerakan di sepanjang KKP (mungkin titik asal di dalam keluk atau KKP beralih).";
-      }
-      return out;
-    }
+    kira: kiraKosLepas
   });
+
+  // Kos lepas di antara dua titik KKP (dikongsi oleh kalkulator T4 dan STPM).
+  function kiraKosLepas(x) {
+    var dx = x.x1 - x.x0;
+    var dy = x.y1 - x.y0;
+    if (dx === 0) return { ralat: "Perubahan barang X tidak boleh sifar." };
+    var c = dy / dx;
+    var L = [
+      "Perubahan barang Y = " + nom(x.y1) + " − " + kr(x.y0) + " = " + nom(dy),
+      "Perubahan barang X = " + nom(x.x1) + " − " + kr(x.x0) + " = " + nom(dx),
+      "Kecerunan KKP = " + nom(dy) + " ÷ " + kr(dx) + " = <b>" + nom(c) + "</b>"
+    ];
+    var out = {
+      hasil: [H("Kecerunan KKP", nom(c)), H("Kos lepas 1 unit X", nom(Math.abs(c)) + " unit Y"), H("Kos lepas 1 unit Y", dy !== 0 ? nom(Math.abs(dx / dy)) + " unit X" : "–")],
+      langkah: L
+    };
+    if ((dx > 0 && dy < 0) || (dx < 0 && dy > 0)) {
+      var tambahX = dx > 0;
+      L.push(
+        tambahX
+          ? "Menambah " + nom(dx) + " unit X mengorbankan " + nom(-dy) + " unit Y, maka kos lepas 1 unit X = " + nom(-dy) + " ÷ " + nom(dx) + " = <b>" + nom(Math.abs(c)) + " unit Y</b>"
+          : "Menambah " + nom(dy) + " unit Y mengorbankan " + nom(-dx) + " unit X, maka kos lepas 1 unit Y = " + nom(-dx) + " ÷ " + nom(dy) + " = <b>" + nom(Math.abs(dx / dy)) + " unit X</b>"
+      );
+      out.nota = "Tanda negatif menunjukkan KKP mencerun ke bawah dari kiri ke kanan: untuk menambah satu barang, sebahagian barang lain terpaksa dikorbankan.";
+    } else {
+      out.amaran = "Kedua-dua barang tidak berubah secara bertentangan. Ini bukan pergerakan di sepanjang KKP (mungkin titik asal di dalam keluk atau KKP beralih).";
+    }
+    return out;
+  }
 
   /* =========================================================
      TINGKATAN 4 · BAB 2 · Pasaran
@@ -1966,6 +1969,31 @@
   });
 
   /* =========================================================
+     STPM PENGGAL 1 · BAB 1 · Pengenalan
+     ========================================================= */
+  tambah({
+    id: "stpm-kos-lepas",
+    bab: "stpm-p1-b1",
+    no: "1.5",
+    tajuk: "Kos lepas pada keluk kemungkinan pengeluaran (STPM)",
+    kunci: "kkp kecerunan barang industri pertanian perkilangan cembung lurus malar",
+    rumus: ["Kos lepas = " + frac("Perubahan unit barang yang dikorbankan", "Perubahan unit barang yang ditambah")],
+    petunjuk: "Contoh modul PdP Penggal 1: barang X = barang industri (unit), barang Y = barang pertanian (unit).",
+    medan: [
+      { k: "x0", l: "Barang X di titik asal" },
+      { k: "y0", l: "Barang Y di titik asal" },
+      { k: "x1", l: "Barang X di titik baharu" },
+      { k: "y1", l: "Barang Y di titik baharu" }
+    ],
+    contoh: [
+      { n: "C → D", v: { x0: 2, y0: 27, x1: 3, y1: 23 } },
+      { n: "E → F", v: { x0: 4, y0: 17, x1: 5, y1: 0 } },
+      { n: "Pakaian A → B", v: { x0: 0, y0: 25, x1: 5, y1: 20 } }
+    ],
+    kira: kiraKosLepas
+  });
+
+  /* =========================================================
      ENJIN PAPARAN
      ========================================================= */
   var ikutId = {};
@@ -2127,7 +2155,7 @@
     var jadual = medanJadual(k).length > 0;
     var h =
       '<article class="kalk kaca-pekat' + (jadual ? " lebar" : "") + '" id="kalk-' + k.id + '" data-id="' + k.id + '" style="--warna-bab:' + b.warna + '">' +
-      '<header class="kalk-kepala"><span class="kalk-tag"><i></i>T' + b.tingkatan + " · " + esc(k.no) + "</span><h3>" + esc(k.tajuk) + "</h3></header>" +
+      '<header class="kalk-kepala"><span class="kalk-tag"><i></i>' + esc(E.labelPendek(b)) + " · " + esc(k.no) + "</span><h3>" + esc(k.tajuk) + "</h3></header>" +
       '<div class="kotak rumus"><span class="kotak-label">Rumus</span>' +
       k.rumus
         .map(function (r) {
@@ -2165,7 +2193,7 @@
       '<div class="kalk-hasil" aria-live="polite"></div>' +
       '<footer class="kalk-kaki">' +
       '<button type="button" class="btn btn-kecil btn-hantu" data-set-semula>' + E.ikon("ulang") + " Set semula</button>" +
-      '<a class="btn btn-kecil btn-hantu" href="#' + b.id + '">' + E.ikon("buku") + " Nota T" + b.tingkatan + " Bab " + b.no + "</a>" +
+      '<a class="btn btn-kecil btn-hantu" href="#' + b.id + '">' + E.ikon("buku") + " Nota " + esc(E.labelBab(b)) + "</a>" +
       "</footer></article>";
     return h;
   }
@@ -2223,7 +2251,7 @@
   /* ---------- halaman ---------- */
   function teksCari(k) {
     var b = E.babIkut[k.bab];
-    return (k.tajuk + " " + k.kunci + " " + k.rumus.join(" ") + " " + b.tajuk + " t" + b.tingkatan + " bab " + b.no + " " + k.no).replace(/<[^>]+>/g, " ").toLowerCase();
+    return (k.tajuk + " " + k.kunci + " " + k.rumus.join(" ") + " " + b.tajuk + " " + E.kunciKumpulan(b) + " " + E.labelBab(b) + " " + k.no).replace(/<[^>]+>/g, " ").toLowerCase();
   }
 
   function bilanganBab(id) {
@@ -2235,7 +2263,18 @@
   function papar(app, sasaran) {
     var st = { tapis: "semua", cari: "" };
     var fokus = null;
-    if (sasaran === "t4" || sasaran === "t5" || (E.babIkut[sasaran] && bilanganBab(sasaran))) st.tapis = sasaran;
+    var babAda = E.bab.filter(function (b) {
+      return bilanganBab(b.id) > 0;
+    });
+    var kumpulanAda = E.kumpulan().filter(function (g) {
+      return g.bab.some(function (b) {
+        return bilanganBab(b.id) > 0;
+      });
+    });
+    var kunciAda = kumpulanAda.map(function (g) {
+      return g.kunci;
+    });
+    if (kunciAda.indexOf(sasaran) !== -1 || (E.babIkut[sasaran] && bilanganBab(sasaran))) st.tapis = sasaran;
     else if (ikutId[sasaran]) fokus = sasaran;
 
     var keadaan = {};
@@ -2243,22 +2282,21 @@
       keadaan[k.id] = keadaanAwal(k, 0);
     });
 
-    var babAda = E.bab.filter(function (b) {
-      return bilanganBab(b.id) > 0;
-    });
-
     var html =
       '<div class="bekas pandangan halaman-kalk">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Kalkulator</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kalkulator Ekonomi</h1><p>Semua rumus dan pengiraan dalam silibus Ekonomi Tingkatan 4 dan 5. Tukar nilai, jawapan dan jalan kira dikemas kini serta-merta. Nilai awal ialah contoh daripada buku teks.</p></div></div>' +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kalkulator Ekonomi</h1><p>Semua rumus dan pengiraan dalam silibus Ekonomi Tingkatan 4 dan 5' + (E.babPeringkat("stpm").length ? " serta STPM" : "") + '. Tukar nilai, jawapan dan jalan kira dikemas kini serta-merta. Nilai awal ialah contoh daripada buku teks.</p></div></div>' +
       '<div class="penapis kaca kalk-penapis">' +
       '<div class="baris"><b>Pilih</b>' +
       '<button type="button" class="cip" data-tapis="semua">Semua</button>' +
-      '<button type="button" class="cip" data-tapis="t4">Tingkatan 4</button>' +
-      '<button type="button" class="cip" data-tapis="t5">Tingkatan 5</button>' +
+      kumpulanAda
+        .map(function (g) {
+          return '<button type="button" class="cip" data-tapis="' + g.kunci + '">' + esc(g.label) + "</button>";
+        })
+        .join("") +
       babAda
         .map(function (b) {
-          return '<button type="button" class="cip" data-tapis="' + b.id + '"><span class="titik" style="color:' + b.warna + '"></span>T' + b.tingkatan + " B" + b.no + "</button>";
+          return '<button type="button" class="cip" data-tapis="' + b.id + '"><span class="titik" style="color:' + b.warna + '"></span>' + esc(E.labelPendek(b)) + " B" + b.no + "</button>";
         })
         .join("") +
       "</div>" +
@@ -2267,7 +2305,7 @@
     babAda.forEach(function (b) {
       html +=
         '<section class="galeri-kumpulan kalk-kumpulan" data-bab="' + b.id + '" style="--warna-bab:' + b.warna + '">' +
-        '<h2><span class="lencana-bab" style="width:36px;height:36px;font-size:16px;border-radius:11px">' + b.no + "</span> T" + b.tingkatan + " · " + esc(b.tajuk) + "</h2>" +
+        '<h2><span class="lencana-bab" style="width:36px;height:36px;font-size:16px;border-radius:11px">' + b.no + "</span> " + esc(E.labelPendek(b)) + " · " + esc(b.tajuk) + "</h2>" +
         '<div class="grid-kalk">' +
         K.filter(function (k) {
           return k.bab === b.id;
@@ -2296,7 +2334,7 @@
       akar.querySelectorAll(".kalk").forEach(function (el) {
         var k = ikutId[el.getAttribute("data-id")];
         var b = E.babIkut[k.bab];
-        var ok = st.tapis === "semua" || st.tapis === "t" + b.tingkatan || st.tapis === k.bab;
+        var ok = st.tapis === "semua" || st.tapis === E.kunciKumpulan(b) || st.tapis === k.bab;
         if (ok && q.length)
           ok = q.every(function (w) {
             return indeks[k.id].indexOf(w) !== -1;
