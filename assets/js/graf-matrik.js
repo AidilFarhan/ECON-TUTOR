@@ -14,6 +14,7 @@
   /* =========================================================
      Carta daripada jadual. Semua data datang daripada data-opt:
      { tajuk, petunjuk, namaX, unitX, nilaiX:[…], xAwal, dp, nota:{x: html}, notaLalai,
+       diskret: true → penjejak lompat antara baris (siri masa); lalai: bergerak licin,
        panel:[{ labelX, labelY, x:[a,b], y:[a,b], tikX, tikY, asalan, paksiXBawah,
                 siri:[{ id, nama, label, kelas, data:[[x,y]…], unit, rm, dp, licin, titik, dxLabel, dyLabel }],
                 zon:[{ dari, ke, kelas: "z1"|"z2"|"z3", label }],
@@ -39,21 +40,45 @@
         return (opt.namaX ? opt.namaX + " " : "") + E.fmt(v, opt.dpX != null ? opt.dpX : 2) + (opt.unitX ? " " + opt.unitX : "");
       }
 
+      // Nilai tepat pada baris jadual; di antara baris, dibaca daripada keluk licin
+      // (atau garis lurus bagi siri licin: false). Di luar julat siri: tiada nilai.
       function nilaiPada(s, x) {
         for (var i = 0; i < s.data.length; i++) if (Math.abs(s.data[i][0] - x) < 1e-9) return s.data[i][1];
-        return null;
+        if (x < s.data[0][0] || x > s.data[s.data.length - 1][0]) return null;
+        if (s.licin === false) {
+          for (var j = 1; j < s.data.length; j++) {
+            var a = s.data[j - 1],
+              b = s.data[j];
+            if (x <= b[0]) return E.lerp(a[1], b[1], (x - a[0]) / (b[0] - a[0]));
+          }
+          return null;
+        }
+        if (!s.f)
+          s.f = G.monoton(
+            s.data.map(function (p) {
+              return p[0];
+            }),
+            s.data.map(function (p) {
+              return p[1];
+            })
+          );
+        return s.f(x);
       }
 
       function baca(x) {
         if (x == null) return;
-        var bits = [[opt.namaX || "X", E.fmt(x, opt.dpX != null ? opt.dpX : 2) + (opt.unitX ? " " + opt.unitX : ""), ""]];
+        var tepat = nilaiX.indexOf(x) !== -1;
+        var dpX = opt.dpX != null ? opt.dpX : 2;
+        var bits = [[opt.namaX || "X", E.fmt(x, tepat ? dpX : Math.max(dpX, 2)) + (opt.unitX ? " " + opt.unitX : ""), ""]];
         semuaSiri.forEach(function (s) {
           var v = nilaiPada(s, x);
           var dp = s.dp != null ? s.dp : opt.dp != null ? opt.dp : 2;
+          if (!tepat) dp = Math.max(dp, 2);
           var teks = v == null ? "–" : s.rm ? E.rm(v, dp, dp > 0) : E.fmt(v, dp) + (s.unit ? " " + s.unit : "");
           bits.push([s.nama, teks, s.kelas || ""]);
         });
-        var nota = opt.nota && opt.nota[String(x)] != null ? opt.nota[String(x)] : opt.notaLalai || "";
+        var nota = tepat && opt.nota && opt.nota[String(x)] != null ? opt.nota[String(x)] : opt.notaLalai || "";
+        if (!tepat && !nota) nota = '<span class="teks-lemah">Nilai di antara baris jadual dibaca daripada keluk.</span>';
         K.baca.innerHTML = G.nilai(bits) + (nota ? '<div class="ayat">' + nota + "</div>" : "");
       }
 
@@ -71,7 +96,7 @@
             dxLabel: s.dxLabel,
             dyLabel: s.dyLabel
           };
-          semuaSiri.push({ nama: s.nama, kelas: t.kelas, data: s.data, unit: s.unit, dp: s.dp, rm: s.rm });
+          semuaSiri.push({ nama: s.nama, kelas: t.kelas, data: s.data, unit: s.unit, dp: s.dp, rm: s.rm, licin: s.licin });
           return t;
         });
         var c = G.carta(
@@ -88,6 +113,7 @@
             siri: siri,
             zon: p.zon,
             nilaiX: nilaiX,
+            selanjar: !opt.diskret,
             xAwal: xAwal,
             fmtX: fmtX,
             nisbah: function (w) {
@@ -243,14 +269,14 @@
           plot.teks(r2[1], lrac(r2[1]), "LRAC", "g-teks d", "end", "label", -4, -10);
         }
         var y = kosPanjang(st.q);
-        plot.panduanKePaksi(st.q, y, { labelX: E.fmt(st.q, 0), labelY: E.fmt(y, 2) });
+        plot.panduanKePaksi(st.q, y, { labelX: E.fmt(st.q, 1), labelY: E.fmt(y, 2) });
         plot.nod(st.q, y, { pegang: "q", kelas: "d" });
         baca(y);
       }
 
       function baca(y) {
         var bits = [
-          ["Keluaran", E.fmt(st.q, 0) + " unit", ""],
+          ["Keluaran", E.fmt(st.q, 1) + " unit", ""],
           ["Kos purata jangka panjang", E.rm(y, 2, true), "d"]
         ];
         var ayat;
@@ -258,7 +284,7 @@
           var i = lojiDipilih(st.q);
           bits.push(["Saiz loji dipilih", LOJI3[i].nama, "c3"]);
           ayat =
-            "Pada keluaran " + E.fmt(st.q, 0) + " unit, firma memilih loji <b>" + LOJI3[i].nama + "</b> kerana kos puratanya paling rendah pada keluaran itu. " +
+            "Pada keluaran " + E.fmt(st.q, 1) + " unit, firma memilih loji <b>" + LOJI3[i].nama + "</b> kerana kos puratanya paling rendah pada keluaran itu. " +
             "LAC terdiri daripada bahagian setiap keluk SAC yang paling rendah.";
         } else if (st.q < 50) {
           ayat = '<span class="status baik">LRAC menurun</span> Firma menikmati <b>ekonomi bidangan dalaman</b>. SAC menyentuh LRAC pada bahagian SAC yang sedang menurun.';
@@ -272,7 +298,7 @@
 
       function had(q) {
         var r = julatBawah(kosPanjang, st.mod === "banyak" ? 7.8 : HAD_Y);
-        return E.clamp(Math.round(q), Math.ceil(r[0]), Math.floor(r[1]));
+        return E.clamp(Math.round(q * 10) / 10, Math.ceil(r[0]), Math.floor(r[1]));
       }
 
       G.interaksi(plot, {

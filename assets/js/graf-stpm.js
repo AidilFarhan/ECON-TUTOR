@@ -16,36 +16,56 @@
      PENGGAL 1 · BAB 1 · Perubahan KKP (anugerah sumber, teknologi,
      komposisi barang modal dan barang pengguna)
      ========================================================= */
+  // tambah/kurang: kedua-dua barang berubah. naik/turun: punca bagi satu barang sahaja
+  // ({b} diganti nama barang). Keadaan berkurang ialah logik songsang keadaan bertambah.
   var PUNCA = {
     sumber: {
       nama: "Anugerah sumber",
       paksiX: "Barang X",
       paksiY: "Barang Y",
       tambah: "Pertambahan anugerah sumber (pertambahan penduduk atau kemasukan buruh asing, penemuan sumber alam baharu, pertambahan pelaburan)",
-      kurang: "Pengurangan anugerah sumber (kepupusan bahan galian, pengurangan tenaga kerja asing, kemerosotan pelaburan)"
+      kurang: "Pengurangan anugerah sumber (kepupusan bahan galian, pengurangan tenaga kerja asing, kemerosotan pelaburan)",
+      naik: "pertambahan anugerah sumber bagi pengeluaran {b} (contoh pertambahan penduduk atau kemasukan buruh asing, penemuan sumber alam baharu, pertambahan pelaburan)",
+      turun: "pengurangan anugerah sumber bagi pengeluaran {b} (contoh kepupusan bahan galian, pengurangan tenaga kerja asing, kemerosotan pelaburan)"
     },
     teknologi: {
       nama: "Tingkat teknologi",
       paksiX: "Barang X",
       paksiY: "Barang Y",
       tambah: "Perkembangan teknologi yang sama dalam pengeluaran barang X dan barang Y",
-      kurang: "Kemunduran teknologi dalam pengeluaran kedua-dua barang"
+      kurang: "Kemunduran teknologi dalam pengeluaran kedua-dua barang",
+      naik: "perkembangan teknologi dalam pengeluaran {b}",
+      turun: "kemunduran teknologi dalam pengeluaran {b}"
     },
     komposisi: {
       nama: "Komposisi barang modal",
       paksiX: "Barang modal",
       paksiY: "Barang pengguna",
       tambah: "Kadar pertambahan komposisi barang modal sama dengan kadar pertambahan barang pengguna",
-      kurang: "Kadar pengurangan komposisi barang modal sama dengan kadar pengurangan barang pengguna"
+      kurang: "Kadar pengurangan komposisi barang modal sama dengan kadar pengurangan barang pengguna",
+      naik: "pertambahan komposisi {b}",
+      turun: "pengurangan komposisi {b}"
     }
   };
+
+  // Keadaan peralihan KKP: [kod, label butang, sasaran A′ (paksi Y), sasaran B′ (paksi X)]
+  var KES_KKP = [
+    ["kanan", "Beralih ke kanan", 13, 13],
+    ["kiri", "Beralih ke kiri", 7, 7],
+    ["y+", "Y sahaja bertambah", 13, 10],
+    ["x+", "X sahaja bertambah", 10, 13],
+    ["y-", "Y sahaja berkurang", 7, 10],
+    ["x-", "X sahaja berkurang", 10, 7],
+    ["y+x-", "Y bertambah, X berkurang", 13, 7],
+    ["y-x+", "Y berkurang, X bertambah", 7, 13]
+  ];
 
   G.daftar(
     "kkp-anjakan",
     function (host, opt) {
       var K = G.kad(host, {
         tajuk: opt.tajuk || "Perubahan keluk kemungkinan pengeluaran",
-        petunjuk: "Seret A′ (paksi tegak) atau B′ (paksi datar) · anak panah ↑↓ dan ←→"
+        petunjuk: "Seret keluk, A′ (paksi tegak) atau B′ (paksi datar) · anak panah ↑↓ dan ←→"
       });
       var ASAL = 10;
       var MIN = 4,
@@ -68,20 +88,27 @@
       G.pemisah(K.kawalan);
       var segKes = G.segmen(
         K.kawalan,
-        [
-          ["kanan", "Beralih ke kanan"],
-          ["kiri", "Beralih ke kiri"],
-          ["y", "Y sahaja"],
-          ["x", "X sahaja"]
-        ],
+        KES_KKP.map(function (k) {
+          return [k[0], k[1]];
+        }),
         "kanan",
         function (v) {
-          var sasar = { kanan: [13, 13], kiri: [7, 7], y: [13, ASAL], x: [ASAL, 13] }[v];
-          st.a = sasar[0];
-          st.b = sasar[1];
+          KES_KKP.forEach(function (k) {
+            if (k[0] === v) {
+              st.a = k[2];
+              st.b = k[3];
+            }
+          });
           lukis();
         }
       );
+      G.pemisah(K.kawalan);
+      // Situasi asal: KKP kembali ke garis putus-putus AB
+      G.butang(K.kawalan, "↺ Situasi asal", function () {
+        st.a = ASAL;
+        st.b = ASAL;
+        lukis();
+      });
 
       var plot = G.plot(K.kanvas, {
         x: [0, 16],
@@ -111,21 +138,24 @@
         };
       }
 
-      function sama(u, v) {
-        return Math.abs(u - v) < 0.25;
+      // Arah perubahan setiap pintasan: +1 bertambah, −1 berkurang, 0 tetap
+      function arah(v) {
+        return v > ASAL + 0.15 ? 1 : v < ASAL - 0.15 ? -1 : 0;
       }
 
       function kes() {
-        var naikA = st.a > ASAL + 0.25,
-          turunA = st.a < ASAL - 0.25,
-          naikB = st.b > ASAL + 0.25,
-          turunB = st.b < ASAL - 0.25;
-        if (sama(st.a, ASAL) && sama(st.b, ASAL)) return "tetap";
-        if (naikA && naikB) return "kanan";
-        if (turunA && turunB) return "kiri";
-        if (naikA && !naikB && !turunB) return "y";
-        if (naikB && !naikA && !turunA) return "x";
-        return "campur";
+        var dy = arah(st.a),
+          dx = arah(st.b);
+        if (!dy && !dx) return "tetap";
+        if (dy > 0 && dx > 0) return "kanan";
+        if (dy < 0 && dx < 0) return "kiri";
+        if (!dx) return dy > 0 ? "y+" : "y-";
+        if (!dy) return dx > 0 ? "x+" : "x-";
+        return dy > 0 ? "y+x-" : "y-x+";
+      }
+
+      function hurufBesar(t) {
+        return t.charAt(0).toUpperCase() + t.slice(1);
       }
 
       function lukis() {
@@ -145,6 +175,15 @@
             y1 = keluk(st.a, st.b)(x1);
           if (Math.abs(x1 - x0) + Math.abs(y1 - y0) > 0.9) plot.panah(x0, y0, x1 - (x1 - x0) * 0.12, y1 - (y1 - y0) * 0.12, st.a + st.b > 2 * ASAL ? "baik" : "s", "tanda", 9);
         }
+        // kawasan sentuh sepanjang keluk semasa: seret keluk untuk mengalihnya secara licin
+        var f = keluk(st.a, st.b),
+          d = "";
+        for (var i = 0; i <= 60; i++) {
+          var xi = (st.b * i) / 60;
+          d += (i ? " L " : "M ") + plot.X(xi).toFixed(1) + " " + plot.Y(f(xi)).toFixed(1);
+        }
+        var gk = G.svgEl("g", { "data-pegang": "keluk", class: "g-pemegang", style: "touch-action:none;cursor:grab" }, plot.lapis.pemegang);
+        G.svgEl("path", { d: d, class: "g-lengkung tebal-hit" }, gk);
         plot.nod(0, st.a, { pegang: "A", kelas: "c3", label: "A′", dx: 14, dy: -10, kelasLabel: "c3" });
         plot.nod(st.b, 0, { pegang: "B", kelas: "c3", label: "B′", dx: 10, dy: -14, kelasLabel: "c3" });
         baca(p);
@@ -152,24 +191,27 @@
 
       function baca(p) {
         var k = kes();
-        segKes.set(k === "tetap" || k === "campur" ? null : k);
-        var x = p.paksiX.toLowerCase(),
-          y = p.paksiY.toLowerCase();
+        segKes.set(k === "tetap" ? null : k);
+        // "Barang X" → "barang X" (huruf pertama sahaja dikecilkan)
+        var x = p.paksiX.charAt(0).toLowerCase() + p.paksiX.slice(1),
+          y = p.paksiY.charAt(0).toLowerCase() + p.paksiY.slice(1);
+        function naik(b) {
+          return p.naik.replace("{b}", b);
+        }
+        function turun(b) {
+          return p.turun.replace("{b}", b);
+        }
         var ayat;
-        if (k === "tetap") ayat = "KKP tidak berubah. Seret A′ atau B′, atau pilih satu keadaan di atas.";
+        if (k === "tetap") ayat = "KKP berada pada situasi asal AB. Seret keluk, A′ atau B′, atau pilih satu keadaan di atas.";
         else if (k === "kanan") ayat = '<span class="status baik">Beralih ke kanan secara selari</span> ' + p.tambah + ". Pengeluaran " + y + " dan " + x + " kedua-duanya bertambah, maka KKP beralih dari AB ke A′B′.";
         else if (k === "kiri") ayat = '<span class="status buruk">Beralih ke kiri secara selari</span> ' + p.kurang + ". Pengeluaran kedua-dua barang berkurang, maka KKP beralih dari AB ke A′B′.";
-        else if (k === "y")
-          ayat =
-            '<span class="status baik">Berpusing ke luar pada paksi tegak</span> ' +
-            (st.punca === "komposisi" ? "Pertambahan komposisi barang pengguna sahaja: pengeluaran barang pengguna bertambah manakala barang modal tetap." : "Perkembangan teknologi dalam pengeluaran " + y + " sahaja, maka pengeluaran " + y + " sahaja bertambah.") +
-            " KKP beralih dari AB ke A′B.";
-        else if (k === "x")
-          ayat =
-            '<span class="status baik">Berpusing ke luar pada paksi datar</span> ' +
-            (st.punca === "komposisi" ? "Pertambahan komposisi barang modal sahaja: pengeluaran barang modal bertambah manakala barang pengguna tetap." : "Perkembangan teknologi dalam pengeluaran " + x + " sahaja, maka pengeluaran " + x + " sahaja bertambah.") +
-            " KKP beralih dari AB ke AB′.";
-        else ayat = '<span class="status amaran">Perubahan tidak sekata</span> Satu barang bertambah dan satu lagi berkurang. Keadaan ini tidak dibincangkan dalam modul; cuba salah satu keadaan di atas.';
+        else if (k === "y+") ayat = '<span class="status baik">Berpusing ke luar pada paksi tegak</span> ' + hurufBesar(naik(y)) + ", maka pengeluaran maksimum " + y + " sahaja bertambah manakala " + x + " tetap. KKP beralih dari AB ke A′B.";
+        else if (k === "y-") ayat = '<span class="status buruk">Berpusing ke dalam pada paksi tegak</span> ' + hurufBesar(turun(y)) + ", maka pengeluaran maksimum " + y + " sahaja berkurang manakala " + x + " tetap. KKP beralih dari AB ke A′B.";
+        else if (k === "x+") ayat = '<span class="status baik">Berpusing ke luar pada paksi datar</span> ' + hurufBesar(naik(x)) + ", maka pengeluaran maksimum " + x + " sahaja bertambah manakala " + y + " tetap. KKP beralih dari AB ke AB′.";
+        else if (k === "x-") ayat = '<span class="status buruk">Berpusing ke dalam pada paksi datar</span> ' + hurufBesar(turun(x)) + ", maka pengeluaran maksimum " + x + " sahaja berkurang manakala " + y + " tetap. KKP beralih dari AB ke AB′.";
+        else if (k === "y+x-")
+          ayat = '<span class="status amaran">Satu bertambah, satu berkurang</span> ' + hurufBesar(naik(y)) + " menambah pengeluaran maksimum " + y + ", manakala " + turun(x) + " mengurangkan pengeluaran maksimum " + x + ". KKP beralih dari AB ke A′B′.";
+        else ayat = '<span class="status amaran">Satu bertambah, satu berkurang</span> ' + hurufBesar(turun(y)) + " mengurangkan pengeluaran maksimum " + y + ", manakala " + naik(x) + " menambah pengeluaran maksimum " + x + ". KKP beralih dari AB ke A′B′.";
         var bits = [
           [p.paksiY + " maksimum", E.fmt(ASAL, 1) + " → " + E.fmt(st.a, 1) + " unit", "c3"],
           [p.paksiX + " maksimum", E.fmt(ASAL, 1) + " → " + E.fmt(st.b, 1) + " unit", "c3"]
@@ -177,16 +219,26 @@
         K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + ' <span class="teks-lemah">(Nilai contoh.)</span></div>';
       }
 
+      // Seret keluk: kedua-dua pintasan berubah mengikut nisbah jarak penuding dari asalan
+      var seretan = null;
       G.interaksi(plot, {
-        seret: function (n, pt) {
-          if (n === "A" && pt.y != null) st.a = E.bundar(E.clamp(pt.y, MIN, MAKS), 1);
-          else if (n === "B" && pt.x != null) st.b = E.bundar(E.clamp(pt.x, MIN, MAKS), 1);
-          else return;
+        seret: function (n, pt, fasa) {
+          if (n === "A" && pt.y != null) st.a = E.bundar(E.clamp(pt.y, MIN, MAKS), 2);
+          else if (n === "B" && pt.x != null) st.b = E.bundar(E.clamp(pt.x, MIN, MAKS), 2);
+          else if (n === "keluk") {
+            if (fasa === "mula" && pt.x != null && pt.y != null) seretan = { r0: Math.max(Math.sqrt(pt.x * pt.x + pt.y * pt.y), 0.5), a0: st.a, b0: st.b };
+            if (!seretan || pt.x == null || pt.y == null) return;
+            var nisbah = Math.sqrt(pt.x * pt.x + pt.y * pt.y) / seretan.r0;
+            nisbah = E.clamp(nisbah, MIN / Math.min(seretan.a0, seretan.b0), MAKS / Math.max(seretan.a0, seretan.b0));
+            st.a = E.bundar(seretan.a0 * nisbah, 2);
+            st.b = E.bundar(seretan.b0 * nisbah, 2);
+            if (fasa === "tamat") seretan = null;
+          } else return;
           lukis();
         },
         kekunci: function (k) {
-          if (k.dy) st.a = E.bundar(E.clamp(st.a + k.dy * 0.5, MIN, MAKS), 1);
-          if (k.dx) st.b = E.bundar(E.clamp(st.b + k.dx * 0.5, MIN, MAKS), 1);
+          if (k.dy) st.a = E.bundar(E.clamp(st.a + k.dy * 0.1, MIN, MAKS), 2);
+          if (k.dx) st.b = E.bundar(E.clamp(st.b + k.dx * 0.1, MIN, MAKS), 2);
           lukis();
         }
       });
@@ -366,7 +418,7 @@
         seret: function (n, pt) {
           if (n !== "P" || pt.y == null) return;
           var h = hadA();
-          st.A = E.bundar(E.clamp(pt.y, h[0], h[1]), 1);
+          st.A = E.bundar(E.clamp(pt.y, h[0], h[1]), 2);
           lukis();
         },
         kekunci: function (k) {

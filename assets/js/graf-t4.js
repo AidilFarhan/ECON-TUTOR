@@ -100,6 +100,8 @@
       aria: cfg.aria || "Carta interaktif"
     });
     var st = { x: cfg.xAwal != null ? cfg.xAwal : null };
+    // Lalai: penjejak bergerak licin sepanjang keluk. selanjar: false → lompat antara nod (contoh siri masa tahunan).
+    var selanjar = cfg.selanjar !== false;
     var fungsi = {};
     cfg.siri.forEach(function (s) {
       fungsi[s.id] = s.f
@@ -118,7 +120,7 @@
 
     function nilaiPada(s, x) {
       for (var i = 0; i < s.data.length; i++) if (Math.abs(s.data[i][0] - x) < 1e-9) return s.data[i][1];
-      if (!cfg.selanjar || x < s.data[0][0] || x > s.data[s.data.length - 1][0]) return null;
+      if (!selanjar || x < s.data[0][0] || x > s.data[s.data.length - 1][0]) return null;
       if (fungsi[s.id]) return fungsi[s.id](x);
       for (var j = 1; j < s.data.length; j++) {
         var a = s.data[j - 1],
@@ -194,11 +196,14 @@
       xMax = cfg.nilaiX[cfg.nilaiX.length - 1];
 
     function snap(v) {
-      if (cfg.selanjar) {
+      if (selanjar) {
         v = E.clamp(v, xMin, xMax);
-        // tarikan kecil ke nod jadual supaya nilai integer mudah dipilih
-        var n = Math.round(v);
-        if (cfg.nilaiX.indexOf(n) !== -1 && Math.abs(plot.X(v) - plot.X(n)) <= 4) return n;
+        // tarikan kecil ke nod jadual (dalam 5 px) supaya nilai jadual mudah dipilih
+        var dekat = cfg.nilaiX[0];
+        cfg.nilaiX.forEach(function (n) {
+          if (Math.abs(n - v) < Math.abs(dekat - v)) dekat = n;
+        });
+        if (Math.abs(plot.X(v) - plot.X(dekat)) <= 5) return dekat;
         return Math.round(v * 100) / 100;
       }
       var terbaik = cfg.nilaiX[0];
@@ -213,6 +218,13 @@
       return terbaik;
     }
 
+    function nodSeterusnya(x0, naik) {
+      var nod = cfg.nilaiX.filter(function (n) {
+        return naik ? n > x0 + 1e-9 : n < x0 - 1e-9;
+      });
+      return nod.length ? (naik ? nod[0] : nod[nod.length - 1]) : x0;
+    }
+
     function ke(v) {
       if (v !== st.x) {
         st.x = v;
@@ -224,7 +236,7 @@
     var tunggu = null,
       bingkai = 0;
     function keLicin(v) {
-      if (!cfg.selanjar) return ke(v);
+      if (!selanjar) return ke(v);
       tunggu = v;
       if (bingkai) return;
       bingkai = requestAnimationFrame(function () {
@@ -242,14 +254,15 @@
       },
       tekanSeret: true,
       kekunci: function (k) {
-        if (cfg.selanjar) {
+        if (selanjar) {
           var x0 = st.x == null ? xMin : st.x;
           if (k.kunci === "Home") return ke(xMin);
           if (k.kunci === "End") return ke(xMax);
           var arah = k.dx || k.dy;
           if (!arah) return;
-          // anak panah: 0.1 unit; Shift + anak panah: ke output integer seterusnya
-          var baru = Math.abs(arah) > 1 ? (arah > 0 ? Math.floor(x0 + 1e-9) + 1 : Math.ceil(x0 - 1e-9) - 1) : Math.round((x0 + (arah > 0 ? 0.1 : -0.1)) * 10) / 10;
+          // anak panah: 1% julat paksi; Shift + anak panah: ke nod jadual seterusnya
+          var langkah = (xMax - xMin) / 100;
+          var baru = Math.abs(arah) > 1 ? nodSeterusnya(x0, arah > 0) : Math.round((x0 + (arah > 0 ? langkah : -langkah)) * 100) / 100;
           return ke(E.clamp(baru, xMin, xMax));
         }
         var i = cfg.nilaiX.indexOf(st.x);
@@ -268,6 +281,11 @@
         lukis();
       },
       set: ke,
+      // nilai siri pada x (diinterpolasi jika selanjar)
+      nilai: function (id, x) {
+        for (var i = 0; i < cfg.siri.length; i++) if (cfg.siri[i].id === id) return nilaiPada(cfg.siri[i], x);
+        return null;
+      },
       get x() {
         return st.x;
       }
@@ -846,6 +864,7 @@
           labelY: "Peratus guna tenaga",
           siri: SIRI,
           nilaiX: TAHUN,
+          selanjar: false,
           xAwal: 2014,
           fmtX: String,
           aria: "Carta garis guna tenaga mengikut sektor"
@@ -1527,12 +1546,30 @@
 
       function baca(x) {
         if (x == null) return;
-        var i = L.indexOf(x);
+        // nilai jadual pada integer; di antara nod, nilai dibaca daripada keluk licin
+        function pada(arr) {
+          var i = L.indexOf(x);
+          if (i >= 0) return arr[i];
+          var d = data(arr);
+          if (x < d[0][0] || x > d[d.length - 1][0]) return null;
+          return G.monoton(
+            d.map(function (p) {
+              return p[0];
+            }),
+            d.map(function (p) {
+              return p[1];
+            })
+          )(x);
+        }
+        var tp = pada(TP),
+          ap = pada(AP),
+          mp = pada(MP);
+        var bulat = L.indexOf(x) >= 0;
         var bits = [
-          ["Buruh", x + " orang", ""],
-          ["TP", TP[i] + " unit", "d"],
-          ["AP", AP[i] == null ? "–" : E.fmt(AP[i], 2) + " unit", "c3"],
-          ["MP", MP[i] == null ? "–" : E.fmt(MP[i], 0) + " unit", "s"]
+          ["Buruh", E.fmt(x, 2) + " orang", ""],
+          ["TP", E.fmt(tp, bulat ? 0 : 2) + " unit", "d"],
+          ["AP", ap == null ? "–" : E.fmt(ap, 2) + " unit", "c3"],
+          ["MP", mp == null ? "–" : E.fmt(mp, bulat ? 0 : 2) + " unit", "s"]
         ];
         var ayat;
         if (x === 0) ayat = "Tanpa buruh (input berubah), tiada keluaran walaupun tanah (input tetap) tersedia.";
@@ -1544,7 +1581,7 @@
           ayat =
             '<span class="status baik">Tahap II · paling cekap</span> Bermula apabila MP = AP (AP maksimum 8 unit, buruh ke-4) dan berakhir apabila MP = 0 (TP maksimum 46 unit, buruh ke-9). TP bertambah dengan kadar berkurangan, manakala AP dan MP menurun. Gabungan input berubah dengan input tetap paling optimum.';
         else ayat = '<span class="status merah">Tahap III · tidak cekap</span> MP negatif (−1 unit) dan TP merosot daripada 46 kepada 45 unit. Berlaku <b>pembaziran input berubah</b>: lebih ramai buruh menghasilkan keluaran yang semakin kurang.';
-        if (x >= 4) ayat += "<br><b>Hukum pulangan berkurangan</b>: selepas buruh ke-3, setiap buruh tambahan menambah keluaran yang semakin kecil (MP buruh ke-" + x + " = " + E.fmt(MP[i], 0) + " unit).";
+        if (x >= 4) ayat += "<br><b>Hukum pulangan berkurangan</b>: selepas buruh ke-3, setiap buruh tambahan menambah keluaran yang semakin kecil (MP pada " + E.fmt(x, 2) + " buruh = " + E.fmt(mp, bulat ? 0 : 2) + " unit).";
         K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + "</div>";
       }
       baca(3);

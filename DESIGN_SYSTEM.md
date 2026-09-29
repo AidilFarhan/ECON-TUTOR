@@ -243,7 +243,7 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
   - inputs: `.grid-medan.kalk-medan` of `.medan` fields (text inputs with `inputmode="decimal"`; 16 px on phones so iOS does not zoom), optional fields marked *pilihan*
   - editable table (`.kalk-jadual.jadual`): right-aligned input cells (max 120 px), computed columns in accent (`th.hasil`, `td.hasil`), the selected row tinted with a left bar; a "Leret jadual" hint appears only when the table overflows
   - answers (`.kalk-jawapan` > `.kalk-nilai`): accent-soft tiles with a small label, a 20 px display value (or a status pill) and an optional `small` note
-  - worked steps (`.kalk-langkah`): dashed box, "JALAN KIRA" label in `--c-3`, numbered list with tabular numbers
+  - worked steps (`.kalk-langkah`): dashed box, "JALAN KIRA" label in `--c-3`, numbered list with tabular numbers. Each step opens with an economic sentence (`.kalk-ayat`, helper `ay()` in `kalkulator.js`) that names every term, including the numerator (*pengangka*) and denominator (*penyebut*) of each division, followed by the numeric line
   - interpretation (`.kalk-nota`, left rule), warning (`.kalk-ralat.amaran`) or error (`.kalk-ralat`)
   - footer (`.kalk-kaki`): *Set semula* and a link to the chapter notes
 - **Deep link highlight:** `.kalk.sorot` adds a chapter-coloured border and ring for 1.8 s.

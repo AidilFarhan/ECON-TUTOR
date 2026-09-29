@@ -159,7 +159,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
   - T4 Bab 4: TP/AP/MP with production stages, short-run cost table (TC, VC, AFC, AVC, AC, MC), total revenue and profit, economic profit, productivity, social cost and benefit.
   - T5 Bab 1: price index, weighted and unweighted CPI, inflation rate, cost-push pricing, real income, unemployment rate and LFPR, GDP (expenditure), real GDP, growth rate, national budget balance, progressive/regressive/proportional tax, company tax, statutory reserve ratio.
   - T5 Bab 2: comparative advantage, specific and ad valorem tariffs, current account, currency conversion (buying/selling rates), effect of exchange-rate changes on exports and imports.
-- **FR-36** Each calculator shows the formula, live answers, numbered worked steps (*jalan kira*) and an interpretation. Invalid or missing input shows a clear message instead of a wrong number.
+- **FR-36** Each calculator shows the formula, live answers, numbered worked steps (*jalan kira*), each written first as an economic sentence (naming the numerator and denominator of every division) and then in numbers, and an interpretation. Invalid or missing input shows a clear message instead of a wrong number.
 - **FR-37** Initial values are the textbook's worked examples and reproduce the textbook answers. Some calculators offer several example chips.
 - **FR-38** Table calculators (market, equilibrium, TP/AP/MP, cost, CPI) allow editing cells and adding or removing rows; tapping a row shows that row's working.
 - **FR-39** Filter by form or chapter and search by keyword. Deep links: `#kalkulator-<chapterId>` and `#kalkulator-<calculatorId>`. Each chapter page has a "Kalkulator (n)" button.

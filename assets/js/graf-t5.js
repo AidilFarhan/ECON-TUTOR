@@ -145,7 +145,7 @@
           if (n.charAt(0) !== "b" || pt.x == null) return;
           var i = parseInt(n.slice(1), 10);
           aktif = i;
-          var ind = E.clamp(Math.round(pt.x * 2) / 2, 50, 165);
+          var ind = E.clamp(Math.round(pt.x * 10) / 10, 50, 165);
           B[i].p1 = E.bundar((B[i].p0 * ind) / 100, 2);
           lukis();
         },
@@ -647,7 +647,7 @@
             kum = KUNCI[i] === "M" ? kum - st.M : kum + st[KUNCI[i]];
           }
           var v = n === "M" ? kum - pt.y : pt.y - kum;
-          st[n] = E.clamp(Math.round(v / 10) * 10, 0, 2500);
+          st[n] = E.clamp(Math.round(v), 0, 2500);
           lukis();
         }
       });
@@ -1064,7 +1064,7 @@
       G.interaksi(plot, {
         seret: function (n, pt) {
           if (n === "r" && pt.y != null) {
-            st.r = E.clamp(Math.round(pt.y * 4) / 4, 1.25, 8.75);
+            st.r = E.clamp(Math.round(pt.y * 100) / 100, 1.25, 8.75);
             lukis();
           }
         },
@@ -1159,8 +1159,8 @@
       G.interaksi(plot, {
         seret: function (n, pt) {
           if (pt.x == null) return;
-          if (n === "ax" || n === "bx") st[n] = E.clamp(Math.round(pt.x / 5) * 5, 10, 155);
-          else if (n === "ay" || n === "by") st[n] = E.clamp(Math.round(pt.y / 5) * 5, 10, 115);
+          if (n === "ax" || n === "bx") st[n] = E.clamp(Math.round(pt.x), 10, 155);
+          else if (n === "ay" || n === "by") st[n] = E.clamp(Math.round(pt.y), 10, 115);
           else return;
           lukis();
         }
@@ -1263,7 +1263,7 @@
           var kum = 0;
           for (var i = 0; i < KOMP.length; i++) {
             if (KOMP[i].id === n) {
-              st[n] = E.clamp(Math.round((pt.y - kum) / 5) * 5, -150, 220);
+              st[n] = E.clamp(Math.round(pt.y - kum), -150, 220);
               lukis();
               return;
             }

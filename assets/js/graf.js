@@ -1469,14 +1469,14 @@
       return -1;
     }
     function setHarga(p) {
-      st.p = E.clamp(Math.round(p * 2) / 2, pr.pMin, pr.pMaks);
+      st.p = E.clamp(Math.round(p * 100) / 100, pr.pMin, pr.pMaks);
     }
     // harga yang meletakkan nod panel i paling hampir dengan penunjuk
     function hargaTerdekat(i, px, py) {
       var ps = panelSimpan[i];
       var terbaik = st.p,
         jarak = Infinity;
-      for (var p = pr.pMin; p <= pr.pMaks + 1e-9; p += 0.25) {
+      for (var p = pr.pMin; p <= pr.pMaks + 1e-9; p += 0.05) {
         var dx = ps.X(q(i, p, false)) - px,
           dy = ps.Y(p) - py;
         var j = dx * dx + dy * dy;
@@ -1502,8 +1502,8 @@
           if (fasa === "mula") seretan = { q0: ps.invX(pt.px), dq0: st.dq[i] };
           if (!seretan || pt.px == null) return;
           var baru = seretan.dq0 + (ps.invX(pt.px) - seretan.q0);
-          baru = E.clamp(Math.round(baru / LANGKAH) * LANGKAH, -HAD, HAD);
-          st.dq[i] = Math.abs(baru) < LANGKAH / 2 ? 0 : baru;
+          baru = E.clamp(Math.round(baru * 100) / 100, -HAD, HAD);
+          st.dq[i] = Math.abs(baru) < LANGKAH / 4 ? 0 : baru;
           if (fasa === "tamat") seretan = null;
         } else return;
         lukis();

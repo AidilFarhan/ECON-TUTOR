@@ -3913,6 +3913,19 @@ ol.roman > li::before {
   font-weight: 700;
 }
 
+/* baris ayat ekonomi di atas nombor: maksud pengangka dan penyebut */
+.kalk-ayat {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.kalk-langkah li + li {
+  margin-top: 6px;
+}
+
 .kalk-nota {
   padding-left: 12px;
   border-left: 3px solid var(--warna-bab);

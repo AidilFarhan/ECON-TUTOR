@@ -161,7 +161,7 @@ flowchart TB
   - UI controls: `G.julat` (slider), `G.pilih` (segmented control), `G.butang`, `G.medan`, `G.gridMedan`, `G.legenda`.
   - Maths and motion: `G.tween`, `G.monoton` (monotone cubic interpolation), `G.silang` (line intersection), `G.kelukD` / `G.kelukS` (linear demand/supply).
   - Layout, reading panel and static figures: `G.pantauSaiz` (ResizeObserver), `G.nilai` (reading chips), `G.statik(spec)` (non-interactive figures for quiz diagrams).
-- **Series charts.** `G.carta` (in `graf-t4.js`) draws line charts with a vertical tracker. With `selanjar: true` the tracker moves continuously (0.01 unit) along the curves and shows value labels. The short-run cost graph uses this.
+- **Series charts.** `G.carta` (in `graf-t4.js`) draws line charts with a vertical tracker. By default (`selanjar` not `false`) the tracker moves continuously (0.01 unit) along the curves, reads interpolated values, and snaps to a table node within 5 px; arrow keys step 1% of the x range and Shift + arrow jumps to the next node. Set `selanjar: false` for yearly series that must jump between data points (guna tenaga, and `carta-jadual` with `"diskret": true`). Other draggable graphs round to 0.01 instead of whole steps, so every curve moves smoothly (owner request).
 - **Lifecycle.** Each widget returns `{ musnah }` to disconnect observers and timers. `G.tanggal()` calls them all on navigation.
 
 ### 3.5 Economics calculator (`EKO.kalkulator`)

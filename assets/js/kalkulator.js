@@ -46,6 +46,10 @@
   function H(l, v, s, ket) {
     return { l: l, v: v, s: s || "", ket: ket || "" };
   }
+  // Baris ayat ekonomi di atas setiap langkah jalan kira: maksud pengangka dan penyebut
+  function ay(t) {
+    return '<span class="kalk-ayat">' + t + "</span>";
+  }
   function sama(a, b) {
     return Math.abs(a - b) < 1e-9;
   }
@@ -92,9 +96,9 @@
     if (dx === 0) return { ralat: "Perubahan barang X tidak boleh sifar." };
     var c = dy / dx;
     var L = [
-      "Perubahan barang Y = " + nom(x.y1) + " − " + kr(x.y0) + " = " + nom(dy),
-      "Perubahan barang X = " + nom(x.x1) + " − " + kr(x.x0) + " = " + nom(dx),
-      "Kecerunan KKP = " + nom(dy) + " ÷ " + kr(dx) + " = <b>" + nom(c) + "</b>"
+      ay("Perubahan barang Y = kuantiti Y di titik baharu − kuantiti Y di titik asal") + "Perubahan barang Y = " + nom(x.y1) + " − " + kr(x.y0) + " = " + nom(dy),
+      ay("Perubahan barang X = kuantiti X di titik baharu − kuantiti X di titik asal") + "Perubahan barang X = " + nom(x.x1) + " − " + kr(x.x0) + " = " + nom(dx),
+      ay("Kecerunan KKP = perubahan barang Y (pengangka) ÷ perubahan barang X (penyebut)") + "Kecerunan KKP = " + nom(dy) + " ÷ " + kr(dx) + " = <b>" + nom(c) + "</b>"
     ];
     var out = {
       hasil: [H("Kecerunan KKP", nom(c)), H("Kos lepas 1 unit X", nom(Math.abs(c)) + " unit Y"), H("Kos lepas 1 unit Y", dy !== 0 ? nom(Math.abs(dx / dy)) + " unit X" : "–")],
@@ -104,8 +108,8 @@
       var tambahX = dx > 0;
       L.push(
         tambahX
-          ? "Menambah " + nom(dx) + " unit X mengorbankan " + nom(-dy) + " unit Y, maka kos lepas 1 unit X = " + nom(-dy) + " ÷ " + nom(dx) + " = <b>" + nom(Math.abs(c)) + " unit Y</b>"
-          : "Menambah " + nom(dy) + " unit Y mengorbankan " + nom(-dx) + " unit X, maka kos lepas 1 unit Y = " + nom(-dx) + " ÷ " + nom(dy) + " = <b>" + nom(Math.abs(dx / dy)) + " unit X</b>"
+          ? ay("Kos lepas 1 unit X = unit Y yang dikorbankan ÷ unit X yang ditambah") + "Menambah " + nom(dx) + " unit X mengorbankan " + nom(-dy) + " unit Y, maka kos lepas 1 unit X = " + nom(-dy) + " ÷ " + nom(dx) + " = <b>" + nom(Math.abs(c)) + " unit Y</b>"
+          : ay("Kos lepas 1 unit Y = unit X yang dikorbankan ÷ unit Y yang ditambah") + "Menambah " + nom(dy) + " unit Y mengorbankan " + nom(-dx) + " unit X, maka kos lepas 1 unit Y = " + nom(-dx) + " ÷ " + nom(dy) + " = <b>" + nom(Math.abs(dx / dy)) + " unit X</b>"
       );
       out.nota = "Tanda negatif menunjukkan KKP mencerun ke bawah dari kiri ke kanan: untuk menambah satu barang, sebahagian barang lain terpaksa dikorbankan.";
     } else {
@@ -152,7 +156,7 @@
         }
         var q = r.a + r.b + (r.c || 0);
         sel.push(nom(q));
-        L.push("Harga " + wang(r.p) + ": " + nom(r.a) + " + " + nom(r.b) + (r.c != null ? " + " + nom(r.c) : "") + " = <b>" + nom(q) + " unit</b>");
+        L.push(ay("Kuantiti pasaran = jumlah kuantiti setiap individu atau firma pada harga yang sama") + "Harga " + wang(r.p) + ": " + nom(r.a) + " + " + nom(r.b) + (r.c != null ? " + " + nom(r.c) : "") + " = <b>" + nom(q) + " unit</b>");
       });
       var sah = x.j.filter(function (r) {
         return r.p != null && r.a != null && r.b != null;
@@ -211,7 +215,7 @@
         var k = b > 0 ? "Lebihan permintaan" : b < 0 ? "Lebihan penawaran" : "Keseimbangan";
         keadaan.push(k);
         if (b === 0 && !eq) eq = r;
-        L.push(wang(r.p) + ": " + nom(r.qd) + " − " + nom(r.qs) + " = " + nom(b) + " → " + (b > 0 ? "lebihan permintaan " + nom(b) + ", harga cenderung naik" : b < 0 ? "lebihan penawaran " + nom(-b) + ", harga cenderung turun" : "<b>keseimbangan</b>"));
+        L.push(ay("Beza = kuantiti diminta − kuantiti ditawar (positif: lebihan permintaan; negatif: lebihan penawaran)") + wang(r.p) + ": " + nom(r.qd) + " − " + nom(r.qs) + " = " + nom(b) + " → " + (b > 0 ? "lebihan permintaan " + nom(b) + ", harga cenderung naik" : b < 0 ? "lebihan penawaran " + nom(-b) + ", harga cenderung turun" : "<b>keseimbangan</b>"));
       });
       var out = { sel: { beza: beza, keadaan: keadaan }, langkah: L };
       if (eq) {
@@ -265,16 +269,16 @@
       var dq = ((x.q1 - x.q0) / x.q0) * 100;
       var dp = ((x.p1 - x.p0) / x.p0) * 100;
       var L = [
-        "%ΔQ = (" + nom(x.q1) + " − " + nom(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(dq),
-        "%ΔP = (" + nom(x.p1) + " − " + nom(x.p0) + ") ÷ " + nom(x.p0) + " × 100 = " + pc(dp)
+        ay("%ΔQ = (kuantiti baharu − kuantiti asal) ÷ kuantiti asal × 100") + "%ΔQ = (" + nom(x.q1) + " − " + nom(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(dq),
+        ay("%ΔP = (harga baharu − harga asal) ÷ harga asal × 100") + "%ΔP = (" + nom(x.p1) + " − " + nom(x.p0) + ") ÷ " + nom(x.p0) + " × 100 = " + pc(dp)
       ];
       var tr0 = x.p0 * x.q0;
       var tr1 = x.p1 * x.q1;
       var dtr = tr1 - tr0;
       var baris = [
-        "TR asal = " + wang(x.p0) + " × " + nom(x.q0) + " = " + wang(tr0),
-        "TR baharu = " + wang(x.p1) + " × " + nom(x.q1) + " = " + wang(tr1),
-        "Perubahan TR = " + wang(tr1) + " − " + wang(tr0) + " = <b>" + wang(dtr) + "</b>"
+        ay("Jumlah hasil (TR) asal = harga asal × kuantiti asal") + "TR asal = " + wang(x.p0) + " × " + nom(x.q0) + " = " + wang(tr0),
+        ay("TR baharu = harga baharu × kuantiti baharu") + "TR baharu = " + wang(x.p1) + " × " + nom(x.q1) + " = " + wang(tr1),
+        ay("Perubahan TR = TR baharu − TR asal") + "Perubahan TR = " + wang(tr1) + " − " + wang(tr0) + " = <b>" + wang(dtr) + "</b>"
       ];
       if (dp === 0) {
         if (dq === 0) return { ralat: "Harga dan kuantiti tidak berubah. Tukar sekurang-kurangnya satu nilai." };
@@ -282,7 +286,7 @@
       }
       var ed = dq / dp;
       var a = Math.abs(ed);
-      L.push("Ed = " + pc(dq) + " ÷ " + krp(dp) + " = " + nom(ed) + (ed < 0 ? ", dinyatakan sebagai <b>" + nom(a) + "</b>" : ""));
+      L.push(ay("Ed = peratus perubahan kuantiti diminta (pengangka) ÷ peratus perubahan harga (penyebut)") + "Ed = " + pc(dq) + " ÷ " + krp(dp) + " = " + nom(ed) + (ed < 0 ? ", dinyatakan sebagai <b>" + nom(a) + "</b>" : ""));
       L = L.concat(baris);
       var out = {
         hasil: [H("Ed", nom(a)), jenisAnjal(a), H("Perubahan TR", (dtr > 0 ? "+" : "") + wang(dtr))],
@@ -358,10 +362,10 @@
         var dp = ((x.p1 - x.p0) / x.p0) * 100;
         var dq = (d ? -1 : 1) * x.e * dp;
         var q1 = x.q0 * (1 + dq / 100);
-        L.push("%ΔP = (" + nom(x.p1) + " − " + nom(x.p0) + ") ÷ " + nom(x.p0) + " × 100 = " + pc(dp));
-        L.push(nama + " = %ΔQ ÷ %ΔP, maka %ΔQ = " + nom(x.e) + " × " + pc(Math.abs(dp)) + " = " + pc(Math.abs(dq)) + (d ? " (arah bertentangan dengan harga)" : " (searah dengan harga)"));
+        L.push(ay("%ΔP = (harga baharu − harga asal) ÷ harga asal × 100") + "%ΔP = (" + nom(x.p1) + " − " + nom(x.p0) + ") ÷ " + nom(x.p0) + " × 100 = " + pc(dp));
+        L.push(ay("Peratus perubahan kuantiti = nilai keanjalan × peratus perubahan harga") + nama + " = %ΔQ ÷ %ΔP, maka %ΔQ = " + nom(x.e) + " × " + pc(Math.abs(dp)) + " = " + pc(Math.abs(dq)) + (d ? " (arah bertentangan dengan harga)" : " (searah dengan harga)"));
         L.push("%ΔQ = " + pc(dq));
-        L.push("Q₁ = " + nom(x.q0) + " × (1 + " + kr(dq) + " ÷ 100) = <b>" + nom(q1) + "</b>");
+        L.push(ay("Kuantiti baharu = kuantiti asal × (1 + peratus perubahan kuantiti ÷ 100)") + "Q₁ = " + nom(x.q0) + " × (1 + " + kr(dq) + " ÷ 100) = <b>" + nom(q1) + "</b>");
         if (q1 < 0) return { ralat: "Kuantiti baharu menjadi negatif. Semak nilai keanjalan dan harga." };
         return { hasil: [H("Kuantiti baharu Q₁", nom(q1)), H("%ΔQ", pc(dq))], langkah: L };
       }
@@ -369,10 +373,10 @@
       var dq2 = ((x.q1 - x.q0) / x.q0) * 100;
       var dp2 = ((d ? -1 : 1) * dq2) / x.e;
       var p1 = x.p0 * (1 + dp2 / 100);
-      L.push("%ΔQ = (" + nom(x.q1) + " − " + nom(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(dq2));
-      L.push(nama + " = %ΔQ ÷ %ΔP, maka %ΔP = " + pc(Math.abs(dq2)) + " ÷ " + nom(x.e) + " = " + pc(Math.abs(dp2)) + (d ? " (arah bertentangan dengan kuantiti)" : " (searah dengan kuantiti)"));
+      L.push(ay("%ΔQ = (kuantiti baharu − kuantiti asal) ÷ kuantiti asal × 100") + "%ΔQ = (" + nom(x.q1) + " − " + nom(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(dq2));
+      L.push(ay("Peratus perubahan harga = peratus perubahan kuantiti ÷ nilai keanjalan") + nama + " = %ΔQ ÷ %ΔP, maka %ΔP = " + pc(Math.abs(dq2)) + " ÷ " + nom(x.e) + " = " + pc(Math.abs(dp2)) + (d ? " (arah bertentangan dengan kuantiti)" : " (searah dengan kuantiti)"));
       L.push("%ΔP = " + pc(dp2));
-      L.push("P₁ = " + wang(x.p0) + " × (1 + " + kr(dp2) + " ÷ 100) = <b>" + wang(p1) + "</b>");
+      L.push(ay("Harga baharu = harga asal × (1 + peratus perubahan harga ÷ 100)") + "P₁ = " + wang(x.p0) + " × (1 + " + kr(dp2) + " ÷ 100) = <b>" + wang(p1) + "</b>");
       return { hasil: [H("Harga baharu P₁", wang(p1)), H("%ΔP", pc(dp2))], langkah: L };
     }
   });
@@ -396,15 +400,15 @@
       var dq = ((x.q1 - x.q0) / x.q0) * 100;
       var dp = ((x.p1 - x.p0) / x.p0) * 100;
       var L = [
-        "%ΔQ = (" + nom(x.q1) + " − " + nom(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(dq),
-        "%ΔP = (" + nom(x.p1) + " − " + nom(x.p0) + ") ÷ " + nom(x.p0) + " × 100 = " + pc(dp)
+        ay("%ΔQ = (kuantiti ditawar baharu − kuantiti ditawar asal) ÷ kuantiti ditawar asal × 100") + "%ΔQ = (" + nom(x.q1) + " − " + nom(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(dq),
+        ay("%ΔP = (harga baharu − harga asal) ÷ harga asal × 100") + "%ΔP = (" + nom(x.p1) + " − " + nom(x.p0) + ") ÷ " + nom(x.p0) + " × 100 = " + pc(dp)
       ];
       if (dp === 0) {
         if (dq === 0) return { ralat: "Harga dan kuantiti tidak berubah. Tukar sekurang-kurangnya satu nilai." };
         return { hasil: [H("Es", "∞"), H("Jenis", "Anjal sempurna", "baik")], langkah: L };
       }
       var es = dq / dp;
-      L.push("Es = " + pc(dq) + " ÷ " + krp(dp) + " = <b>" + nom(es) + "</b>");
+      L.push(ay("Es = peratus perubahan kuantiti ditawar (pengangka) ÷ peratus perubahan harga (penyebut)") + "Es = " + pc(dq) + " ÷ " + krp(dp) + " = <b>" + nom(es) + "</b>");
       var ab = E.bundar(Math.abs(es), 6);
       var out = { hasil: [H("Es", nom(es)), jenisAnjal(es)], langkah: L };
       out.nota =
@@ -443,11 +447,11 @@
       var bp = x.p1 - x.p0;
       var bf = x.t - bp;
       var L = [
-        "Beban pengguna seunit = " + wang(x.p1) + " − " + wang(x.p0) + " = " + wang(bp),
-        "Beban pengeluar seunit = " + wang(x.t) + " − " + wang(bp) + " = " + wang(bf),
-        "Jumlah beban pengguna = " + wang(bp) + " × " + nom(x.q1) + " = <b>" + wang(bp * x.q1) + "</b>",
-        "Jumlah beban pengeluar = " + wang(bf) + " × " + nom(x.q1) + " = <b>" + wang(bf * x.q1) + "</b>",
-        "Hasil cukai kerajaan = " + wang(x.t) + " × " + nom(x.q1) + " = <b>" + wang(x.t * x.q1) + "</b>"
+        ay("Beban pengguna seunit = harga selepas cukai − harga sebelum cukai") + "Beban pengguna seunit = " + wang(x.p1) + " − " + wang(x.p0) + " = " + wang(bp),
+        ay("Beban pengeluar seunit = cukai seunit − beban pengguna seunit") + "Beban pengeluar seunit = " + wang(x.t) + " − " + wang(bp) + " = " + wang(bf),
+        ay("Jumlah beban pengguna = beban pengguna seunit × kuantiti selepas cukai") + "Jumlah beban pengguna = " + wang(bp) + " × " + nom(x.q1) + " = <b>" + wang(bp * x.q1) + "</b>",
+        ay("Jumlah beban pengeluar = beban pengeluar seunit × kuantiti selepas cukai") + "Jumlah beban pengeluar = " + wang(bf) + " × " + nom(x.q1) + " = <b>" + wang(bf * x.q1) + "</b>",
+        ay("Hasil cukai kerajaan = cukai seunit × kuantiti selepas cukai") + "Hasil cukai kerajaan = " + wang(x.t) + " × " + nom(x.q1) + " = <b>" + wang(x.t * x.q1) + "</b>"
       ];
       var out = {
         hasil: [H("Beban pengguna", wang(bp * x.q1), "", pc((bp / x.t) * 100, 1) + " daripada cukai"), H("Beban pengeluar", wang(bf * x.q1), "", pc((bf / x.t) * 100, 1) + " daripada cukai"), H("Hasil kerajaan", wang(x.t * x.q1))],
@@ -484,11 +488,11 @@
       var fp = x.p0 - x.p1;
       var ff = x.s - fp;
       var L = [
-        "Faedah pengguna seunit = " + wang(x.p0) + " − " + wang(x.p1) + " = " + wang(fp),
-        "Faedah pengeluar seunit = " + wang(x.s) + " − " + wang(fp) + " = " + wang(ff),
-        "Jumlah faedah pengguna = " + wang(fp) + " × " + nom(x.q1) + " = <b>" + wang(fp * x.q1) + "</b>",
-        "Jumlah faedah pengeluar = " + wang(ff) + " × " + nom(x.q1) + " = <b>" + wang(ff * x.q1) + "</b>",
-        "Perbelanjaan kerajaan = " + wang(x.s) + " × " + nom(x.q1) + " = <b>" + wang(x.s * x.q1) + "</b>"
+        ay("Faedah pengguna seunit = harga sebelum subsidi − harga selepas subsidi") + "Faedah pengguna seunit = " + wang(x.p0) + " − " + wang(x.p1) + " = " + wang(fp),
+        ay("Faedah pengeluar seunit = subsidi seunit − faedah pengguna seunit") + "Faedah pengeluar seunit = " + wang(x.s) + " − " + wang(fp) + " = " + wang(ff),
+        ay("Jumlah faedah pengguna = faedah pengguna seunit × kuantiti selepas subsidi") + "Jumlah faedah pengguna = " + wang(fp) + " × " + nom(x.q1) + " = <b>" + wang(fp * x.q1) + "</b>",
+        ay("Jumlah faedah pengeluar = faedah pengeluar seunit × kuantiti selepas subsidi") + "Jumlah faedah pengeluar = " + wang(ff) + " × " + nom(x.q1) + " = <b>" + wang(ff * x.q1) + "</b>",
+        ay("Perbelanjaan kerajaan = subsidi seunit × kuantiti selepas subsidi") + "Perbelanjaan kerajaan = " + wang(x.s) + " × " + nom(x.q1) + " = <b>" + wang(x.s * x.q1) + "</b>"
       ];
       var out = {
         hasil: [H("Faedah pengguna", wang(fp * x.q1)), H("Faedah pengeluar", wang(ff * x.q1)), H("Kos kepada kerajaan", wang(x.s * x.q1))],
@@ -535,7 +539,7 @@
       var out = {
         hasil: [H("Pendapatan individu", wang(t))],
         langkah: [
-          "Pendapatan individu = " +
+          ay("Pendapatan individu = jumlah semua sumber pendapatan") + "Pendapatan individu = " +
             kunci
               .map(function (k) {
                 return wang(x[k]);
@@ -566,12 +570,12 @@
     kira: function (x) {
       if (x.h0 <= 0) return { ralat: "Harga purata mesti lebih daripada sifar." };
       var ub = x.upah / x.h0;
-      var out = { hasil: [H("Upah benar", nom(ub) + " unit")], langkah: ["Upah benar = " + wang(x.upah) + " ÷ " + wang(x.h0) + " = <b>" + nom(ub) + " unit</b>"] };
+      var out = { hasil: [H("Upah benar", nom(ub) + " unit")], langkah: [ay("Upah benar = upah wang (pengangka) ÷ harga barang (penyebut): bilangan unit barang yang mampu dibeli") + "Upah benar = " + wang(x.upah) + " ÷ " + wang(x.h0) + " = <b>" + nom(ub) + " unit</b>"] };
       if (x.h1 != null && x.h1 > 0) {
         var ub1 = x.upah / x.h1;
         var ubah = ((ub1 - ub) / ub) * 100;
-        out.langkah.push("Upah benar baharu = " + wang(x.upah) + " ÷ " + wang(x.h1) + " = <b>" + nom(ub1) + " unit</b>");
-        out.langkah.push("Perubahan kuasa beli = (" + nom(ub1) + " − " + nom(ub) + ") ÷ " + nom(ub) + " × 100 = " + pc(ubah));
+        out.langkah.push(ay("Upah benar baharu = upah wang ÷ harga barang baharu") + "Upah benar baharu = " + wang(x.upah) + " ÷ " + wang(x.h1) + " = <b>" + nom(ub1) + " unit</b>");
+        out.langkah.push(ay("Perubahan kuasa beli = (upah benar baharu − upah benar asal) ÷ upah benar asal × 100") + "Perubahan kuasa beli = (" + nom(ub1) + " − " + nom(ub) + ") ÷ " + nom(ub) + " × 100 = " + pc(ubah));
         out.hasil.push(H("Upah benar baharu", nom(ub1) + " unit"));
         out.hasil.push(H("Kuasa beli", (ubah > 0 ? "+" : "") + pc(ubah), ubah < 0 ? "buruk" : ubah > 0 ? "baik" : "neutral"));
         out.nota = ubah < 0 ? "Harga naik tetapi upah wang tetap, maka kuasa beli (upah benar) menurun." : ubah > 0 ? "Harga turun, maka upah benar dan kuasa beli meningkat." : "";
@@ -607,9 +611,9 @@
       return {
         hasil: [H("Jumlah pendapatan", wang(p)), H("Potongan wajib", wang(w)), H("Pendapatan boleh guna", wang(pbg), pbg >= 0 ? "baik" : "buruk")],
         langkah: [
-          "Jumlah pendapatan = " + wang(x.gaji) + " + " + wang(x.elaun) + " + " + wang(x.lain) + " = " + wang(p),
-          "Potongan wajib = " + wang(x.kwsp) + " + " + wang(x.perkeso) + " + " + wang(x.zakat) + " + " + wang(x.cukai) + " = " + wang(w),
-          "PBG = " + wang(p) + " − " + wang(w) + " = <b>" + wang(pbg) + "</b>"
+          ay("Jumlah pendapatan = gaji + elaun + pendapatan lain") + "Jumlah pendapatan = " + wang(x.gaji) + " + " + wang(x.elaun) + " + " + wang(x.lain) + " = " + wang(p),
+          ay("Potongan wajib = KWSP + PERKESO + zakat + cukai pendapatan") + "Potongan wajib = " + wang(x.kwsp) + " + " + wang(x.perkeso) + " + " + wang(x.zakat) + " + " + wang(x.cukai) + " = " + wang(w),
+          ay("Pendapatan boleh guna = jumlah pendapatan − potongan wajib") + "PBG = " + wang(p) + " − " + wang(w) + " = <b>" + wang(pbg) + "</b>"
         ]
       };
     }
@@ -642,7 +646,7 @@
     ],
     kira: function (x) {
       var bc = Math.max(0, x.tahunan - x.pelepasan);
-      var L = ["Pendapatan boleh cukai = " + wang(x.tahunan) + " − " + wang(x.pelepasan) + " = <b>" + wang(bc) + "</b>"];
+      var L = [ay("Pendapatan boleh cukai = pendapatan tahunan − pelepasan cukai") + "Pendapatan boleh cukai = " + wang(x.tahunan) + " − " + wang(x.pelepasan) + " = <b>" + wang(bc) + "</b>"];
       if (bc > 100000) return { hasil: [H("Pendapatan boleh cukai", wang(bc))], langkah: L, amaran: "Jadual dalam buku teks hanya sehingga RM100 000. Cukai bagi pendapatan melebihi jumlah ini tidak dikira di sini." };
       var baki = bc;
       var c = 0;
@@ -652,7 +656,7 @@
         var bah = Math.min(baki, j[0]);
         var cukai = (bah * j[1]) / 100;
         c += cukai;
-        L.push(wang(bah) + (awal ? " pertama" : " berikutnya") + " × " + j[1] + "% = " + wang(cukai));
+        L.push(ay("Cukai banjaran = pendapatan dalam banjaran × kadar cukai banjaran itu") + wang(bah) + (awal ? " pertama" : " berikutnya") + " × " + j[1] + "% = " + wang(cukai));
         baki -= bah;
         awal = false;
       });
@@ -688,11 +692,11 @@
       var out = {
         hasil: [H("PBG", wang(pbg)), H("Baki", wang(baki)), H("Belanjawan", baki > 0 ? "Lebihan" : baki < 0 ? "Defisit" : "Seimbang", baki > 0 ? "baik" : baki < 0 ? "buruk" : "neutral")],
         langkah: [
-          "PBG = " + wang(x.pendapatan) + " − " + wang(x.potongan) + " = " + wang(pbg),
-          "Baki = " + wang(pbg) + " − (" + wang(x.belanja) + " + " + wang(x.tabung) + ") = <b>" + wang(baki) + "</b>"
+          ay("Pendapatan boleh guna = pendapatan − potongan") + "PBG = " + wang(x.pendapatan) + " − " + wang(x.potongan) + " = " + wang(pbg),
+          ay("Baki = pendapatan boleh guna − (perbelanjaan + tabungan)") + "Baki = " + wang(pbg) + " − (" + wang(x.belanja) + " + " + wang(x.tabung) + ") = <b>" + wang(baki) + "</b>"
         ]
       };
-      if (pbg > 0) out.langkah.push("Kadar tabungan = " + wang(x.tabung) + " ÷ " + wang(pbg) + " × 100 = " + pc((x.tabung / pbg) * 100));
+      if (pbg > 0) out.langkah.push(ay("Kadar tabungan = tabungan (pengangka) ÷ pendapatan boleh guna (penyebut) × 100") + "Kadar tabungan = " + wang(x.tabung) + " ÷ " + wang(pbg) + " × 100 = " + pc((x.tabung / pbg) * 100));
       out.nota = baki > 0 ? "Lebihan boleh ditambah kepada simpanan, dana kecemasan atau pelaburan." : baki < 0 ? "Perbelanjaan melebihi pendapatan boleh guna. Kurangkan perbelanjaan kehendak dan utamakan keperluan." : "Semua pendapatan boleh guna telah diagihkan.";
       return out;
     }
@@ -744,12 +748,12 @@
       var bulan = x.tahun * 12;
       var ansuran = jum / bulan;
       var L = [];
-      if (x.jenisDp === "pc") L.push("Pendahuluan = " + pc(x.dpPc) + " × " + wang(x.harga) + " = " + wang(dp));
-      L.push("Jumlah pinjaman = " + wang(x.harga) + " − " + wang(dp) + " = " + wang(pinjam));
-      L.push("Faedah = " + wang(pinjam) + " × " + pc(x.kadar) + " × " + nom(x.tahun) + " = " + wang(faedah));
-      L.push("Jumlah perlu dibayar = " + wang(pinjam) + " + " + wang(faedah) + " = " + wang(jum));
-      L.push("Ansuran = " + wang(jum) + " ÷ " + nom(bulan) + " bulan = <b>" + wang(ansuran) + " sebulan</b>");
-      L.push("Jumlah kos sebenar = " + wang(dp) + " + " + wang(jum) + " = " + wang(dp + jum));
+      if (x.jenisDp === "pc") L.push(ay("Pendahuluan = peratus pendahuluan × harga barang") + "Pendahuluan = " + pc(x.dpPc) + " × " + wang(x.harga) + " = " + wang(dp));
+      L.push(ay("Jumlah pinjaman = harga barang − pendahuluan") + "Jumlah pinjaman = " + wang(x.harga) + " − " + wang(dp) + " = " + wang(pinjam));
+      L.push(ay("Faedah = jumlah pinjaman × kadar faedah setahun × bilangan tahun") + "Faedah = " + wang(pinjam) + " × " + pc(x.kadar) + " × " + nom(x.tahun) + " = " + wang(faedah));
+      L.push(ay("Jumlah perlu dibayar = jumlah pinjaman + faedah") + "Jumlah perlu dibayar = " + wang(pinjam) + " + " + wang(faedah) + " = " + wang(jum));
+      L.push(ay("Ansuran bulanan = jumlah perlu dibayar (pengangka) ÷ bilangan bulan (penyebut)") + "Ansuran = " + wang(jum) + " ÷ " + nom(bulan) + " bulan = <b>" + wang(ansuran) + " sebulan</b>");
+      L.push(ay("Jumlah kos sebenar = pendahuluan + jumlah perlu dibayar") + "Jumlah kos sebenar = " + wang(dp) + " + " + wang(jum) + " = " + wang(dp + jum));
       return {
         hasil: [H("Ansuran bulanan", wang(ansuran), "neutral"), H("Jumlah faedah", wang(faedah)), H("Kos sebenar barang", wang(dp + jum))],
         langkah: L,
@@ -807,7 +811,7 @@
         var f = (x.modal * x.kadar * x.tahun) / 100;
         return {
           hasil: [H("Pulangan", wang(f)), H("Sebulan", wang(f / (x.tahun * 12 || 1))), H("Nilai akhir", wang(x.modal + f))],
-          langkah: ["Pulangan = " + wang(x.modal) + " × " + pc(x.kadar) + " × " + nom(x.tahun) + " = <b>" + wang(f) + "</b>", "Nilai akhir = " + wang(x.modal) + " + " + wang(f) + " = " + wang(x.modal + f)],
+          langkah: [ay("Pulangan = modal × kadar pulangan setahun × bilangan tahun") + "Pulangan = " + wang(x.modal) + " × " + pc(x.kadar) + " × " + nom(x.tahun) + " = <b>" + wang(f) + "</b>", ay("Nilai akhir = modal + pulangan") + "Nilai akhir = " + wang(x.modal) + " + " + wang(f) + " = " + wang(x.modal + f)],
           nota: "Pulangan ini ialah kos lepas jika simpanan digunakan untuk tujuan lain (contohnya modal perniagaan)."
         };
       }
@@ -815,7 +819,7 @@
       var k = (x.pulangan / x.modal) * 100;
       return {
         hasil: [H("Kadar pulangan", pc(k))],
-        langkah: ["Kadar pulangan = " + wang(x.pulangan) + " ÷ " + wang(x.modal) + " × 100 = <b>" + pc(k) + "</b>"],
+        langkah: [ay("Kadar pulangan = pulangan (pengangka) ÷ modal (penyebut) × 100") + "Kadar pulangan = " + wang(x.pulangan) + " ÷ " + wang(x.modal) + " × 100 = <b>" + pc(k) + "</b>"],
         nota: "Pelaburan berisiko tinggi biasanya menawarkan pulangan yang lebih tinggi."
       };
     }
@@ -885,8 +889,8 @@
       var b = r[p];
       var L = [];
       if (b && b.l > 0 && b.tp != null) {
-        L.push("AP (buruh ke-" + nom(b.l) + ") = " + nom(b.tp) + " ÷ " + nom(b.l) + " = <b>" + nom(ap[p]) + "</b>");
-        if (mp[p] != null) L.push("MP (buruh ke-" + nom(b.l) + ") = (" + nom(b.tp) + " − " + nom(r[p - 1].tp) + ") ÷ (" + nom(b.l) + " − " + nom(r[p - 1].l) + ") = <b>" + nom(mp[p]) + "</b>");
+        L.push(ay("AP = jumlah keluaran, TP (pengangka) ÷ bilangan buruh (penyebut)") + "AP (buruh ke-" + nom(b.l) + ") = " + nom(b.tp) + " ÷ " + nom(b.l) + " = <b>" + nom(ap[p]) + "</b>");
+        if (mp[p] != null) L.push(ay("MP = perubahan TP (pengangka) ÷ perubahan bilangan buruh (penyebut)") + "MP (buruh ke-" + nom(b.l) + ") = (" + nom(b.tp) + " − " + nom(r[p - 1].tp) + ") ÷ (" + nom(b.l) + " − " + nom(r[p - 1].l) + ") = <b>" + nom(mp[p]) + "</b>");
       } else {
         L.push("Pilih baris dengan buruh lebih daripada sifar untuk melihat jalan kira.");
       }
@@ -1013,11 +1017,11 @@
       var b = x.j[p];
       var L = [];
       if (b && b.q > 0 && tc[p] != null) {
-        L.push(x.data === "tc" ? "VC = TC − FC = " + wang(tc[p]) + " − " + wang(x.fc) + " = " + wang(vc[p]) : "TC = FC + VC = " + wang(x.fc) + " + " + wang(vc[p]) + " = " + wang(tc[p]));
-        L.push("AFC = " + wang(x.fc) + " ÷ " + nom(b.q) + " = " + wang(x.fc / b.q));
-        L.push("AVC = " + wang(vc[p]) + " ÷ " + nom(b.q) + " = " + wang(vc[p] / b.q));
-        L.push("AC = " + wang(tc[p]) + " ÷ " + nom(b.q) + " = <b>" + wang(tc[p] / b.q) + "</b> (atau AFC + AVC)");
-        if (p > 0 && tc[p - 1] != null) L.push("MC = (" + wang(tc[p]) + " − " + wang(tc[p - 1]) + ") ÷ (" + nom(b.q) + " − " + nom(x.j[p - 1].q) + ") = <b>" + wang((tc[p] - tc[p - 1]) / (b.q - x.j[p - 1].q)) + "</b>");
+        L.push(x.data === "tc" ? ay("Kos berubah = jumlah kos − kos tetap") + "VC = TC − FC = " + wang(tc[p]) + " − " + wang(x.fc) + " = " + wang(vc[p]) : ay("Jumlah kos = kos tetap + kos berubah") + "TC = FC + VC = " + wang(x.fc) + " + " + wang(vc[p]) + " = " + wang(tc[p]));
+        L.push(ay("AFC = kos tetap (pengangka) ÷ kuantiti keluaran (penyebut)") + "AFC = " + wang(x.fc) + " ÷ " + nom(b.q) + " = " + wang(x.fc / b.q));
+        L.push(ay("AVC = kos berubah (pengangka) ÷ kuantiti keluaran (penyebut)") + "AVC = " + wang(vc[p]) + " ÷ " + nom(b.q) + " = " + wang(vc[p] / b.q));
+        L.push(ay("AC = jumlah kos (pengangka) ÷ kuantiti keluaran (penyebut)") + "AC = " + wang(tc[p]) + " ÷ " + nom(b.q) + " = <b>" + wang(tc[p] / b.q) + "</b> (atau AFC + AVC)");
+        if (p > 0 && tc[p - 1] != null) L.push(ay("MC = perubahan jumlah kos (pengangka) ÷ perubahan kuantiti keluaran (penyebut)") + "MC = (" + wang(tc[p]) + " − " + wang(tc[p - 1]) + ") ÷ (" + nom(b.q) + " − " + nom(x.j[p - 1].q) + ") = <b>" + wang((tc[p] - tc[p - 1]) / (b.q - x.j[p - 1].q)) + "</b>");
       } else {
         L.push("Pilih baris dengan output lebih daripada sifar untuk melihat jalan kira.");
       }
@@ -1053,9 +1057,9 @@
       var u = tr - tc;
       var out = {
         hasil: [H("TR", wang(tr)), H("TC", wang(tc)), H(u >= 0 ? "Untung" : "Rugi", wang(Math.abs(u)), u > 0 ? "baik" : u < 0 ? "buruk" : "neutral")],
-        langkah: ["TR = " + wang(x.p) + " × " + nom(x.q) + " = " + wang(tr), "TC = " + wang(x.fc) + " + " + wang(x.vc) + " = " + wang(tc), "Untung = " + wang(tr) + " − " + wang(tc) + " = <b>" + wang(u) + "</b>"]
+        langkah: [ay("Jumlah hasil = harga × kuantiti") + "TR = " + wang(x.p) + " × " + nom(x.q) + " = " + wang(tr), ay("Jumlah kos = kos tetap + kos berubah") + "TC = " + wang(x.fc) + " + " + wang(x.vc) + " = " + wang(tc), ay("Untung = jumlah hasil − jumlah kos") + "Untung = " + wang(tr) + " − " + wang(tc) + " = <b>" + wang(u) + "</b>"]
       };
-      if (x.q > 0) out.langkah.push("AC = " + wang(tc) + " ÷ " + nom(x.q) + " = " + wang(tc / x.q) + ", maka untung seunit = " + wang(x.p) + " − " + wang(tc / x.q) + " = " + wang(x.p - tc / x.q));
+      if (x.q > 0) out.langkah.push(ay("Kos purata = jumlah kos ÷ kuantiti; untung seunit = harga − kos purata") + "AC = " + wang(tc) + " ÷ " + nom(x.q) + " = " + wang(tc / x.q) + ", maka untung seunit = " + wang(x.p) + " − " + wang(tc / x.q) + " = " + wang(x.p - tc / x.q));
       out.nota = u > 0 ? "TR &gt; TC: firma mendapat untung." : u < 0 ? "TR &lt; TC: firma mengalami kerugian." : "TR = TC: firma pulang modal.";
       return out;
     }
@@ -1084,9 +1088,9 @@
       return {
         hasil: [H("Untung perakaunan", wang(ua)), H("Kos implisit", wang(imp)), H("Untung ekonomi", wang(ue), ue > 0 ? "baik" : ue < 0 ? "buruk" : "neutral")],
         langkah: [
-          "Kos implisit = " + wang(x.gaji) + " + " + wang(x.faedah) + " + " + wang(x.lain) + " = " + wang(imp),
-          "Untung = " + wang(x.tr) + " − " + wang(x.eks) + " = " + wang(ua),
-          "Untung ekonomi = " + wang(x.tr) + " − (" + wang(x.eks) + " + " + wang(imp) + ") = <b>" + wang(ue) + "</b>"
+          ay("Kos implisit = gaji dilepaskan + faedah dilepaskan + kos lepas lain") + "Kos implisit = " + wang(x.gaji) + " + " + wang(x.faedah) + " + " + wang(x.lain) + " = " + wang(imp),
+          ay("Untung perakaunan = jumlah hasil − kos eksplisit") + "Untung = " + wang(x.tr) + " − " + wang(x.eks) + " = " + wang(ua),
+          ay("Untung ekonomi = jumlah hasil − (kos eksplisit + kos implisit)") + "Untung ekonomi = " + wang(x.tr) + " − (" + wang(x.eks) + " + " + wang(imp) + ") = <b>" + wang(ue) + "</b>"
         ],
         nota: ue > 0 ? "Untung ekonomi positif: perniagaan ini lebih baik daripada pilihan kedua terbaik." : ue < 0 ? "Untung ekonomi negatif: pilihan kedua terbaik (contohnya kekal makan gaji) memberi pulangan lebih tinggi." : "Untung ekonomi sifar: pulangan perniagaan sama dengan pilihan kedua terbaik."
       };
@@ -1110,12 +1114,12 @@
     kira: function (x) {
       if (x.i0 <= 0) return { ralat: "Input mesti lebih daripada sifar." };
       var p0 = x.o0 / x.i0;
-      var out = { hasil: [H("Produktiviti", nom(p0) + " unit seinput")], langkah: ["Produktiviti = " + nom(x.o0) + " ÷ " + nom(x.i0) + " = <b>" + nom(p0) + "</b> unit bagi setiap unit input"] };
+      var out = { hasil: [H("Produktiviti", nom(p0) + " unit seinput")], langkah: [ay("Produktiviti = jumlah keluaran (pengangka) ÷ jumlah input (penyebut)") + "Produktiviti = " + nom(x.o0) + " ÷ " + nom(x.i0) + " = <b>" + nom(p0) + "</b> unit bagi setiap unit input"] };
       if (x.o1 != null && x.i1 != null && x.i1 > 0) {
         var p1 = x.o1 / x.i1;
         var u = ((p1 - p0) / p0) * 100;
-        out.langkah.push("Produktiviti tempoh kedua = " + nom(x.o1) + " ÷ " + nom(x.i1) + " = <b>" + nom(p1) + "</b>");
-        out.langkah.push("Perubahan = (" + nom(p1) + " − " + nom(p0) + ") ÷ " + nom(p0) + " × 100 = " + pc(u));
+        out.langkah.push(ay("Produktiviti tempoh kedua = keluaran tempoh kedua ÷ input tempoh kedua") + "Produktiviti tempoh kedua = " + nom(x.o1) + " ÷ " + nom(x.i1) + " = <b>" + nom(p1) + "</b>");
+        out.langkah.push(ay("Perubahan produktiviti = (produktiviti baharu − produktiviti asal) ÷ produktiviti asal × 100") + "Perubahan = (" + nom(p1) + " − " + nom(p0) + ") ÷ " + nom(p0) + " × 100 = " + pc(u));
         out.hasil.push(H("Tempoh kedua", nom(p1)));
         out.hasil.push(H("Perubahan", (u > 0 ? "+" : "") + pc(u), u > 0 ? "baik" : u < 0 ? "buruk" : "neutral"));
         out.nota = u > 0 ? "Produktiviti meningkat: lebih banyak output dihasilkan bagi setiap unit input." : u < 0 ? "Produktiviti menurun." : "";
@@ -1144,7 +1148,7 @@
       var b = fs - ks;
       return {
         hasil: [H("Kos sosial", wang(ks)), H("Faedah sosial", wang(fs)), H("Faedah bersih sosial", wang(b), b > 0 ? "baik" : b < 0 ? "buruk" : "neutral")],
-        langkah: ["Kos sosial = " + wang(x.kp) + " + " + wang(x.kl) + " = " + wang(ks), "Faedah sosial = " + wang(x.fp) + " + " + wang(x.fl) + " = " + wang(fs), "Faedah sosial − Kos sosial = " + wang(fs) + " − " + wang(ks) + " = <b>" + wang(b) + "</b>"],
+        langkah: [ay("Kos sosial = kos persendirian + kos luaran") + "Kos sosial = " + wang(x.kp) + " + " + wang(x.kl) + " = " + wang(ks), ay("Faedah sosial = faedah persendirian + faedah luaran") + "Faedah sosial = " + wang(x.fp) + " + " + wang(x.fl) + " = " + wang(fs), ay("Faedah bersih kepada masyarakat = faedah sosial − kos sosial") + "Faedah sosial − Kos sosial = " + wang(fs) + " − " + wang(ks) + " = <b>" + wang(b) + "</b>"],
         nota: b > 0 ? "Faedah sosial melebihi kos sosial: aktiviti ini menguntungkan masyarakat." : b < 0 ? "Kos sosial melebihi faedah sosial: aktiviti ini membebankan masyarakat walaupun mungkin menguntungkan firma." : "Faedah sosial sama dengan kos sosial."
       };
     }
@@ -1170,7 +1174,7 @@
       var i = (x.h1 / x.h0) * 100;
       return {
         hasil: [H("Indeks harga", nom(i)), H("Perubahan harga", (i >= 100 ? "+" : "") + pc(i - 100), i > 100 ? "amaran" : i < 100 ? "baik" : "neutral")],
-        langkah: ["Indeks harga = " + wang(x.h1) + " ÷ " + wang(x.h0) + " × 100 = <b>" + nom(i) + "</b>"],
+        langkah: [ay("Indeks harga = harga tahun semasa (pengangka) ÷ harga tahun asas (penyebut) × 100") + "Indeks harga = " + wang(x.h1) + " ÷ " + wang(x.h0) + " × 100 = <b>" + nom(i) + "</b>"],
         nota: i > 100 ? "Harga naik " + pc(i - 100) + " berbanding tahun dasar." : i < 100 ? "Harga turun " + pc(100 - i) + " berbanding tahun dasar." : "Harga sama dengan tahun dasar."
       };
     }
@@ -1240,12 +1244,12 @@
       var tw = ji / n;
       var L = [];
       var b = x.j[x._baris.j];
-      if (b && b.h0 > 0 && b.h1 != null) L.push("Indeks " + esc(b.nama || "barang") + " = " + wang(b.h1) + " ÷ " + wang(b.h0) + " × 100 = " + nom((b.h1 / b.h0) * 100));
-      L.push("IHP tanpa wajaran = " + nom(ji) + " ÷ " + n + " = <b>" + nom(tw) + "</b>");
+      if (b && b.h0 > 0 && b.h1 != null) L.push(ay("Indeks barang = harga tahun semasa ÷ harga tahun asas × 100") + "Indeks " + esc(b.nama || "barang") + " = " + wang(b.h1) + " ÷ " + wang(b.h0) + " × 100 = " + nom((b.h1 / b.h0) * 100));
+      L.push(ay("IHP tanpa wajaran = jumlah indeks semua barang (pengangka) ÷ bilangan barang (penyebut)") + "IHP tanpa wajaran = " + nom(ji) + " ÷ " + n + " = <b>" + nom(tw) + "</b>");
       var out = { sel: { i: si, iw: siw }, langkah: L, hasil: [H("IHP tanpa wajaran", nom(tw))] };
       if (jw > 0) {
         var bw = jiw / jw;
-        L.push("IHP berwajaran = " + nom(jiw) + " ÷ " + nom(jw) + " = <b>" + nom(bw) + "</b>");
+        L.push(ay("IHP berwajaran = jumlah (indeks × wajaran) (pengangka) ÷ jumlah wajaran (penyebut)") + "IHP berwajaran = " + nom(jiw) + " ÷ " + nom(jw) + " = <b>" + nom(bw) + "</b>");
         out.hasil.push(H("IHP berwajaran", nom(bw), bw > 100 ? "amaran" : "baik"));
         out.nota = bw > 100 ? "Tingkat harga umum tahun semasa naik " + pc(bw - 100) + " berbanding tahun dasar: kos sara hidup meningkat." : bw < 100 ? "Tingkat harga umum turun " + pc(100 - bw) + " berbanding tahun dasar." : "Tingkat harga umum sama dengan tahun dasar.";
       }
@@ -1277,7 +1281,7 @@
       else j = H("Keadaan", "Hiperinflasi", "buruk");
       return {
         hasil: [H("Kadar inflasi", pc(r)), j],
-        langkah: ["Kadar inflasi = (" + nom(x.i1) + " − " + nom(x.i0) + ") ÷ " + nom(x.i0) + " × 100 = <b>" + pc(r) + "</b>"],
+        langkah: [ay("Kadar inflasi = (IHP tahun semasa − IHP tahun sebelum) ÷ IHP tahun sebelum × 100") + "Kadar inflasi = (" + nom(x.i1) + " − " + nom(x.i0) + ") ÷ " + nom(x.i0) + " × 100 = <b>" + pc(r) + "</b>"],
         nota: "Klasifikasi buku teks: inflasi sederhana 2% hingga 3% setahun, inflasi merangkak 4% hingga 5% setahun, hiperinflasi beratus-ratus peratus setahun. Kadar negatif bermaksud deflasi."
       };
     }
@@ -1301,11 +1305,11 @@
       var h1 = x.k1 * (1 + x.m / 100);
       var out = {
         hasil: [H("Harga asal", wang(h0)), H("Harga baharu", wang(h1))],
-        langkah: ["Harga asal = " + wang(x.k0) + " + " + pc(x.m) + " × " + wang(x.k0) + " = " + wang(h0), "Harga baharu = " + wang(x.k1) + " + " + pc(x.m) + " × " + wang(x.k1) + " = <b>" + wang(h1) + "</b>"]
+        langkah: [ay("Harga jualan = kos seunit + margin untung × kos seunit") + "Harga asal = " + wang(x.k0) + " + " + pc(x.m) + " × " + wang(x.k0) + " = " + wang(h0), ay("Harga baharu = kos seunit baharu + margin untung × kos seunit baharu") + "Harga baharu = " + wang(x.k1) + " + " + pc(x.m) + " × " + wang(x.k1) + " = <b>" + wang(h1) + "</b>"]
       };
       if (h0 > 0) {
         var u = ((h1 - h0) / h0) * 100;
-        out.langkah.push("Kenaikan harga = (" + wang(h1) + " − " + wang(h0) + ") ÷ " + wang(h0) + " × 100 = " + pc(u));
+        out.langkah.push(ay("Kenaikan harga = (harga baharu − harga asal) ÷ harga asal × 100") + "Kenaikan harga = (" + wang(h1) + " − " + wang(h0) + ") ÷ " + wang(h0) + " × 100 = " + pc(u));
         out.hasil.push(H("Kenaikan harga", pc(u), u > 0 ? "amaran" : "neutral"));
       }
       out.nota = "Kenaikan kos pengeluaran dipindahkan kepada pengguna melalui harga yang lebih tinggi: inflasi tolakan kos.";
@@ -1330,7 +1334,7 @@
       var b = (x.n / x.ihp) * 100;
       return {
         hasil: [H("Pendapatan benar", wang(b)), H("Beza kuasa beli", wang(b - x.n), b < x.n ? "buruk" : "baik")],
-        langkah: ["Pendapatan benar = " + wang(x.n) + " ÷ " + nom(x.ihp) + " × 100 = <b>" + wang(b) + "</b>"],
+        langkah: [ay("Pendapatan benar = pendapatan nominal (pengangka) ÷ IHP (penyebut) × 100") + "Pendapatan benar = " + wang(x.n) + " ÷ " + nom(x.ihp) + " × 100 = <b>" + wang(b) + "</b>"],
         nota: x.ihp > 100 ? "IHP melebihi 100: harga naik berbanding tahun dasar, maka kuasa beli gaji " + wang(x.n) + " hanya bernilai " + wang(b) + " pada harga tahun dasar." : "IHP 100 ke bawah: kuasa beli tidak berkurang berbanding tahun dasar."
       };
     }
@@ -1385,15 +1389,15 @@
       var pg = x.pg;
       if (x.data === "guna") {
         pg = x.tb - x.gt;
-        L.push("Penganggur = " + nom(x.tb) + " − " + nom(x.gt) + " = " + nom(pg));
+        L.push(ay("Penganggur = jumlah tenaga buruh − guna tenaga") + "Penganggur = " + nom(x.tb) + " − " + nom(x.gt) + " = " + nom(pg));
       }
       var k = (pg / x.tb) * 100;
-      L.push("Kadar pengangguran = " + nom(pg) + " ÷ " + nom(x.tb) + " × 100 = <b>" + pc(k) + "</b>");
+      L.push(ay("Kadar pengangguran = bilangan penganggur (pengangka) ÷ jumlah tenaga buruh (penyebut) × 100") + "Kadar pengangguran = " + nom(pg) + " ÷ " + nom(x.tb) + " × 100 = <b>" + pc(k) + "</b>");
       var penuh = k < 4;
       var out = { hasil: [H("Kadar pengangguran", pc(k)), H("Guna tenaga penuh", penuh ? "Ya (&lt; 4%)" : "Tidak (≥ 4%)", penuh ? "baik" : "buruk")], langkah: L };
       if (x.pend != null && x.pend > 0) {
         var kp = (x.tb / x.pend) * 100;
-        L.push("KPTB = " + nom(x.tb) + " ÷ " + nom(x.pend) + " × 100 = <b>" + pc(kp) + "</b>");
+        L.push(ay("KPTB = jumlah tenaga buruh (pengangka) ÷ penduduk umur 15–64 tahun (penyebut) × 100") + "KPTB = " + nom(x.tb) + " ÷ " + nom(x.pend) + " × 100 = <b>" + pc(kp) + "</b>");
         out.hasil.push(H("KPTB", pc(kp)));
       }
       out.nota = penuh ? "Kadar pengangguran kurang daripada 4%, maka ekonomi mencapai guna tenaga penuh." : "Kadar pengangguran 4% atau lebih: ekonomi belum mencapai guna tenaga penuh.";
@@ -1422,7 +1426,7 @@
       var k = x.c + x.i + x.g + xm;
       return {
         hasil: [H("KDNK", nom(k)), H("Eksport bersih (X − M)", nom(xm), xm >= 0 ? "baik" : "buruk")],
-        langkah: ["X − M = " + nom(x.xx) + " − " + nom(x.m) + " = " + nom(xm), "KDNK = " + nom(x.c) + " + " + nom(x.i) + " + " + nom(x.g) + " + " + kr(xm) + " = <b>" + nom(k) + "</b>"],
+        langkah: [ay("Eksport bersih = eksport − import") + "X − M = " + nom(x.xx) + " − " + nom(x.m) + " = " + nom(xm), ay("KDNK = penggunaan (C) + pelaburan (I) + perbelanjaan kerajaan (G) + eksport bersih (X − M)") + "KDNK = " + nom(x.c) + " + " + nom(x.i) + " + " + nom(x.g) + " + " + kr(xm) + " = <b>" + nom(k) + "</b>"],
         nota: "Unit jawapan sama dengan unit data (contohnya RM bilion)."
       };
     }
@@ -1445,7 +1449,7 @@
       var b = (x.n / x.i) * 100;
       return {
         hasil: [H("KDNK benar", nom(b))],
-        langkah: ["KDNK benar = " + nom(x.n) + " ÷ " + nom(x.i) + " × 100 = <b>" + nom(b) + "</b>"],
+        langkah: [ay("KDNK benar = KDNK nominal (pengangka) ÷ indeks harga (penyebut) × 100") + "KDNK benar = " + nom(x.n) + " ÷ " + nom(x.i) + " × 100 = <b>" + nom(b) + "</b>"],
         nota: x.i > 100 ? "Indeks melebihi 100: sebahagian nilai KDNK nominal disebabkan kenaikan harga, bukan pertambahan output." : "KDNK benar menyingkirkan kesan perubahan harga supaya output sebenar dapat dibandingkan."
       };
     }
@@ -1523,12 +1527,12 @@
         if (x.i0 <= 0 || x.i1 <= 0) return { ralat: "Indeks harga mesti lebih daripada sifar." };
         b0 = (x.n0 / x.i0) * 100;
         b1 = (x.n1 / x.i1) * 100;
-        L.push("KDNK benar tahun sebelumnya = " + nom(x.n0) + " ÷ " + nom(x.i0) + " × 100 = " + nom(b0));
-        L.push("KDNK benar tahun semasa = " + nom(x.n1) + " ÷ " + nom(x.i1) + " × 100 = " + nom(b1));
+        L.push(ay("KDNK benar tahun sebelum = KDNK nominal ÷ indeks harga × 100") + "KDNK benar tahun sebelumnya = " + nom(x.n0) + " ÷ " + nom(x.i0) + " × 100 = " + nom(b0));
+        L.push(ay("KDNK benar tahun semasa = KDNK nominal ÷ indeks harga × 100") + "KDNK benar tahun semasa = " + nom(x.n1) + " ÷ " + nom(x.i1) + " × 100 = " + nom(b1));
       }
       if (b0 <= 0) return { ralat: "KDNK benar tahun sebelumnya mesti lebih daripada sifar." };
       var g = ((b1 - b0) / b0) * 100;
-      L.push("Kadar pertumbuhan = (" + nom(b1) + " − " + nom(b0) + ") ÷ " + nom(b0) + " × 100 = <b>" + pc(g) + "</b>");
+      L.push(ay("Kadar pertumbuhan = (KDNK benar tahun semasa − KDNK benar tahun sebelum) ÷ KDNK benar tahun sebelum × 100") + "Kadar pertumbuhan = (" + nom(b1) + " − " + nom(b0) + ") ÷ " + nom(b0) + " × 100 = <b>" + pc(g) + "</b>");
       return {
         hasil: [H("Kadar pertumbuhan", pc(g)), H("Keadaan", g > 0 ? "Pertumbuhan ekonomi" : g < 0 ? "Kemelesetan ekonomi" : "Tiada pertumbuhan", g > 0 ? "baik" : g < 0 ? "buruk" : "neutral")],
         langkah: L,
@@ -1558,13 +1562,13 @@
       var h = x.cl + x.ctl + x.bc;
       var p = x.mg + x.pb;
       var b = h - p;
-      var L = ["Hasil kerajaan = " + nom(x.cl) + " + " + nom(x.ctl) + " + " + nom(x.bc) + " = " + nom(h), "Perbelanjaan kerajaan = " + nom(x.mg) + " + " + nom(x.pb) + " = " + nom(p), "Imbangan = " + nom(h) + " − " + nom(p) + " = <b>" + nom(b) + "</b>"];
+      var L = [ay("Hasil kerajaan = cukai langsung + cukai tak langsung + hasil bukan cukai") + "Hasil kerajaan = " + nom(x.cl) + " + " + nom(x.ctl) + " + " + nom(x.bc) + " = " + nom(h), ay("Perbelanjaan kerajaan = perbelanjaan mengurus + perbelanjaan pembangunan") + "Perbelanjaan kerajaan = " + nom(x.mg) + " + " + nom(x.pb) + " = " + nom(p), ay("Imbangan belanjawan = hasil − perbelanjaan (positif: lebihan; negatif: defisit)") + "Imbangan = " + nom(h) + " − " + nom(p) + " = <b>" + nom(b) + "</b>"];
       var out = {
         hasil: [H("Hasil", nom(h)), H("Perbelanjaan", nom(p)), H("Belanjawan", b > 0 ? "Lebihan " + nom(b) : b < 0 ? "Defisit " + nom(-b) : "Seimbang", b > 0 ? "baik" : b < 0 ? "buruk" : "neutral")],
         langkah: L
       };
       if (x.kdnk != null && x.kdnk > 0) {
-        L.push("Imbangan sebagai % KDNK = " + nom(b) + " ÷ " + nom(x.kdnk) + " × 100 = " + pc((b / x.kdnk) * 100));
+        L.push(ay("Imbangan sebagai % KDNK = imbangan belanjawan (pengangka) ÷ KDNK (penyebut) × 100") + "Imbangan sebagai % KDNK = " + nom(b) + " ÷ " + nom(x.kdnk) + " × 100 = " + pc((b / x.kdnk) * 100));
         out.hasil.push(H("% KDNK", pc((b / x.kdnk) * 100)));
       }
       out.nota =
@@ -1613,7 +1617,7 @@
       }[j.v];
       return {
         hasil: [H("Kadar A", pc(ka)), H("Kadar B", pc(kb)), j],
-        langkah: ["Kadar A = " + wang(x.ca) + " ÷ " + wang(x.pa) + " × 100 = " + pc(ka), "Kadar B = " + wang(x.cb) + " ÷ " + wang(x.pb) + " × 100 = " + pc(kb)],
+        langkah: [ay("Kadar cukai = cukai dibayar (pengangka) ÷ pendapatan (penyebut) × 100") + "Kadar A = " + wang(x.ca) + " ÷ " + wang(x.pa) + " × 100 = " + pc(ka), ay("Kadar cukai = cukai dibayar (pengangka) ÷ pendapatan (penyebut) × 100") + "Kadar B = " + wang(x.cb) + " ÷ " + wang(x.pb) + " × 100 = " + pc(kb)],
         nota: nota
       };
     }
@@ -1650,12 +1654,12 @@
         var a = Math.min(x.u, 500000);
         var b = Math.max(0, x.u - 500000);
         c = a * 0.19 + b * 0.24;
-        L.push("19% × " + wang(a) + " = " + wang(a * 0.19));
+        L.push(ay("Cukai = kadar cukai × pendapatan bercukai dalam banjaran") + "19% × " + wang(a) + " = " + wang(a * 0.19));
         if (b > 0) L.push("24% × " + wang(b) + " = " + wang(b * 0.24));
         L.push("Jumlah cukai = <b>" + wang(c) + "</b>");
       } else {
         c = x.u * 0.24;
-        L.push("Cukai = 24% × " + wang(x.u) + " = <b>" + wang(c) + "</b>");
+        L.push(ay("Cukai = kadar cukai × pendapatan bercukai") + "Cukai = 24% × " + wang(x.u) + " = <b>" + wang(c) + "</b>");
       }
       return {
         hasil: [H("Cukai syarikat", wang(c)), H("Kadar purata", x.u > 0 ? pc((c / x.u) * 100) : "–")],
@@ -1682,11 +1686,11 @@
     ],
     kira: function (x) {
       var r = (x.d * x.n) / 100;
-      var L = ["Rizab wajib = " + nom(x.d) + " × " + pc(x.n) + " = <b>" + nom(r) + "</b>", "Boleh dipinjamkan = " + nom(x.d) + " − " + nom(r) + " = " + nom(x.d - r)];
+      var L = [ay("Rizab wajib = deposit × nisbah rizab berkanun") + "Rizab wajib = " + nom(x.d) + " × " + pc(x.n) + " = <b>" + nom(r) + "</b>", ay("Boleh dipinjamkan = deposit − rizab wajib") + "Boleh dipinjamkan = " + nom(x.d) + " − " + nom(r) + " = " + nom(x.d - r)];
       var out = { hasil: [H("Rizab wajib", nom(r)), H("Boleh dipinjamkan", nom(x.d - r))], langkah: L };
       if (x.n1 != null) {
         var r1 = (x.d * x.n1) / 100;
-        L.push("Pada nisbah " + pc(x.n1) + ": rizab wajib = " + nom(x.d) + " × " + pc(x.n1) + " = " + nom(r1) + ", boleh dipinjamkan = " + nom(x.d - r1));
+        L.push(ay("Rizab wajib baharu = deposit × nisbah rizab baharu") + "Pada nisbah " + pc(x.n1) + ": rizab wajib = " + nom(x.d) + " × " + pc(x.n1) + " = " + nom(r1) + ", boleh dipinjamkan = " + nom(x.d - r1));
         out.hasil.push(H("Perubahan pinjaman", (r - r1 >= 0 ? "+" : "") + nom(r - r1), r1 > r ? "buruk" : r1 < r ? "baik" : "neutral"));
         out.nota = r1 > r ? "Nisbah dinaikkan: lebih banyak wang disimpan di bank pusat, kurang wang boleh dipinjamkan, bekalan wang berkurang (dasar kewangan menguncup)." : r1 < r ? "Nisbah diturunkan: lebih banyak wang boleh dipinjamkan, bekalan wang bertambah (dasar kewangan mengembang)." : "";
       } else {
@@ -1728,10 +1732,10 @@
       var klBX = x.cy / x.cx;
       var klBY = x.cx / x.cy;
       var L = [
-        A + ": kos lepas 1 " + X + " = " + nom(x.ay) + " ÷ " + nom(x.ax) + " = " + nom(klAX) + " " + Y,
-        A + ": kos lepas 1 " + Y + " = " + nom(x.ax) + " ÷ " + nom(x.ay) + " = " + nom(klAY) + " " + X,
-        B + ": kos lepas 1 " + X + " = " + nom(x.cy) + " ÷ " + nom(x.cx) + " = " + nom(klBX) + " " + Y,
-        B + ": kos lepas 1 " + Y + " = " + nom(x.cx) + " ÷ " + nom(x.cy) + " = " + nom(klBY) + " " + X
+        ay("Kos lepas 1 unit barang = keluaran barang lain yang dikorbankan (pengangka) ÷ keluaran barang itu (penyebut)") + A + ": kos lepas 1 " + X + " = " + nom(x.ay) + " ÷ " + nom(x.ax) + " = " + nom(klAX) + " " + Y,
+        ay("Kos lepas 1 unit barang = keluaran barang lain yang dikorbankan (pengangka) ÷ keluaran barang itu (penyebut)") + A + ": kos lepas 1 " + Y + " = " + nom(x.ax) + " ÷ " + nom(x.ay) + " = " + nom(klAY) + " " + X,
+        ay("Kos lepas 1 unit barang = keluaran barang lain yang dikorbankan (pengangka) ÷ keluaran barang itu (penyebut)") + B + ": kos lepas 1 " + X + " = " + nom(x.cy) + " ÷ " + nom(x.cx) + " = " + nom(klBX) + " " + Y,
+        ay("Kos lepas 1 unit barang = keluaran barang lain yang dikorbankan (pengangka) ÷ keluaran barang itu (penyebut)") + B + ": kos lepas 1 " + Y + " = " + nom(x.cx) + " ÷ " + nom(x.cy) + " = " + nom(klBY) + " " + X
       ];
       if (sama(klAX, klBX)) return { hasil: [H("Faedah berbanding", "Tiada", "neutral")], langkah: L, nota: "Kos lepas kedua-dua negara sama, maka tiada faedah berbanding dan tiada keuntungan daripada pengkhususan." };
       var xA = klAX < klBX;
@@ -1799,13 +1803,13 @@
       } else {
         if (x.h == null) return { ralat: "Tarif ad valorem memerlukan harga seunit barang." };
         seunit = (x.k / 100) * x.h;
-        L.push("Tarif seunit = " + pc(x.k) + " × " + wang(x.h) + " = " + wang(seunit));
+        L.push(ay("Tarif seunit = kadar tarif × harga import seunit") + "Tarif seunit = " + pc(x.k) + " × " + wang(x.h) + " = " + wang(seunit));
       }
       var jum = seunit * x.q;
-      L.push("Hasil tarif = " + wang(seunit) + " × " + nom(x.q) + " = <b>" + wang(jum) + "</b>");
+      L.push(ay("Hasil tarif = tarif seunit × kuantiti import") + "Hasil tarif = " + wang(seunit) + " × " + nom(x.q) + " = <b>" + wang(jum) + "</b>");
       var out = { hasil: [H("Tarif seunit", wang(seunit)), H("Hasil tarif kerajaan", wang(jum))], langkah: L };
       if (x.h != null) {
-        L.push("Harga seunit selepas tarif = " + wang(x.h) + " + " + wang(seunit) + " = " + wang(x.h + seunit));
+        L.push(ay("Harga selepas tarif = harga import + tarif seunit") + "Harga seunit selepas tarif = " + wang(x.h) + " + " + wang(seunit) + " = " + wang(x.h + seunit));
         out.hasil.push(H("Harga selepas tarif", wang(x.h + seunit), "amaran"));
       }
       out.nota = "Tarif menaikkan harga barang import, maka permintaan terhadap barang import berkurang dan industri tempatan dilindungi. Kutipan tarif menjadi sumber hasil kerajaan.";
@@ -1849,11 +1853,11 @@
       return {
         hasil: [H("Imbangan dagangan", nom(d), st(d)), H("Imbangan perkhidmatan", nom(p), st(p)), H("Pendapatan primer", nom(a1), st(a1)), H("Pendapatan sekunder", nom(a2), st(a2)), H("Akaun semasa", (s > 0 ? "Lebihan " : s < 0 ? "Defisit " : "") + nom(Math.abs(s)), st(s))],
         langkah: [
-          "Imbangan dagangan = " + nom(x.xb) + " − " + nom(x.mb) + " = " + nom(d),
-          "Imbangan perkhidmatan = " + nom(x.xp) + " − " + nom(x.mp) + " = " + nom(p),
-          "Pendapatan primer = " + nom(x.p1) + " − " + nom(x.b1) + " = " + nom(a1),
-          "Pendapatan sekunder = " + nom(x.p2) + " − " + nom(x.b2) + " = " + nom(a2),
-          "Akaun semasa = " + nom(d) + " + " + kr(p) + " + " + kr(a1) + " + " + kr(a2) + " = <b>" + nom(s) + "</b>"
+          ay("Imbangan dagangan = eksport barang − import barang") + "Imbangan dagangan = " + nom(x.xb) + " − " + nom(x.mb) + " = " + nom(d),
+          ay("Imbangan perkhidmatan = eksport perkhidmatan − import perkhidmatan") + "Imbangan perkhidmatan = " + nom(x.xp) + " − " + nom(x.mp) + " = " + nom(p),
+          ay("Pendapatan primer = penerimaan − pembayaran") + "Pendapatan primer = " + nom(x.p1) + " − " + nom(x.b1) + " = " + nom(a1),
+          ay("Pendapatan sekunder = penerimaan − pembayaran") + "Pendapatan sekunder = " + nom(x.p2) + " − " + nom(x.b2) + " = " + nom(a2),
+          ay("Akaun semasa = imbangan dagangan + imbangan perkhidmatan + pendapatan primer + pendapatan sekunder") + "Akaun semasa = " + nom(d) + " + " + kr(p) + " + " + kr(a1) + " + " + kr(a2) + " = <b>" + nom(s) + "</b>"
         ],
         nota: s > 0 ? "Lebihan akaun semasa: jumlah penerimaan melebihi jumlah pembayaran." : s < 0 ? "Defisit akaun semasa: jumlah pembayaran melebihi jumlah penerimaan." : "Akaun semasa seimbang."
       };
@@ -1913,14 +1917,14 @@
         var ap = Math.floor(a * 100 + 1e-7) / 100;
         return {
           hasil: [H("Diterima", kod + E.fmt(ap, 2, true), "neutral")],
-          langkah: [wang(x.rm) + " × " + kod + nom(x.unit, 4) + " ÷ " + kadar(x.jual) + " = <b>" + kod + E.fmt(ap, 2, true) + "</b>"],
+          langkah: [ay("Mata wang asing diperoleh = jumlah ringgit × unit mata wang asing ÷ kadar jual bank") + wang(x.rm) + " × " + kod + nom(x.unit, 4) + " ÷ " + kadar(x.jual) + " = <b>" + kod + E.fmt(ap, 2, true) + "</b>"],
           nota: "Kita membeli mata wang asing daripada bank, maka bank menggunakan <b>harga jualan</b>." + (Math.abs(a - ap) > 1e-7 ? " Jawapan dipotong kepada 2 tempat perpuluhan seperti dalam buku teks." : "")
         };
       }
       var r = (x.asing * x.beli) / x.unit;
       return {
         hasil: [H("Diterima", wang(r), "neutral")],
-        langkah: [kod + nom(x.asing) + " × " + kadar(x.beli) + (x.unit === 1 ? "" : " ÷ " + kod + nom(x.unit, 4)) + " = <b>" + wang(r) + "</b>"],
+        langkah: [ay("Ringgit diperoleh = jumlah mata wang asing × kadar beli bank ÷ unit mata wang asing") + kod + nom(x.asing) + " × " + kadar(x.beli) + (x.unit === 1 ? "" : " ÷ " + kod + nom(x.unit, 4)) + " = <b>" + wang(r) + "</b>"],
         nota: "Kita menjual mata wang asing kepada bank, maka bank menggunakan <b>harga belian</b>."
       };
     }
@@ -1953,9 +1957,9 @@
       var e1 = x.ek / x.k1;
       var susut = x.k1 > x.k0;
       var L = [
-        "Harga import: " + kod + nom(x.im) + " × " + kadar(x.k0) + " = " + wang(i0) + " → " + kod + nom(x.im) + " × " + kadar(x.k1) + " = <b>" + wang(i1) + "</b>",
-        "Harga eksport: " + wang(x.ek) + " ÷ " + kadar(x.k0) + " = " + mw(kod, e0) + " → " + wang(x.ek) + " ÷ " + kadar(x.k1) + " = <b>" + mw(kod, e1) + "</b>",
-        "Perubahan nilai ringgit = (" + nom(x.k0, 4) + " ÷ " + nom(x.k1, 4) + " − 1) × 100 = " + pc((x.k0 / x.k1 - 1) * 100)
+        ay("Harga import dalam ringgit = harga dalam mata wang asing × kadar pertukaran") + "Harga import: " + kod + nom(x.im) + " × " + kadar(x.k0) + " = " + wang(i0) + " → " + kod + nom(x.im) + " × " + kadar(x.k1) + " = <b>" + wang(i1) + "</b>",
+        ay("Harga eksport dalam mata wang asing = harga dalam ringgit (pengangka) ÷ kadar pertukaran (penyebut)") + "Harga eksport: " + wang(x.ek) + " ÷ " + kadar(x.k0) + " = " + mw(kod, e0) + " → " + wang(x.ek) + " ÷ " + kadar(x.k1) + " = <b>" + mw(kod, e1) + "</b>",
+        ay("Perubahan nilai ringgit = (kadar lama ÷ kadar baharu − 1) × 100") + "Perubahan nilai ringgit = (" + nom(x.k0, 4) + " ÷ " + nom(x.k1, 4) + " − 1) × 100 = " + pc((x.k0 / x.k1 - 1) * 100)
       ];
       if (x.k0 === x.k1) return { hasil: [H("Ringgit", "Tidak berubah", "neutral")], langkah: L };
       return {
@@ -2025,10 +2029,10 @@
       var cs0 = 0.5 * q0 * (x.a - p0);
       var ps0 = 0.5 * q0 * (p0 - x.c);
       var L = [
-        x.a + " − " + kr(x.b) + "Q = " + kr(x.c) + " + " + kr(x.d) + "Q → Q = (" + nom(x.a) + " − " + kr(x.c) + ") ÷ (" + nom(x.b) + " + " + nom(x.d) + ") = <b>" + nom(q0) + "</b>",
-        "P = " + nom(x.a) + " − " + nom(x.b) + " × " + nom(q0) + " = <b>" + wang(p0) + "</b>",
-        "Lebihan pengguna = ½ × " + nom(q0) + " × (" + nom(x.a) + " − " + nom(p0) + ") = <b>" + wang(cs0) + "</b>",
-        "Lebihan pengeluar = ½ × " + nom(q0) + " × (" + nom(p0) + " − " + kr(x.c) + ") = <b>" + wang(ps0) + "</b>"
+        ay("Keseimbangan apabila Qd = Qs: Q = (pintasan harga DD − pintasan harga SS) ÷ (kecerunan DD + kecerunan SS)") + x.a + " − " + kr(x.b) + "Q = " + kr(x.c) + " + " + kr(x.d) + "Q → Q = (" + nom(x.a) + " − " + kr(x.c) + ") ÷ (" + nom(x.b) + " + " + nom(x.d) + ") = <b>" + nom(q0) + "</b>",
+        ay("Harga keseimbangan = pintasan harga DD − kecerunan DD × Q") + "P = " + nom(x.a) + " − " + nom(x.b) + " × " + nom(q0) + " = <b>" + wang(p0) + "</b>",
+        ay("Lebihan pengguna = ½ × kuantiti keseimbangan × (pintasan harga DD − harga keseimbangan)") + "Lebihan pengguna = ½ × " + nom(q0) + " × (" + nom(x.a) + " − " + nom(p0) + ") = <b>" + wang(cs0) + "</b>",
+        ay("Lebihan pengeluar = ½ × kuantiti keseimbangan × (harga keseimbangan − pintasan harga SS)") + "Lebihan pengeluar = ½ × " + nom(q0) + " × (" + nom(p0) + " − " + kr(x.c) + ") = <b>" + wang(ps0) + "</b>"
       ];
       var out = { hasil: [H("Harga keseimbangan", wang(p0)), H("Kuantiti keseimbangan", nom(q0)), H("Lebihan pengguna", wang(cs0))], langkah: L };
       if (t) {
@@ -2038,13 +2042,13 @@
         var cs1 = 0.5 * q1 * (x.a - p1);
         var cukai = t > 0;
         L.push(
-          "SS baharu: P = " + kr(x.c) + (cukai ? " + " : " − ") + nom(Math.abs(t)) + " + " + nom(x.d) + "Q → Q = (" + nom(x.a) + " − " + kr(x.c + t) + ") ÷ " + nom(x.b + x.d) + " = <b>" + nom(q1) + "</b>, P = <b>" + wang(p1) + "</b>",
-          "Lebihan pengguna baharu = ½ × " + nom(q1) + " × (" + nom(x.a) + " − " + nom(p1) + ") = <b>" + wang(cs1) + "</b>; perubahan = <b>" + (cs1 >= cs0 ? "+" : "−") + wang(Math.abs(cs1 - cs0)) + "</b>"
+          ay("Selepas cukai atau subsidi, SS beralih: Q baharu = (pintasan DD − pintasan SS baharu) ÷ (kecerunan DD + kecerunan SS)") + "SS baharu: P = " + kr(x.c) + (cukai ? " + " : " − ") + nom(Math.abs(t)) + " + " + nom(x.d) + "Q → Q = (" + nom(x.a) + " − " + kr(x.c + t) + ") ÷ " + nom(x.b + x.d) + " = <b>" + nom(q1) + "</b>, P = <b>" + wang(p1) + "</b>",
+          ay("Lebihan pengguna baharu = ½ × Q baharu × (pintasan harga DD − harga baharu)") + "Lebihan pengguna baharu = ½ × " + nom(q1) + " × (" + nom(x.a) + " − " + nom(p1) + ") = <b>" + wang(cs1) + "</b>; perubahan = <b>" + (cs1 >= cs0 ? "+" : "−") + wang(Math.abs(cs1 - cs0)) + "</b>"
         );
         var bebanP = Math.abs(p1 - p0) * q1;
         var jumlah = Math.abs(t) * q1;
         L.push(
-          (cukai ? "Hasil cukai kerajaan" : "Perbelanjaan subsidi kerajaan") + " = " + nom(Math.abs(t)) + " × " + nom(q1) + " = <b>" + wang(jumlah) + "</b>; " +
+          ay("Jumlah cukai atau subsidi = kadar seunit × Q baharu; bahagian pengguna = perubahan harga × Q baharu") + (cukai ? "Hasil cukai kerajaan" : "Perbelanjaan subsidi kerajaan") + " = " + nom(Math.abs(t)) + " × " + nom(q1) + " = <b>" + wang(jumlah) + "</b>; " +
             (cukai ? "beban" : "faedah") + " pengguna = " + nom(Math.abs(p1 - p0)) + " × " + nom(q1) + " = " + wang(bebanP) + " (" + pc((bebanP / jumlah) * 100, 1) + "), " +
             (cukai ? "beban" : "faedah") + " pengeluar = " + wang(jumlah - bebanP) + " (" + pc(((jumlah - bebanP) / jumlah) * 100, 1) + ")"
         );
@@ -2095,9 +2099,9 @@
       return {
         hasil: [H(nama, nom(e)), H("Tafsiran", jenis, "neutral")],
         langkah: [
-          "%ΔQ = (" + nom(x.q1) + " − " + kr(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(((x.q1 - x.q0) / x.q0) * 100),
-          "%ΔX = (" + nom(x.x1) + " − " + kr(x.x0) + ") ÷ " + nom(x.x0) + " × 100 = " + pc(((x.x1 - x.x0) / x.x0) * 100),
-          nama + " = " + pc(((x.q1 - x.q0) / x.q0) * 100) + " ÷ " + krp(((x.x1 - x.x0) / x.x0) * 100) + " = <b>" + nom(e) + "</b>"
+          ay("%ΔQ = (kuantiti baharu − kuantiti asal) ÷ kuantiti asal × 100") + "%ΔQ = (" + nom(x.q1) + " − " + kr(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(((x.q1 - x.q0) / x.q0) * 100),
+          ay("%ΔX = (nilai baharu − nilai asal) ÷ nilai asal × 100 (harga barang lain bagi Ec, pendapatan bagi Ey)") + "%ΔX = (" + nom(x.x1) + " − " + kr(x.x0) + ") ÷ " + nom(x.x0) + " × 100 = " + pc(((x.x1 - x.x0) / x.x0) * 100),
+          ay("Keanjalan = %ΔQ (pengangka) ÷ %ΔX (penyebut)") + nama + " = " + pc(((x.q1 - x.q0) / x.q0) * 100) + " ÷ " + krp(((x.x1 - x.x0) / x.x0) * 100) + " = <b>" + nom(e) + "</b>"
         ],
         nota: x.jenis === "ey" ? "Tafsiran mengikut modul: 0 < Ey ≤ 1 normal, Ey > 1 mewah, Ey = 0 mesti, Ey < 0 bawahan." : "Ec positif: pengganti; negatif: penggenap; sifar: tiada kaitan."
       };
@@ -2132,10 +2136,10 @@
       var out = {
         hasil: [H("Q", nom(q) + " unit"), H("AVC", wang(avc)), H("TFC", wang(tfc)), H("TVC", wang(tvc))],
         langkah: [
-          "Q = " + wang(x.tc) + " ÷ " + wang(x.ac) + " = <b>" + nom(q) + " unit</b>",
-          "AVC = " + wang(x.ac) + " − " + wang(x.afc) + " = <b>" + wang(avc) + "</b>",
-          "TFC = " + wang(x.afc) + " × " + nom(q) + " = <b>" + wang(tfc) + "</b>",
-          "TVC = " + wang(x.tc) + " − " + wang(tfc) + " = <b>" + wang(tvc) + "</b>"
+          ay("Kuantiti = jumlah kos (pengangka) ÷ kos purata (penyebut)") + "Q = " + wang(x.tc) + " ÷ " + wang(x.ac) + " = <b>" + nom(q) + " unit</b>",
+          ay("AVC = kos purata − kos tetap purata") + "AVC = " + wang(x.ac) + " − " + wang(x.afc) + " = <b>" + wang(avc) + "</b>",
+          ay("TFC = kos tetap purata × kuantiti") + "TFC = " + wang(x.afc) + " × " + nom(q) + " = <b>" + wang(tfc) + "</b>",
+          ay("TVC = jumlah kos − jumlah kos tetap") + "TVC = " + wang(x.tc) + " − " + wang(tfc) + " = <b>" + wang(tvc) + "</b>"
         ]
       };
       if (avc < 0) out.amaran = "AFC melebihi AC: data tidak munasabah kerana AVC menjadi negatif.";
@@ -2168,20 +2172,20 @@
       var knkhp = x.kdnk + pfbln;
       var knkkf = knkhp - x.ctl + x.sub;
       var L = [
-        "PFBLN = " + nom(x.terima, 0) + " − " + nom(x.bayar, 0) + " = " + nom(pfbln, 0),
-        "KNK<sub>hp</sub> = " + nom(x.kdnk, 0) + " + " + kr(pfbln, 0) + " = <b>" + nom(knkhp, 0) + "</b>",
-        "KNK<sub>kf</sub> = " + nom(knkhp, 0) + " − " + nom(x.ctl, 0) + " + " + nom(x.sub, 0) + " = <b>" + nom(knkkf, 0) + "</b>"
+        ay("PFBLN = penerimaan faktor dari luar negeri − pembayaran faktor ke luar negeri") + "PFBLN = " + nom(x.terima, 0) + " − " + nom(x.bayar, 0) + " = " + nom(pfbln, 0),
+        ay("KNK harga pasaran = KDNK harga pasaran + PFBLN") + "KNK<sub>hp</sub> = " + nom(x.kdnk, 0) + " + " + kr(pfbln, 0) + " = <b>" + nom(knkhp, 0) + "</b>",
+        ay("KNK kos faktor = KNK harga pasaran − cukai tak langsung + subsidi") + "KNK<sub>kf</sub> = " + nom(knkhp, 0) + " − " + nom(x.ctl, 0) + " + " + nom(x.sub, 0) + " = <b>" + nom(knkkf, 0) + "</b>"
       ];
       var hasil = [H("PFBLN", "RM" + nom(pfbln, 0) + " juta", pfbln < 0 ? "amaran" : "baik"), H("KNK harga pasaran", "RM" + nom(knkhp, 0) + " juta"), H("KNK kos faktor", "RM" + nom(knkkf, 0) + " juta")];
       if (x.susut != null) {
         var knb = knkkf - x.susut;
-        L.push("KNB<sub>kf</sub> = " + nom(knkkf, 0) + " − " + nom(x.susut, 0) + " = <b>" + nom(knb, 0) + "</b> (pendapatan negara)");
+        L.push(ay("KNB kos faktor = KNK kos faktor − susut nilai") + "KNB<sub>kf</sub> = " + nom(knkkf, 0) + " − " + nom(x.susut, 0) + " = <b>" + nom(knb, 0) + "</b> (pendapatan negara)");
         hasil.push(H("Pendapatan negara (KNB kf)", "RM" + nom(knb, 0) + " juta", "baik"));
       }
       if (x.ihp != null) {
         if (x.ihp === 0) return { ralat: "IHP tidak boleh sifar." };
         var benar = (knkhp * 100) / x.ihp;
-        L.push("KNK benar = 100 ÷ " + nom(x.ihp) + " × " + nom(knkhp, 0) + " = <b>" + nom(benar) + "</b>");
+        L.push(ay("KNK benar = 100 ÷ IHP × KNK nominal") + "KNK benar = 100 ÷ " + nom(x.ihp) + " × " + nom(knkhp, 0) + " = <b>" + nom(benar) + "</b>");
         hasil.push(H("KNK benar", "RM" + nom(benar) + " juta"));
       }
       return { hasil: hasil, langkah: L, nota: pfbln < 0 ? "PFBLN negatif: KDNK lebih besar daripada KNK." : "PFBLN positif: KNK lebih besar daripada KDNK." };
@@ -2230,22 +2234,22 @@
       var y = autonomi / penyebut;
       var k = 1 / penyebut;
       var L = [
-        "Y = " + nom(x.a) + " + " + nom(x.b) + "(Y − " + nom(x.t) + ") + " + nom(x.i) + " + " + nom(x.g) + (X || m0 || m ? " + " + nom(X) + " − (" + nom(m0) + " + " + nom(m) + "Y)" : ""),
-        "Y = " + nom(autonomi) + " + " + nom(x.b - m) + "Y → " + nom(penyebut) + "Y = " + nom(autonomi),
-        "Y = " + nom(autonomi) + " ÷ " + nom(penyebut) + " = <b>RM" + nom(y) + " juta</b>",
-        "Pengganda = 1 ÷ " + nom(penyebut) + " = <b>" + nom(k) + "</b>"
+        ay("Keseimbangan: Y = C + I + G (+ X − M), dengan C = a + MPC(Y − T)") + "Y = " + nom(x.a) + " + " + nom(x.b) + "(Y − " + nom(x.t) + ") + " + nom(x.i) + " + " + nom(x.g) + (X || m0 || m ? " + " + nom(X) + " − (" + nom(m0) + " + " + nom(m) + "Y)" : ""),
+        ay("Kumpulkan sebutan Y: (1 − MPC + m)Y = jumlah perbelanjaan autonomi") + "Y = " + nom(autonomi) + " + " + nom(x.b - m) + "Y → " + nom(penyebut) + "Y = " + nom(autonomi),
+        ay("Y keseimbangan = jumlah perbelanjaan autonomi (pengangka) ÷ (1 − MPC + m) (penyebut)") + "Y = " + nom(autonomi) + " ÷ " + nom(penyebut) + " = <b>RM" + nom(y) + " juta</b>",
+        ay("Pengganda = 1 ÷ (1 − MPC + m)") + "Pengganda = 1 ÷ " + nom(penyebut) + " = <b>" + nom(k) + "</b>"
       ];
       var hasil = [H("Y keseimbangan", "RM" + nom(y) + " juta", "baik"), H("Pengganda", nom(k))];
       if (X || m0 || m) {
         var nx = X - (m0 + m * y);
-        L.push("Eksport bersih = " + nom(X) + " − (" + nom(m0) + " + " + nom(m) + " × " + nom(y) + ") = <b>" + nom(nx) + "</b>");
+        L.push(ay("Eksport bersih = eksport − (import autonomi + MPM × Y)") + "Eksport bersih = " + nom(X) + " − (" + nom(m0) + " + " + nom(m) + " × " + nom(y) + ") = <b>" + nom(nx) + "</b>");
         hasil.push(H("Eksport bersih", "RM" + nom(nx) + " juta", nx < 0 ? "amaran" : "baik"));
       }
       var out = { hasil: hasil, langkah: L };
       if (x.yf != null) {
         var jurang = x.yf - y;
         var lompang = Math.abs(jurang) / k;
-        L.push("Jurang KNK = " + nom(x.yf) + " − " + nom(y) + " = " + nom(jurang) + "; lompang = " + nom(Math.abs(jurang)) + " ÷ " + nom(k) + " = <b>" + nom(lompang) + "</b>");
+        L.push(ay("Jurang KNK = Yf − Y keseimbangan; lompang = jurang KNK (pengangka) ÷ pengganda (penyebut)") + "Jurang KNK = " + nom(x.yf) + " − " + nom(y) + " = " + nom(jurang) + "; lompang = " + nom(Math.abs(jurang)) + " ÷ " + nom(k) + " = <b>" + nom(lompang) + "</b>");
         hasil.push(H(jurang > 0 ? "Lompang deflasi" : jurang < 0 ? "Lompang inflasi" : "Guna tenaga penuh", "RM" + nom(lompang) + " juta", jurang > 0 ? "amaran" : jurang < 0 ? "merah" : "baik"));
         out.nota = jurang > 0 ? "G perlu ditambah sebanyak lompang deflasi untuk mencapai guna tenaga penuh." : jurang < 0 ? "G perlu dikurangkan sebanyak lompang inflasi." : "Ekonomi berada pada guna tenaga penuh.";
       }
@@ -2281,10 +2285,10 @@
       return {
         hasil: [H("Pengganda wang", nom(k)), H("Jumlah deposit", wang(dep)), H("Jumlah pinjaman (kredit baharu)", wang(pinjam), "baik"), H("Jumlah rizab", wang(rizab))],
         langkah: [
-          "Pengganda = 1 ÷ " + nom(nr) + " = <b>" + nom(k) + "</b>",
-          "Jumlah deposit = " + nom(k) + " × " + wang(x.d) + " = <b>" + wang(dep) + "</b>",
-          "Jumlah pinjaman = " + nom(k) + " × " + wang(x.d * (1 - nr)) + " = <b>" + wang(pinjam) + "</b>",
-          "Jumlah rizab = " + nom(k) + " × " + wang(x.d * nr) + " = <b>" + wang(rizab) + "</b>"
+          ay("Pengganda wang = 1 ÷ nisbah rizab") + "Pengganda = 1 ÷ " + nom(nr) + " = <b>" + nom(k) + "</b>",
+          ay("Jumlah deposit = pengganda wang × deposit awal") + "Jumlah deposit = " + nom(k) + " × " + wang(x.d) + " = <b>" + wang(dep) + "</b>",
+          ay("Jumlah pinjaman = pengganda wang × lebihan rizab awal") + "Jumlah pinjaman = " + nom(k) + " × " + wang(x.d * (1 - nr)) + " = <b>" + wang(pinjam) + "</b>",
+          ay("Jumlah rizab = pengganda wang × rizab awal") + "Jumlah rizab = " + nom(k) + " × " + wang(x.d * nr) + " = <b>" + wang(rizab) + "</b>"
         ],
         nota: "Andaian: urus niaga dengan cek, semua lebihan rizab dipinjamkan, tiada bocoran tunai."
       };
@@ -2311,12 +2315,12 @@
     kira: function (x) {
       if (x.t === 0) return { ralat: "T tidak boleh sifar." };
       var p0 = (x.m * x.v) / x.t;
-      var L = ["P = (" + nom(x.m) + " × " + nom(x.v) + ") ÷ " + nom(x.t) + " = <b>" + wang(p0) + "</b>"];
+      var L = [ay("Tingkat harga P = (penawaran wang M × halaju V) (pengangka) ÷ jumlah urus niaga T (penyebut)") + "P = (" + nom(x.m) + " × " + nom(x.v) + ") ÷ " + nom(x.t) + " = <b>" + wang(p0) + "</b>"];
       var hasil = [H("Tingkat harga P", wang(p0))];
       if (x.dm != null) {
         var m1 = x.m * (1 + x.dm / 100),
           p1 = (m1 * x.v) / x.t;
-        L.push("M baharu = " + nom(x.m) + " × (1 " + (x.dm < 0 ? "− " : "+ ") + nom(Math.abs(x.dm) / 100) + ") = " + nom(m1), "P baharu = (" + nom(m1) + " × " + nom(x.v) + ") ÷ " + nom(x.t) + " = <b>" + wang(p1) + "</b>");
+        L.push(ay("M baharu = M × (1 + peratus perubahan M ÷ 100)") + "M baharu = " + nom(x.m) + " × (1 " + (x.dm < 0 ? "− " : "+ ") + nom(Math.abs(x.dm) / 100) + ") = " + nom(m1), ay("P baharu = (M baharu × V) ÷ T") + "P baharu = (" + nom(m1) + " × " + nom(x.v) + ") ÷ " + nom(x.t) + " = <b>" + wang(p1) + "</b>");
         hasil.push(H("P baharu", wang(p1), x.dm > 0 ? "amaran" : "baik"), H("Perubahan P", (p1 >= p0 ? "+" : "−") + wang(Math.abs(p1 - p0))));
       }
       return { hasil: hasil, langkah: L, nota: "Dengan V dan T tetap, P berubah pada kadar yang sama dengan M." };
@@ -2344,7 +2348,7 @@
       var r = (x.x + x.m) / x.y;
       return {
         hasil: [H("Keterbukaan", nom(r)), H("Tafsiran", r > 1 ? "Ekonomi sangat terbuka" : "Kurang terbuka", r > 1 ? "biru" : "neutral")],
-        langkah: ["(" + nom(x.x) + " + " + nom(x.m) + ") ÷ " + nom(x.y) + " = <b>" + nom(r) + "</b>", "Nisbah eksport kepada KDNK = " + nom(x.x) + " ÷ " + nom(x.y) + " = " + nom(x.x / x.y)]
+        langkah: [ay("Keterbukaan ekonomi = (eksport + import) (pengangka) ÷ KDNK (penyebut)") + "(" + nom(x.x) + " + " + nom(x.m) + ") ÷ " + nom(x.y) + " = <b>" + nom(r) + "</b>", ay("Nisbah eksport = eksport ÷ KDNK") + "Nisbah eksport kepada KDNK = " + nom(x.x) + " ÷ " + nom(x.y) + " = " + nom(x.x / x.y)]
       };
     }
   });
@@ -2384,8 +2388,8 @@
       return {
         hasil: [H("Ed kaedah biasa", nom(biasa)), H("Ed titik tengah", nom(tengah), "biru"), H("Darjah (titik tengah)", jenis)],
         langkah: [
-          "Kaedah biasa = (" + nom(x.q1) + " − " + nom(x.q0) + ")/" + nom(x.q0) + " × " + nom(x.p0) + "/(" + nom(x.p1) + " − " + nom(x.p0) + ") = <b>" + nom(biasa) + "</b>",
-          "Titik tengah = (" + nom(x.q1) + " − " + nom(x.q0) + ")/½(" + nom(x.q0) + " + " + nom(x.q1) + ") × ½(" + nom(x.p0) + " + " + nom(x.p1) + ")/(" + nom(x.p1) + " − " + nom(x.p0) + ") = <b>" + nom(tengah) + "</b>"
+          ay("Kaedah biasa: Ed = (perubahan kuantiti ÷ kuantiti asal) × (harga asal ÷ perubahan harga)") + "Kaedah biasa = (" + nom(x.q1) + " − " + nom(x.q0) + ")/" + nom(x.q0) + " × " + nom(x.p0) + "/(" + nom(x.p1) + " − " + nom(x.p0) + ") = <b>" + nom(biasa) + "</b>",
+          ay("Titik tengah: Ed = (perubahan kuantiti ÷ purata kuantiti) × (purata harga ÷ perubahan harga)") + "Titik tengah = (" + nom(x.q1) + " − " + nom(x.q0) + ")/½(" + nom(x.q0) + " + " + nom(x.q1) + ") × ½(" + nom(x.p0) + " + " + nom(x.p1) + ")/(" + nom(x.p1) + " − " + nom(x.p0) + ") = <b>" + nom(tengah) + "</b>"
         ],
         nota: "Kaedah biasa memberi nilai berbeza bagi harga naik dan harga turun dalam julat yang sama; kaedah titik tengah memberi nilai yang sama."
       };
@@ -2432,8 +2436,8 @@
           H("Keputusan", syarat1 && syarat2 ? "Keseimbangan" : "Bukan keseimbangan", syarat1 && syarat2 ? "baik" : "amaran")
         ],
         langkah: [
-          "MUx/Px = " + nom(x.mux) + " ÷ " + nom(x.px) + " = " + nom(rx) + "; MUy/Py = " + nom(x.muy) + " ÷ " + nom(x.py) + " = " + nom(ry) + (syarat1 ? " → <b>sama</b>" : " → tidak sama"),
-          "Belanja = " + nom(x.px) + "(" + nom(x.x, 0) + ") + " + nom(x.py) + "(" + nom(x.y, 0) + ") = " + wang(belanja) + (syarat2 ? " = pendapatan" : " ≠ pendapatan " + wang(x.i))
+          ay("Utiliti sut bagi setiap ringgit = MU unit terakhir (pengangka) ÷ harga barang (penyebut)") + "MUx/Px = " + nom(x.mux) + " ÷ " + nom(x.px) + " = " + nom(rx) + "; MUy/Py = " + nom(x.muy) + " ÷ " + nom(x.py) + " = " + nom(ry) + (syarat1 ? " → <b>sama</b>" : " → tidak sama"),
+          ay("Jumlah belanja = harga X × kuantiti X + harga Y × kuantiti Y; mesti sama dengan pendapatan") + "Belanja = " + nom(x.px) + "(" + nom(x.x, 0) + ") + " + nom(x.py) + "(" + nom(x.y, 0) + ") = " + wang(belanja) + (syarat2 ? " = pendapatan" : " ≠ pendapatan " + wang(x.i))
         ]
       };
       if (!syarat1) out.nota = rx > ry ? "MUx/Px > MUy/Py: tambah X dan kurangkan Y." : "MUx/Px < MUy/Py: kurangkan X dan tambah Y.";
@@ -2468,10 +2472,10 @@
       return {
         hasil: [H("Kos implisit", wang(imp)), H("Kos eksplisit", wang(x.eks)), H("Jumlah kos", wang(x.eks + imp), "biru")],
         langkah: [
-          "Bunga dilepaskan = " + nom(x.r) + "% × " + wang(x.modal) + " = " + wang(bunga),
-          "Sewa dilepaskan = " + wang(x.sewa) + " × 12 = " + wang(sewa),
-          "Kos implisit = " + wang(x.gaji) + " + " + wang(bunga) + " + " + wang(sewa) + " = <b>" + wang(imp) + "</b>",
-          "Jumlah kos = " + wang(x.eks) + " + " + wang(imp) + " = <b>" + wang(x.eks + imp) + "</b>"
+          ay("Bunga dilepaskan = kadar bunga × modal sendiri") + "Bunga dilepaskan = " + nom(x.r) + "% × " + wang(x.modal) + " = " + wang(bunga),
+          ay("Sewa dilepaskan = sewa sebulan × 12 bulan") + "Sewa dilepaskan = " + wang(x.sewa) + " × 12 = " + wang(sewa),
+          ay("Kos implisit = gaji dilepaskan + bunga dilepaskan + sewa dilepaskan") + "Kos implisit = " + wang(x.gaji) + " + " + wang(bunga) + " + " + wang(sewa) + " = <b>" + wang(imp) + "</b>",
+          ay("Jumlah kos = kos eksplisit + kos implisit") + "Jumlah kos = " + wang(x.eks) + " + " + wang(imp) + " = <b>" + wang(x.eks + imp) + "</b>"
         ]
       };
     }
@@ -2504,10 +2508,10 @@
       return {
         hasil: [H("Keluaran Q", nom(q) + " unit"), H("Harga P", wang(p), "biru"), H("MR = MC", wang(mr)), H("Jumlah hasil TR", wang(p * q))],
         langkah: [
-          "MR = " + nom(x.a) + " − " + nom(2 * x.b) + "Q",
-          nom(x.a) + " − " + nom(2 * x.b) + "Q = " + nom(x.c) + " + " + nom(x.d) + "Q → " + nom(2 * x.b + x.d) + "Q = " + nom(x.a - x.c),
-          "Q = " + nom(x.a - x.c) + " ÷ " + nom(2 * x.b + x.d) + " = <b>" + nom(q) + " unit</b>",
-          "P = " + nom(x.a) + " − " + nom(x.b) + "(" + nom(q) + ") = <b>" + wang(p) + "</b>"
+          ay("MR = a − 2bQ (kecerunan MR dua kali kecerunan AR)") + "MR = " + nom(x.a) + " − " + nom(2 * x.b) + "Q",
+          ay("Untung maksimum apabila MR = MC") + nom(x.a) + " − " + nom(2 * x.b) + "Q = " + nom(x.c) + " + " + nom(x.d) + "Q → " + nom(2 * x.b + x.d) + "Q = " + nom(x.a - x.c),
+          ay("Q = (a − c) (pengangka) ÷ (2b + d) (penyebut)") + "Q = " + nom(x.a - x.c) + " ÷ " + nom(2 * x.b + x.d) + " = <b>" + nom(q) + " unit</b>",
+          ay("Harga = a − bQ (dibaca daripada keluk permintaan)") + "P = " + nom(x.a) + " − " + nom(x.b) + "(" + nom(q) + ") = <b>" + wang(p) + "</b>"
         ],
         nota: "Harga monopoli (P) lebih tinggi daripada MC pada keseimbangan, maka kecekapan peruntukan tidak tercapai."
       };
@@ -2548,9 +2552,9 @@
         kt = -x.b / (1 - x.b);
       var y = autonomi * kg;
       var L = [
-        "Y = " + nom(x.a) + " + " + nom(x.b) + "(Y − " + nom(t) + ") + " + nom(x.i) + " + " + nom(g),
-        nom(1 - x.b) + "Y = " + nom(autonomi) + " → Y = <b>" + nom(y) + "</b>",
-        "KG = 1 ÷ " + nom(1 - x.b) + " = " + nom(kg) + "; KT = −" + nom(x.b) + " ÷ " + nom(1 - x.b) + " = " + nom(kt)
+        ay("Keseimbangan: Y = C + I + G, dengan C = a + MPC(Y − T)") + "Y = " + nom(x.a) + " + " + nom(x.b) + "(Y − " + nom(t) + ") + " + nom(x.i) + " + " + nom(g),
+        ay("(1 − MPC)Y = jumlah perbelanjaan autonomi, maka Y = perbelanjaan autonomi ÷ (1 − MPC)") + nom(1 - x.b) + "Y = " + nom(autonomi) + " → Y = <b>" + nom(y) + "</b>",
+        ay("KG = 1 ÷ (1 − MPC); KT = −MPC ÷ (1 − MPC)") + "KG = 1 ÷ " + nom(1 - x.b) + " = " + nom(kg) + "; KT = −" + nom(x.b) + " ÷ " + nom(1 - x.b) + " = " + nom(kt)
       ];
       var hasil = [H("Y keseimbangan", nom(y), "baik"), H("Pengganda KG", nom(kg)), H("Pengganda KT", nom(kt))];
       var out = { hasil: hasil, langkah: L };
@@ -2558,8 +2562,8 @@
         var jurang = x.yf - y;
         var dg = jurang / kg,
           dt = jurang / kt;
-        L.push("Jurang = " + nom(x.yf) + " − " + nom(y) + " = " + nom(jurang));
-        L.push("ΔG = " + nom(jurang) + " ÷ " + nom(kg) + " = <b>" + nom(dg) + "</b>; ΔT = " + nom(jurang) + " ÷ " + nom(kt) + " = <b>" + nom(dt) + "</b>");
+        L.push(ay("Jurang = pendapatan guna tenaga penuh − Y keseimbangan") + "Jurang = " + nom(x.yf) + " − " + nom(y) + " = " + nom(jurang));
+        L.push(ay("ΔG = jurang (pengangka) ÷ KG (penyebut); ΔT = jurang ÷ KT") + "ΔG = " + nom(jurang) + " ÷ " + nom(kg) + " = <b>" + nom(dg) + "</b>; ΔT = " + nom(jurang) + " ÷ " + nom(kt) + " = <b>" + nom(dt) + "</b>");
         hasil.push(H(jurang > 0 ? "Lompang deflasi" : jurang < 0 ? "Lompang inflasi" : "Guna tenaga penuh", nom(Math.abs(dg)), jurang > 0 ? "amaran" : jurang < 0 ? "merah" : "baik"));
         hasil.push(H("Perubahan G diperlukan", nom(dg)));
         hasil.push(H("Perubahan T diperlukan", nom(dt)));
@@ -2600,10 +2604,10 @@
       return {
         hasil: [H("M1 tahun semasa", nom(m11)), H("M2 tahun semasa", nom(m21)), H("Pertumbuhan M1", pc(g1), "biru"), H("Pertumbuhan M2", pc(g2), "biru")],
         langkah: [
-          "M1 = " + nom(x.e0) + " + " + nom(x.d0) + " = " + nom(m10) + " → " + nom(x.e1) + " + " + nom(x.d1) + " = " + nom(m11),
-          "M2 = " + nom(m10) + " + " + nom(x.s0) + " = " + nom(m20) + " → " + nom(m11) + " + " + nom(x.s1) + " = " + nom(m21),
-          "Pertumbuhan M1 = (" + nom(m11) + " − " + nom(m10) + ") ÷ " + nom(m10) + " × 100 = <b>" + pc(g1) + "</b>",
-          "Pertumbuhan M2 = (" + nom(m21) + " − " + nom(m20) + ") ÷ " + nom(m20) + " × 100 = <b>" + pc(g2) + "</b>"
+          ay("M1 = wang dalam edaran + deposit semasa") + "M1 = " + nom(x.e0) + " + " + nom(x.d0) + " = " + nom(m10) + " → " + nom(x.e1) + " + " + nom(x.d1) + " = " + nom(m11),
+          ay("M2 = M1 + separa wang") + "M2 = " + nom(m10) + " + " + nom(x.s0) + " = " + nom(m20) + " → " + nom(m11) + " + " + nom(x.s1) + " = " + nom(m21),
+          ay("Pertumbuhan M1 = (M1 tahun semasa − M1 tahun sebelum) ÷ M1 tahun sebelum × 100") + "Pertumbuhan M1 = (" + nom(m11) + " − " + nom(m10) + ") ÷ " + nom(m10) + " × 100 = <b>" + pc(g1) + "</b>",
+          ay("Pertumbuhan M2 = (M2 tahun semasa − M2 tahun sebelum) ÷ M2 tahun sebelum × 100") + "Pertumbuhan M2 = (" + nom(m21) + " − " + nom(m20) + ") ÷ " + nom(m20) + " × 100 = <b>" + pc(g2) + "</b>"
         ]
       };
     }
@@ -2634,7 +2638,7 @@
         ubah = ((inw - 100) / 100) * 100;
       return {
         hasil: [H("Indeks nilai wang", nom(inw)), H("Perubahan nilai wang", pc(ubah), ubah < 0 ? "merah" : ubah > 0 ? "baik" : "neutral")],
-        langkah: ["INW = " + nom(x.asas) + " ÷ " + nom(x.semasa) + " × 100 = <b>" + nom(inw) + "</b>", "Perubahan = (" + nom(inw) + " − 100) ÷ 100 × 100 = <b>" + pc(ubah) + "</b>"],
+        langkah: [ay("INW = indeks harga tahun asas (pengangka) ÷ indeks harga tahun semasa (penyebut) × 100") + "INW = " + nom(x.asas) + " ÷ " + nom(x.semasa) + " × 100 = <b>" + nom(inw) + "</b>", ay("Perubahan nilai wang = (INW semasa − INW tahun asas) ÷ INW tahun asas × 100") + "Perubahan = (" + nom(inw) + " − 100) ÷ 100 × 100 = <b>" + pc(ubah) + "</b>"],
         nota: ubah < 0 ? "Harga umum naik, maka kuasa beli wang jatuh." : ubah > 0 ? "Harga umum turun, maka kuasa beli wang naik." : "Tiada perubahan nilai wang."
       };
     }
@@ -2660,7 +2664,7 @@
       var k = (x.x / x.m) * 100;
       return {
         hasil: [H("KSP", nom(k), k > 100 ? "baik" : k < 100 ? "amaran" : "neutral")],
-        langkah: [nom(x.x) + " ÷ " + nom(x.m) + " × 100 = <b>" + nom(k) + "</b>"],
+        langkah: [ay("KSP = jumlah nilai eksport (pengangka) ÷ jumlah nilai import (penyebut) × 100") + nom(x.x) + " ÷ " + nom(x.m) + " × 100 = <b>" + nom(k) + "</b>"],
         nota: k > 100 ? "KSP melebihi 100: dengan 100 unit eksport, negara memperoleh " + nom(k) + " unit import." : k < 100 ? "KSP kurang daripada 100: syarat perdagangan tidak menguntungkan." : "KSP sama dengan 100."
       };
     }
