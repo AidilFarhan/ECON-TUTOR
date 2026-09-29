@@ -77,7 +77,7 @@
         .join("");
     }
     var jenama = document.getElementById("jenama");
-    if (jenama) jenama.innerHTML = E.tandaJenama() + '<span>Econ Tutor</span><small>SPM</small>';
+    if (jenama) jenama.innerHTML = E.tandaJenama() + "<span>Econ Tutor</span>";
     var bt = document.getElementById("btn-tema");
     if (bt) bt.addEventListener("click", tukarTema);
   }
@@ -129,9 +129,9 @@
     var tajuk = "Econ Tutor";
     if (h === "utama") {
       pUtama();
-    } else if (h === "nota") {
+    } else if (h === "nota" || h.indexOf("nota-") === 0) {
       nav = "nota";
-      pNota();
+      pNota(h.slice(5));
     } else if (E.babIkut[h]) {
       nav = "nota";
       pBab(E.babIkut[h]);
@@ -233,6 +233,21 @@
     m2: ["Makroekonomi (AE025)", "Matrikulasi Semester 2: pendapatan negara, keseimbangan pendapatan, wang dan bank, inflasi dan pengangguran, dasar fiskal dan kewangan, ekonomi antarabangsa serta pertumbuhan ekonomi."]
   };
 
+  // Peringkat pengajian untuk butang di laman Utama dan penapis halaman Nota.
+  // Laluan: #nota-t4, #nota-t5, #nota-stpm, #nota-matrik, #nota-ijazah
+  var PERINGKAT_NOTA = [
+    { kunci: "t4", label: "Tingkatan 4", kumpulan: ["t4"] },
+    { kunci: "t5", label: "Tingkatan 5", kumpulan: ["t5"] },
+    { kunci: "stpm", label: "STPM", kumpulan: ["p1", "p2", "p3"] },
+    { kunci: "matrik", label: "Matrikulasi", kumpulan: ["m1", "m2"] },
+    { kunci: "ijazah", label: "Ijazah Sarjana Muda", kumpulan: [] }
+  ];
+
+  function peringkatNota(kunci) {
+    for (var i = 0; i < PERINGKAT_NOTA.length; i++) if (PERINGKAT_NOTA[i].kunci === kunci) return PERINGKAT_NOTA[i];
+    return null;
+  }
+
   function gridKumpulan(kunci, tajuk, huraian) {
     var senarai = E.babKumpulan(kunci);
     if (!senarai.length) return "";
@@ -267,9 +282,13 @@
       '<div class="bekas pandangan">' +
       '<section class="wira">' +
       "<div>" +
-      '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5' + (E.babPeringkat("stpm").length ? " · STPM" : "") + (E.babPeringkat("matrik").length ? " · Matrikulasi" : "") + "</span>" +
       "<h1>Nota Ekonomi <em>Interaktif</em></h1>" +
       '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
+      '<nav class="pilih-tahap" aria-label="Pilih peringkat pengajian">' +
+      PERINGKAT_NOTA.map(function (p) {
+        return '<a class="cip" href="#nota-' + p.kunci + '">' + esc(p.label) + "</a>";
+      }).join("") +
+      "</nav>" +
       '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : E.bab[0] ? E.bab[0].id : "nota") + '">' + (akhir ? "Sambung " + esc(E.labelBab(akhir)) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
       '<div class="statistik"><span><b>' + E.bab.length + "</b>bab</span><span><b>" + j.graf + "</b>graf interaktif</span><span><b>" + j.kad + "</b>kad study</span><span><b>" + j.soalan + "</b>soalan kuiz</span><span><b>" + E.kalkulator.senarai.length + "</b>kalkulator</span></div>" +
       "</div>" +
@@ -314,16 +333,30 @@
   }
 
   /* ---------- NOTA (senarai bab) ---------- */
-  function pNota() {
+  function pNota(tapis) {
+    var dipilih = peringkatNota(tapis);
+    var kumpulan = E.kumpulan().filter(function (k) {
+      return !dipilih || dipilih.kumpulan.indexOf(k.kunci) !== -1;
+    });
     app.innerHTML =
       '<div class="bekas pandangan">' +
-      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Nota</span></nav>' +
+      '<nav class="remah"><a href="#utama">Utama</a><span>/</span>' +
+      (dipilih ? '<a href="#nota">Nota</a><span>/</span><span>' + esc(dipilih.label) + "</span>" : "<span>Nota</span>") +
+      "</nav>" +
       '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Nota mengikut bab</h1><p>Setiap bab mengikut susunan buku teks (SPM), sukatan pelajaran (STPM) atau modul kolej (Matrikulasi). Graf dalam nota boleh terus diseret.</p></div></div>' +
-      E.kumpulan()
-        .map(function (k) {
-          return gridKumpulan(k.kunci, esc(k.label));
-        })
-        .join("") +
+      '<div class="penapis kaca" style="margin:16px 0 8px"><div class="baris"><b>Peringkat</b>' +
+      '<a class="cip" href="#nota" aria-pressed="' + !dipilih + '">Semua</a>' +
+      PERINGKAT_NOTA.map(function (p) {
+        return '<a class="cip" href="#nota-' + p.kunci + '" aria-pressed="' + (p === dipilih) + '">' + esc(p.label) + "</a>";
+      }).join("") +
+      "</div></div>" +
+      (kumpulan.length
+        ? kumpulan
+            .map(function (k) {
+              return gridKumpulan(k.kunci, esc(k.label));
+            })
+            .join("")
+        : '<section class="bahagian"><div class="kotak info"><span class="kotak-label">Akan datang</span><p>Nota ' + esc(dipilih ? dipilih.label : "") + " sedang disediakan. Sementara itu, cuba nota peringkat lain di atas.</p></div></section>") +
       "</div>";
   }
 

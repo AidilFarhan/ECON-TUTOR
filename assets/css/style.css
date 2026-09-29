@@ -700,6 +700,25 @@ main {
   margin-top: 24px;
 }
 
+/* butang peringkat pengajian di bawah pengenalan: terus ke nota peringkat itu */
+.wira .pilih-tahap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.wira .pilih-tahap .cip {
+  min-height: 40px;
+  padding-inline: 14px;
+  font-size: 14px;
+}
+
+.wira .pilih-tahap .cip,
+.penapis a.cip {
+  text-decoration: none;
+}
+
 .wira-graf {
   padding: 14px;
 }

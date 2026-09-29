@@ -1,6 +1,6 @@
 # Econ Tutor · Architecture
 
-Econ Tutor is an interactive study site for **SPM Economics, Form 4 and Form 5 (KSSM)** and **STPM Economics (944), Penggal 1–3**. It is a static, build-free web app: plain HTML, CSS and ES5-style JavaScript in the browser, plus a small Vercel layer (Routing Middleware and one function) that puts all content behind a sign-in.
+Econ Tutor is an interactive study site for **SPM Economics, Form 4 and Form 5 (KSSM)** and **STPM Economics (944), Penggal 1–3** and **Matrikulasi Economics (AE015 Mikroekonomi, AE025 Makroekonomi)**. It is a static, build-free web app: plain HTML, CSS and ES5-style JavaScript in the browser, plus a small Vercel layer (Routing Middleware and one function) that puts all content behind a sign-in.
 
 This document explains how the pieces fit together. For visual rules see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). For product scope see [PRD.md](PRD.md). For contributor and AI-agent rules see [AGENTS.md](AGENTS.md).
 
@@ -67,6 +67,7 @@ assets/js/graf.js             EKO.graf: SVG plot engine + market graphs (demand,
 assets/js/graf-t4.js          Form 4 graph widgets + chart helpers (G.carta, G.legenda…)
 assets/js/graf-t5.js          Form 5 graph widgets
 assets/js/graf-stpm.js        STPM graph widgets
+assets/js/graf-matrik.js      Matrikulasi graph widgets (carta-jadual, lrac)
 assets/js/data/t4-bab1.js …   One file per chapter: notes, flashcards, quiz
 assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 questions, marking scheme)
 assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
@@ -91,7 +92,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 `index.html` loads classic scripts with `defer`, so they execute in document order after parsing:
 
 1. `eko-core.js` creates `window.EKO` (alias `E`).
-2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js` attach `EKO.graf` (alias `G`) and register graph widgets.
+2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
@@ -103,7 +104,7 @@ Every file is an IIFE that reads and extends `window.EKO`. No file uses `import`
 
 | API | Purpose |
 | --- | --- |
-| `daftarBab(bab)` | Register a chapter; keeps `E.bab` sorted by level (SPM, then STPM), form/penggal, then number; indexes `E.babIkut[id]` |
+| `daftarBab(bab)` | Register a chapter; keeps `E.bab` sorted by level (SPM, then STPM, then Matrikulasi), form/penggal/semester, then number; indexes `E.babIkut[id]` |
 | `daftarSet(set)` | Register an extra MCQ set (e.g. trial Kertas 1) in `E.setKuiz` |
 | `daftarK2(paper)`, `kertas2Ikut(id)` | Register and look up Kertas 2 papers (`E.kertas2Set`) |
 | `soalanBab(id)` | Chapter quiz = chapter questions + any trial-paper questions tagged `bab: id` |
@@ -119,14 +120,14 @@ Routing is **hash-based** (`location.hash`), so the site works from `file://`, a
 | Hash | View function | Notes |
 | --- | --- | --- |
 | `#utama` (default) | `pUtama` | Hero, progress, continue reading, tools |
-| `#nota` | `pNota` | Chapter grid by form |
+| `#nota`, `#nota-<peringkat>` | `pNota` | Chapter grid by group, with level buttons (`t4`, `t5`, `stpm`, `matrik`, `ijazah`) that filter the groups |
 | `#t4-b1` … `#t5-b2` | `pBab` | Chapter notes, sticky table of contents, "mark as read", next chapter |
 | `#kad`, `#kad-<filter>` | `pKad` | Flashcards; filter `semua`, `t4`, `t5` or a chapter id; search; keyboard `Space`/`1`/`2`/`←`/`→` |
 | `#kuiz` | `pKuizSenarai` | Quiz picker with best scores |
 | `#kuiz-<id>` | `pKuizMula` | `id` = chapter id, `t4`, `t5`, `semua`, or a set id such as `kel25-k1`; timer, per-question explanation, review |
 | `#percubaan` | `pPercubaan` | One section per registered paper (K1 + K2 cards) |
 | `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM); `<level>` = `t4`, `t5` or `stpm` mounts only that level's graphs |
-| `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = a group key (`t4`, `t5`, `p1`, `p2`, `p3`) or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
+| `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = a group key (`t4`, `t5`, `p1`, `p2`, `p3`, `m1`, `m2`) or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
 | `#k2`, `#k2-<paperId>` | `pK2` | Kertas 2 with answer boxes, self-marking against the scheme, level rubrics |
 
 `papar()` is the single render entry point. Before each render, `bersih()` tears down the previous view: it calls `G.tanggal()` (destroys graph widgets), disconnects the TOC observer, clears the quiz timer and removes view-level key listeners. After rendering, `G.pasang(app)` mounts any graph placeholders in the new HTML.
@@ -147,7 +148,7 @@ flowchart TB
   D -->|G.tanggal on route change| X[cleanup]
 ```
 
-- **Registry.** `G.daftar(name, fn, {tajuk, bab})` registers a widget, and `G.info` holds metadata. 36 widgets are used in the notes: 6 in `graf.js`, 12 in `graf-t4.js`, 13 in `graf-t5.js` and 5 in `graf-stpm.js`. `kkp` and `keseimbangan` also accept custom data through `data-opt` (used by the STPM notes).
+- **Registry.** `G.daftar(name, fn, {tajuk, bab})` registers a widget, and `G.info` holds metadata. 38 widgets are used in the notes: 6 in `graf.js`, 12 in `graf-t4.js`, 13 in `graf-t5.js`, 5 in `graf-stpm.js` and 2 in `graf-matrik.js` (`carta-jadual` plots any table from `data-opt` as vertically stacked, synchronised panels; `lrac` draws LRAC as the envelope of SAC curves). `kkp` and `keseimbangan` also accept custom data through `data-opt` (used by the STPM notes).
 - **Mounting.** `G.pasang(root)` finds `[data-graf]:not([data-dipasang])`, parses `data-opt` JSON and calls the widget. Errors are caught per widget and shown as a muted message.
 - **Plot.** A plot has world coordinates (`x`, `y` ranges) and pixel mapping (`X()`, `Y()`, `invX()`, `invY()`). Its responsive size comes from `nisbah` (aspect ratio function) and is capped at 780 px. Layers, in paint order: `latar, zon, grid, kawasan, paksi, hantu, lengkung, panduan, tanda, label, pemegang, atas`.
 - **Drawing primitives.**
@@ -201,7 +202,8 @@ Content lives in JavaScript data files so it works offline and from `file://`, w
 ```js
 EKO.daftarBab({
   id: "t4-b2", tingkatan: 4, no: 2, tajuk: "Pasaran", warna: "var(--bab-rm5)",
-  // peringkat: "stpm" (optional; default "spm"). For STPM, tingkatan = penggal (1–3) and ids are stpm-p<penggal>-b<no>.
+  // peringkat: "stpm" or "matrik" (optional; default "spm"). For STPM, tingkatan = penggal (1–3) and ids are stpm-p<penggal>-b<no>.
+  // For Matrikulasi, tingkatan = semester (1 = AE015, 2 = AE025), ids are m<semester>-b<no> and groups are m1/m2.
   // Labels come from EKO.labelKumpulan/labelPendek/labelBab; groups ("t4", "t5", "p1"…) from EKO.kumpulan().
   ringkas: "Chapter summary",
   seksyen: [{ no: "2.1", tajuk: "…", soalan: ["Guiding question"], html: `<h3>…</h3> <figure data-graf="keseimbangan" data-opt='{"preset":"kawalan"}'></figure>` }],

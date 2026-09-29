@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5) and STPM (Ekonomi 944, Penggal 1–3). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google or email sign-in with an allowlist.
+Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5), STPM (Ekonomi 944, Penggal 1–3) and Matrikulasi (AE015 Mikroekonomi, AE025 Makroekonomi). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google or email sign-in with an allowlist.
 
 Claude Code loads this file through [CLAUDE.md](CLAUDE.md), which adds a few Claude-specific notes.
 
@@ -42,7 +42,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `api/sesi.js`, `lib/*.js` | Session API, signed cookie, allowlist, Firebase token verification |
 | `assets/js/eko-core.js` | `window.EKO`: registries, storage, formatting, icons |
 | `assets/js/graf.js` | `EKO.graf` SVG engine + market graphs |
-| `assets/js/graf-t4.js`, `graf-t5.js`, `graf-stpm.js` | Form 4 / Form 5 / STPM graph widgets |
+| `assets/js/graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` | Form 4 / Form 5 / STPM / Matrikulasi graph widgets |
 | `assets/js/kalkulator.js` | `EKO.kalkulator`: every syllabus formula as a calculator with worked steps, plus the `#kalkulator` view |
 | `assets/js/app.js` | Hash router and all views |
 | `assets/js/akaun.js` | Header account button and sign-out |
@@ -101,6 +101,7 @@ const ctx = { console, document: { getElementById: () => null } }; ctx.window = 
  "data/t5-bab1.js", "data/t5-bab2.js", "data/stpm-p1-bab1.js", "data/stpm-p1-bab2.js", "data/stpm-p1-bab3.js", "data/stpm-p1-bab4.js", "data/stpm-p1-bab5.js",
  "data/stpm-p2-bab1.js", "data/stpm-p2-bab2.js", "data/stpm-p2-bab3.js", "data/stpm-p2-bab4.js", "data/stpm-p2-bab5.js",
  "data/stpm-p3-bab1.js", "data/stpm-p3-bab2.js", "data/stpm-p3-bab3.js", "data/stpm-p3-bab4.js", "data/stpm-p3-bab5.js", "data/stpm-p3-bab6.js",
+ ...[1, 2, 3, 4, 5, 6].map(n => "data/matrik-ae015-bab" + n + ".js"), ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => "data/matrik-ae025-bab" + n + ".js"),
  "data/percubaan-kelantan-2025.js"]
   .forEach(f => vm.runInContext(fs.readFileSync("assets/js/" + f, "utf8"), ctx, { filename: f }));
 for (const b of ctx.EKO.bab) console.log(b.id, b.kad.length, "kad", b.kuiz.length, "kuiz",
@@ -134,7 +135,8 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Fix or extend notes** | Edit the chapter's `assets/js/data/tX-babN.js` → verify the section renders → check the quiz and flashcard counts still load |
 | **Add a chapter** | New data file with `EKO.daftarBab` → add `<script src="assets/js/data/…" defer>` to `index.html` **before `app.js`** → pick a `--bab-rm*` colour → update counts in README and PRD |
 | **Add an STPM chapter** | File `assets/js/data/stpm-p<penggal>-bab<no>.js` with `peringkat: "stpm"`, `tingkatan: <penggal>`, id `stpm-p<penggal>-b<no>` and `kuiz: []` (no STPM quizzes for now). Add the script tag after the other STPM chapters. Labels, groups (`p1`–`p3`), the graph-lab chooser and the calculator filters update automatically. STPM-only graphs go in `graf-stpm.js` |
-| **Add a graph** | In `graf-t4.js` / `graf-t5.js` / `graf-stpm.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
+| **Add a Matrikulasi chapter** | File `assets/js/data/matrik-ae015-bab<no>.js` (Semester 1) or `matrik-ae025-bab<no>.js` (Semester 2) with `peringkat: "matrik"`, `tingkatan: <semester>` (1 = AE015, 2 = AE025), id `m<semester>-b<no>` and `kuiz: []`. Add the script tag after the other Matrikulasi chapters. Plot data tables from the slides with `<figure data-graf="carta-jadual" data-opt='{…}'>` (see the comment in `graf-matrik.js`); inside `data-opt`, write `<` and `>` as `&lt;` and `&gt;` so the graph lab can collect the figure |
+| **Add a graph** | In `graf-t4.js` / `graf-t5.js` / `graf-stpm.js` / `graf-matrik.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
 | **Add or fix a calculator** | In `assets/js/kalkulator.js`, add `tambah({ id, bab, no, tajuk, kunci, rumus[], medan[], contoh[], kira })` under the chapter's heading (ARCHITECTURE §3.5). Use the textbook's worked example as the first `contoh` and check the answer matches the notes. `kira` must be pure and return `ralat` instead of dividing by zero. Run the Node check in §4 |
 | **Add a trial paper** | New `assets/js/data/percubaan-<state>-<year>.js`: `EKO.daftarSet` for K1 (tag each question with `bab`) and `EKO.daftarK2` for K2 (unique `id`, and **no** `kunciLama`). Add the script tag. Home, Percubaan and Kuiz update automatically. Check every K1 answer against the scheme PDF |
 | **Pictures from a paper** | Crop each figure from the PDF with PyMuPDF at 200 dpi (`page.get_pixmap(dpi=200, clip=rect)`), trim white margins, save as WebP in `assets/img/percubaan/<paper>/`. Reference it with `gambar: { src, alt, w, h, kapsyen }` (w and h in pixels), put question text that comes after the figure in `s2`, and use `EKO.gambar(g, true)` for images inside answer options. Always write a meaningful `alt` |
@@ -187,8 +189,8 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | --- | --- |
 | `EKO` / `E` | Global app namespace (`window.EKO`) |
 | `G` / `EKO.graf` | Graph engine |
-| `bab`, `tingkatan`, `no`, `tajuk`, `ringkas` | chapter, form (4/5) or STPM term (1–3), number, title, summary |
-| `peringkat`, `penggal`, `kumpulan` | level (`spm`/`stpm`), STPM term, chapter group (`t4`, `t5`, `p1`–`p3`) |
+| `bab`, `tingkatan`, `no`, `tajuk`, `ringkas` | chapter, form (4/5), STPM term (1–3) or Matrikulasi semester (1–2), number, title, summary |
+| `peringkat`, `penggal`, `kumpulan` | level (`spm`/`stpm`/`matrik`), STPM term, chapter group (`t4`, `t5`, `p1`–`p3`, `m1`–`m2`) |
 | `seksyen`, `soalan`, `html` | section, guiding questions, note markup |
 | `kad` `{d, b, t}` | flashcard: front (*depan*), back (*belakang*), subtopic tag |
 | `kuiz` `{s, p, j, e}` | question: stem (*soalan*), options (*pilihan*), answer index (*jawapan*), explanation (*penerangan*) |

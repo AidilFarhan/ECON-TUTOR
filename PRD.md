@@ -73,6 +73,8 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 
 ### 5.1 Notes: ✅
 - **FR-1** Six SPM chapters: T4 Bab 1–4 and T5 Bab 1–2. Subtopics are numbered as in the textbook (e.g. 1.3.4).
+- **FR-1b** Fourteen Matrikulasi chapters: AE015 Mikroekonomi Bab 1–6 (Semester 1) and AE025 Makroekonomi Bab 1–8 (Semester 2), rewritten from the owner's lecture slides. Source errors are corrected in "Nota semakan" boxes; AE015 2.2–2.4 and 6.5 Oligopoli are marked *cadangan* until the owner supplies the slides. No Matrikulasi quizzes for now.
+- **FR-1c** The home page shows level buttons (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi, Ijazah Sarjana Muda) under the introduction; each opens `#nota-<level>`. The notes page has the same buttons as a filter; Ijazah Sarjana Muda shows an "Akan datang" notice until content exists.
 - **FR-1a** Sixteen STPM chapters (Ekonomi 944): Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6, written from the owner's modules. Numeric errors in a module are corrected and flagged with a "Nota semakan" box. STPM chapters have notes and flashcards; STPM quizzes are not included for now.
 - **FR-2** Each chapter shows guiding questions, definitions, formulas, worked calculations, tables, examples and exam tips as styled callouts.
 - **FR-3** A sticky table of contents highlights the current section. "Tandakan selesai dibaca" records completion, and there is a link to the next chapter.
@@ -84,7 +86,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - No page scrolls horizontally at 360 px.
 
 ### 5.2 Interactive graphs: ✅
-- **FR-5** 65 graphs are embedded in the notes (36 SPM, 29 STPM; 36 widget types). The *Makmal graf* page first asks the user to choose Tingkatan 4, Tingkatan 5 or STPM, then lists that level's graphs by chapter.
+- **FR-5** 103 graphs are embedded in the notes (36 SPM, 29 STPM, 38 Matrikulasi; 38 widget types). The *Makmal graf* page first asks the user to choose Tingkatan 4, Tingkatan 5, STPM or Matrikulasi, then lists that level's graphs by chapter.
 - **FR-5a** Every curve is shown in full: it ends at an axis intercept or a clear end point inside the plot, with its label visible, and never runs into the frame.
 - **FR-6** Curves, price lines and nodes can be dragged with mouse, touch or keyboard.
 - **FR-7** Each graph has a live reading panel with values and a one-to-two-sentence explanation that includes the calculation.
@@ -110,7 +112,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - Graphs are usable with a finger on a 360 px screen and by keyboard.
 
 ### 5.3 Flashcards: ✅
-- **FR-12** 549 cards (263 SPM, 286 STPM). Filter by all, Form 4, Form 5, STPM Penggal 1–3 or a chapter, and search.
+- **FR-12** 799 cards (263 SPM, 286 STPM, 250 Matrikulasi). Filter by all, Form 4, Form 5, STPM Penggal 1–3, Matrikulasi Semester 1–2 or a chapter, and search.
 - **FR-13** Cards flip on tap or `Space`. Keys `1` ("Ulang lagi") and `2` ("Dah ingat") mark a card, and `←`/`→` navigate. The "dah ingat" state is saved.
 
 ### 5.4 Quizzes: ✅
@@ -189,6 +191,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 | **Total SPM** | **16** | **263** | **178** | **36** |
 
 STPM (Ekonomi 944): 16 chapters (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6), 286 flashcards, 0 quiz questions, 29 graphs.
+Matrikulasi (AE015, AE025): 14 chapters (AE015 Bab 1–6, AE025 Bab 1–8), 250 flashcards, 0 quiz questions, 38 graphs, 8 calculators.
 
 Calculators: 48 (SPM 39: T4 Bab 1: 1 · Bab 2: 7 · Bab 3: 7 · Bab 4: 6 · T5 Bab 1: 13 · Bab 2: 5; STPM 9).
 
