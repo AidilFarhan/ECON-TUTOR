@@ -283,7 +283,7 @@
       '<section class="wira">' +
       "<div>" +
       "<h1>Nota Ekonomi <em>Interaktif</em></h1>" +
-      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
+      '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus.</p>' +
       '<nav class="pilih-tahap" aria-label="Pilih peringkat pengajian">' +
       PERINGKAT_NOTA.map(function (p) {
         return '<a class="cip" href="#nota-' + p.kunci + '">' + esc(p.label) + "</a>";
