@@ -1,14 +1,14 @@
 # Econ Tutor
 
-Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), dibina dengan HTML, CSS dan JavaScript biasa sahaja. Tiada pustaka, tiada proses *build* dan tiada pelayan khas.
+Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM) dan **Ekonomi STPM (944) Penggal 1–3**, dibina dengan HTML, CSS dan JavaScript biasa sahaja. Tiada pustaka, tiada proses *build* dan tiada pelayan khas.
 
 ## Kandungan
 
 | Bahagian | Isi |
 | --- | --- |
 | **Nota** | Nota lengkap 6 bab SPM mengikut subtopik buku teks (T4 Bab 1–4, T5 Bab 1–2) dan 16 bab STPM Ekonomi 944 (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6). Nota STPM disertakan kad study; kuiz hanya untuk SPM buat masa ini |
-| **Graf interaktif** | 36 rajah SVG dalam nota. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
-| **Kad study** | 263 kad fakta. Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
+| **Graf interaktif** | 65 rajah SVG dalam nota (36 SPM, 29 STPM). Makmal graf meminta pengguna memilih Tingkatan 4, Tingkatan 5 atau STPM dahulu. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
+| **Kad study** | 549 kad fakta (263 SPM, 286 STPM). Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
 | **Kuiz** | 178 soalan mengikut bab (termasuk Latihan Sumatif buku teks T5), set campuran T4, T5 dan T4 + T5. Setiap jawapan ada penerangan |
 | **Kalkulator Ekonomi** | 48 kalkulator (termasuk 9 untuk STPM: keseimbangan dengan cukai/subsidi, Ec/Ey, kos, KNK, AE–Y dan lompang, penciptaan kredit, Fisher, keterbukaan ekonomi) untuk semua rumus dan pengiraan dalam silibus T4 dan T5 (kos lepas, Ed/Es, beban cukai, PBG, cukai pendapatan, sewa beli, TP/AP/MP, kos, untung, IHP, inflasi, pengangguran, KDNK, belanjawan negara, faedah berbanding, akaun semasa, pertukaran asing dan lain-lain). Setiap satu memaparkan jawapan, jalan kira langkah demi langkah dan tafsiran. Nilai awal ialah contoh buku teks |
 | **Kertas percubaan** | Kelantan 2025, Seberang Perai 2025 dan Perak 2024 (Modul Gempur SPM): setiap satu Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Rajah dan gambar dalam kertas asal dipaparkan terus. Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
@@ -42,6 +42,8 @@ Kemajuan kad, skor kuiz dan jawapan Kertas 2 disimpan dalam `localStorage` pelay
 ## Hosting dengan Vercel
 
 Projek Vercel disambungkan terus ke repo ini. Setiap kali `main` dikemas kini, Vercel menerbitkan semula laman secara automatik. Tiada tetapan *build* diperlukan (Framework Preset: **Other**, tiada *build command*, *output directory* ialah root).
+
+**Merge automatik oleh Claude.** Cikgu telah memberi kebenaran tetap: apabila semua isu selesai dan semakan lulus (kod, kandungan, paparan telefon dan desktop, build preview Vercel), Claude akan terus *merge* PR ke `main` tanpa menunggu arahan dan memberitahu **"SAYA DAH MERGE KE MAIN"**. Pengecualian yang tetap perlu kebenaran cikgu: perubahan akses log masuk, menerbitkan bahan peperiksaan (contoh kertas Terengganu), dan memadam projek atau data. Jika perlu patah balik: Vercel → projek **econwebsite** → **Deployments** → deployment sebelumnya → **⋯** → **Promote to Production**.
 
 Fail `.vercelignore` menghalang fail PDF (buku teks, nota guru, kertas peperiksaan) daripada diterbitkan.
 

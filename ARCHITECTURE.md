@@ -1,6 +1,6 @@
 # Econ Tutor · Architecture
 
-Econ Tutor is an interactive study site for **SPM Economics, Form 4 and Form 5 (KSSM)**. It is a static, build-free web app: plain HTML, CSS and ES5-style JavaScript in the browser, plus a small Vercel layer (Routing Middleware and one function) that puts all content behind a sign-in.
+Econ Tutor is an interactive study site for **SPM Economics, Form 4 and Form 5 (KSSM)** and **STPM Economics (944), Penggal 1–3**. It is a static, build-free web app: plain HTML, CSS and ES5-style JavaScript in the browser, plus a small Vercel layer (Routing Middleware and one function) that puts all content behind a sign-in.
 
 This document explains how the pieces fit together. For visual rules see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). For product scope see [PRD.md](PRD.md). For contributor and AI-agent rules see [AGENTS.md](AGENTS.md).
 
@@ -303,7 +303,7 @@ Possible outcomes of `POST /api/sesi`: `200 ok`, `401 token`, `403 belum_sah` (e
 
 ```mermaid
 flowchart LR
-  B[feature branch] -->|PR| MAIN[main]
+  B[feature branch] -->|PR, auto-merged when checks pass| MAIN[main]
   MAIN -->|Git integration| V1[Vercel project econwebsite<br/>econwebsite.vercel.app]
 ```
 
@@ -313,6 +313,7 @@ flowchart LR
   - `RAHSIA_SESI` (sensitive; production + preview)
   - `EMAIL_DIBENARKAN` (encrypted; all environments)
 - **Domain.** `econwebsite.vercel.app` is the only production domain and the only one in Firebase **Authorized domains**, so Google sign-in works there. (A duplicate project, `econ-tutor`, created during setup has been deleted.) A new custom domain must be added to Firebase Authorized domains before Google sign-in works on it.
+- **Merging.** The agent merges its own PR once all checks pass (AGENTS §6) and reports "SAYA DAH MERGE KE MAIN"; access, exam-material and deletion changes still wait for the owner.
 - **Previews.** Preview deployments sit behind Vercel SSO (Standard Protection). Production domains are public and gated by the middleware.
 
 ---

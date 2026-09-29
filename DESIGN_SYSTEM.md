@@ -89,6 +89,7 @@ Chapter colours are taken from Malaysian banknotes, a local and memorable mnemon
 | `--bab-rm20` | RM20 orange | T4 Bab 4 · Pengeluaran |
 | `--bab-rm50` | RM50 teal | T5 Bab 1 · Ekonomi dan Kerajaan |
 | `--bab-rm100` | RM100 purple | T5 Bab 2 · Malaysia dan Ekonomi Global |
+| `--bab-stpm1` | Magenta (not a banknote) | STPM Bab 1 of each penggal; other STPM chapters reuse `--bab-rm5` to `--bab-rm100` in order |
 
 ### 3.5 Aurora background
 
@@ -268,7 +269,9 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 
 ## 10. Graph design language
 
-These rules are shared by all 31 widgets. Follow them for new graphs.
+These rules are shared by all 36 widgets. Follow them for new graphs.
+
+**Show every curve in full** (owner request). Each curve ends at an axis intercept or at a clear end point inside the plot, and its label sits at that end inside the plot. Never let a curve run into the top or right frame: leave headroom on the axes (for example an axis to 24 for curves that end at 20), start asymptotic curves such as AC or Md below the top of the Y axis, and cap draggable values so key points (such as equilibrium E) stay on the chart. `keseimbangan` takes `data.qHujung` to end SS inside the plot.
 
 | Element | Rule |
 | --- | --- |
