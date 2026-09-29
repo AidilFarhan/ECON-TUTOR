@@ -721,13 +721,14 @@
       var kawasan = document.getElementById("kawasan-kad");
       if (!dek.baris.length) {
         var semua = kadTapis();
-        var ingat = semua.filter(function (k) {
+        // nama lain daripada fungsi ingat(): var di sini akan menyorok fungsi itu dalam seluruh paparDek
+        var bilIngat = semua.filter(function (k) {
           return E.data().kad[k.id];
         }).length;
         kawasan.innerHTML =
           '<div class="keputusan kaca"><svg class="ikon" style="width:44px;height:44px;color:var(--good)" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><h2>' +
           (dek.jumlah ? "Satu pusingan selesai!" : "Tiada kad untuk dipaparkan") +
-          "</h2><p class=\"teks-lemah\">" + ingat + " daripada " + semua.length + " kad dalam pilihan ini sudah ditandakan <b>Dah ingat</b>.</p>" +
+          "</h2><p class=\"teks-lemah\">" + bilIngat + " daripada " + semua.length + " kad dalam pilihan ini sudah ditandakan <b>Dah ingat</b>.</p>" +
           '<div class="baris-cip" style="justify-content:center"><button class="btn btn-utama" id="dek-lagi" type="button">' + E.ikon("ulang") + ' Ulang kad yang belum diingat</button><button class="btn" id="dek-semua" type="button">Mula semula semua kad</button><a class="btn btn-hantu" href="#kuiz">Pergi ke kuiz</a></div></div>';
         document.getElementById("dek-lagi").addEventListener("click", function () {
           st.sorok = true;
