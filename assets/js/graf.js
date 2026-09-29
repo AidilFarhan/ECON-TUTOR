@@ -1714,7 +1714,7 @@
   G.daftar("keseimbangan", function (host, opt) {
     var pr = Object.assign({}, PRESET_SS[opt.preset] || PRESET_SS.seluar);
     // Data sendiri melalui data-opt (contoh nota STPM): { a, b, c, d, x, y, tikX, tikY, labelX, labelY,
-    // tajuk, hargaAwal, pMin, pMaks, anjak, unitQ }. Permintaan P = a − bQ, penawaran P = c + dQ.
+    // tajuk, hargaAwal, pMin, pMaks, anjak, unitQ, qHujung }. Permintaan P = a − bQ, penawaran P = c + dQ.
     if (opt.data) {
       Object.assign(pr, opt.data);
       if (opt.data.unitQ)
@@ -1876,10 +1876,12 @@
       var adaS = Math.abs(st.dqS) > pr.anjak * 0.01;
       var x0 = pr.x[0],
         x1 = pr.x[1];
+      // qHujung (pilihan data-opt): keluk SS berakhir di dalam graf, bukan dipotong bingkai.
+      var xS = pr.qHujung ? Math.min(pr.qHujung, x1) : x1;
       if (adaD) plot.fungsi(d0.P, x0, x1, "g-lengkung d hantu", "hantu");
-      if (adaS) plot.fungsi(s0.P, x0, x1, "g-lengkung s hantu", "hantu");
+      if (adaS) plot.fungsi(s0.P, x0, xS, "g-lengkung s hantu", "hantu");
       plot.fungsi(d1.P, x0, x1, "g-lengkung d", "lengkung");
-      plot.fungsi(s1.P, x0, x1, "g-lengkung s", "lengkung");
+      plot.fungsi(s1.P, x0, xS, "g-lengkung s", "lengkung");
       labelKeluk(d1, adaD ? "D₁" : mod === "forex" ? "DD (ringgit)" : "DD", "d", true);
       labelKeluk(s1, adaS ? "S₁" : mod === "forex" ? "SS (ringgit)" : "SS", "s", false);
       if (adaD) labelKeluk(d0, "D₀", "d lemah", true);
@@ -1923,7 +1925,7 @@
       if (isD) {
         q = Math.min(pr.x[1] * 0.96, Kx.Q(pr.y[0] + (pr.y[1] - pr.y[0]) * 0.08));
       } else {
-        q = Math.min(pr.x[1] * 0.93, Kx.Q(pr.y[1] * 0.93));
+        q = Math.min(pr.qHujung ? Math.min(pr.qHujung, pr.x[1]) : pr.x[1] * 0.93, Kx.Q(pr.y[1] * 0.93));
       }
       p = Kx.P(q);
       if (q > pr.x[0] && q <= pr.x[1] && p >= pr.y[0] && p <= pr.y[1]) {
