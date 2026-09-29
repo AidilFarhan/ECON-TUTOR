@@ -97,7 +97,10 @@ python3 -m http.server 8765
 const fs = require("fs"), vm = require("vm");
 const ctx = { console, document: { getElementById: () => null } }; ctx.window = ctx; vm.createContext(ctx);
 ["eko-core.js", "data/t4-bab1.js", "data/t4-bab2.js", "data/t4-bab3.js", "data/t4-bab4.js",
- "data/t5-bab1.js", "data/t5-bab2.js", "data/stpm-p1-bab1.js", "data/percubaan-kelantan-2025.js"]
+ "data/t5-bab1.js", "data/t5-bab2.js", "data/stpm-p1-bab1.js", "data/stpm-p1-bab2.js", "data/stpm-p1-bab3.js", "data/stpm-p1-bab4.js", "data/stpm-p1-bab5.js",
+ "data/stpm-p2-bab1.js", "data/stpm-p2-bab2.js", "data/stpm-p2-bab3.js", "data/stpm-p2-bab4.js", "data/stpm-p2-bab5.js",
+ "data/stpm-p3-bab1.js", "data/stpm-p3-bab2.js", "data/stpm-p3-bab3.js", "data/stpm-p3-bab4.js", "data/stpm-p3-bab5.js", "data/stpm-p3-bab6.js",
+ "data/percubaan-kelantan-2025.js"]
   .forEach(f => vm.runInContext(fs.readFileSync("assets/js/" + f, "utf8"), ctx, { filename: f }));
 for (const b of ctx.EKO.bab) console.log(b.id, b.kad.length, "kad", b.kuiz.length, "kuiz",
   b.kuiz.filter(q => !(q.j >= 0 && q.j < q.p.length)).length, "bad answers");

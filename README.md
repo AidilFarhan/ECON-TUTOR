@@ -6,11 +6,11 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), dibina d
 
 | Bahagian | Isi |
 | --- | --- |
-| **Nota** | Nota lengkap 6 bab mengikut subtopik buku teks: T4 Bab 1–4 dan T5 Bab 1–2 |
+| **Nota** | Nota lengkap 6 bab SPM mengikut subtopik buku teks (T4 Bab 1–4, T5 Bab 1–2) dan 16 bab STPM Ekonomi 944 (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6). Nota STPM disertakan kad study; kuiz hanya untuk SPM buat masa ini |
 | **Graf interaktif** | 36 rajah SVG dalam nota. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
 | **Kad study** | 263 kad fakta. Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
 | **Kuiz** | 178 soalan mengikut bab (termasuk Latihan Sumatif buku teks T5), set campuran T4, T5 dan T4 + T5. Setiap jawapan ada penerangan |
-| **Kalkulator Ekonomi** | 39 kalkulator untuk semua rumus dan pengiraan dalam silibus T4 dan T5 (kos lepas, Ed/Es, beban cukai, PBG, cukai pendapatan, sewa beli, TP/AP/MP, kos, untung, IHP, inflasi, pengangguran, KDNK, belanjawan negara, faedah berbanding, akaun semasa, pertukaran asing dan lain-lain). Setiap satu memaparkan jawapan, jalan kira langkah demi langkah dan tafsiran. Nilai awal ialah contoh buku teks |
+| **Kalkulator Ekonomi** | 48 kalkulator (termasuk 9 untuk STPM: keseimbangan dengan cukai/subsidi, Ec/Ey, kos, KNK, AE–Y dan lompang, penciptaan kredit, Fisher, keterbukaan ekonomi) untuk semua rumus dan pengiraan dalam silibus T4 dan T5 (kos lepas, Ed/Es, beban cukai, PBG, cukai pendapatan, sewa beli, TP/AP/MP, kos, untung, IHP, inflasi, pengangguran, KDNK, belanjawan negara, faedah berbanding, akaun semasa, pertukaran asing dan lain-lain). Setiap satu memaparkan jawapan, jalan kira langkah demi langkah dan tafsiran. Nilai awal ialah contoh buku teks |
 | **Kertas percubaan** | Kelantan 2025, Seberang Perai 2025 dan Perak 2024 (Modul Gempur SPM): setiap satu Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Rajah dan gambar dalam kertas asal dipaparkan terus. Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
 
 Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
@@ -116,7 +116,7 @@ assets/favicon.svg              ikon laman
 assets/js/eko-core.js           pendaftaran bab, storan, utiliti
 assets/js/graf.js               enjin graf SVG + graf permintaan, penawaran, keseimbangan, keanjalan, cukai dan subsidi
 assets/js/graf-t4.js            graf T4 (KKP, sistem ekonomi, kos, TP/AP/MP, untung, produktiviti, PBG, sewa beli dan lain-lain)
-assets/js/graf-stpm.js          graf STPM (anjakan KKP)
+assets/js/graf-stpm.js          graf STPM (anjakan KKP, struktur pasaran MR = MC, AE–Y, pasaran wang, keluk Lorenz)
 assets/js/graf-t5.js            graf T5 (IHP, AD-AS, pengangguran, KDNK, belanjawan, cukai, faedah berbanding, tarif/subsidi/kuota, akaun semasa, penukaran mata wang, kadar pertukaran)
 assets/js/data/t4-bab1.js ...   nota, kad dan kuiz setiap bab
 assets/js/data/percubaan-kelantan-2025.js     Kertas 1 dan Kertas 2 percubaan Kelantan
@@ -124,7 +124,7 @@ assets/js/data/percubaan-seberang-perai-2025.js  Kertas 1 dan Kertas 2 percubaan
 assets/js/data/percubaan-perak-2024.js        Kertas 1 dan Kertas 2 percubaan Perak (Modul Gempur SPM 2024)
 assets/js/data/percubaan-terengganu-2025.js   Kertas 1 dan Kertas 2 MPP3 Terengganu (disorok)
 assets/img/percubaan/<kertas>/               rajah dan gambar yang dipotong daripada PDF kertas asal (WebP)
-assets/js/kalkulator.js         Kalkulator Ekonomi: 39 kalkulator rumus, jalan kira dan halaman #kalkulator
+assets/js/kalkulator.js         Kalkulator Ekonomi: 48 kalkulator rumus, jalan kira dan halaman #kalkulator
 assets/js/app.js                penghala halaman (#nota, #graf, #kad, #kuiz, #kalkulator, #percubaan, #k2-<id>)
 assets/js/akaun.js              butang akaun dan log keluar dalam bar atas
 assets/js/masuk.js              logik halaman log masuk
