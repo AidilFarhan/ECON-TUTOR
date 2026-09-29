@@ -147,7 +147,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-34** Add or correct content by editing one data file (documented in the README and AGENTS.md).
 
 ### 5.9 Economics calculator (Kalkulator Ekonomi): ✅
-- **FR-35** A **Kalkulator** tab (`#kalkulator`) holds 39 calculators covering every formula and calculation in the T4 and T5 syllabus, grouped by chapter:
+- **FR-35** A **Kalkulator** tab (`#kalkulator`) holds 48 calculators covering every formula and calculation in the T4 and T5 syllabus, plus 9 for STPM, grouped by chapter:
   - T4 Bab 1: opportunity cost on the PPC.
   - T4 Bab 2: market demand/supply, equilibrium and surpluses, Ed with total revenue, Es, finding Q₁ or P₁ from a given elasticity, tax burden, subsidy benefit.
   - T4 Bab 3: personal income, real wage, disposable income, taxable income and income tax (YA 2016 table in the textbook), personal budget, hire purchase instalment, savings and investment return.

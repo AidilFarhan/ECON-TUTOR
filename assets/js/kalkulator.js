@@ -1,6 +1,6 @@
 /* =========================================================
    Econ Tutor · Kalkulator Ekonomi
-   Semua rumus dan pengiraan dalam silibus Ekonomi KSSM T4 & T5.
+   Semua rumus dan pengiraan dalam silibus Ekonomi KSSM T4 & T5 serta STPM.
    Setiap kalkulator memaparkan jawapan, jalan kira dan tafsiran.
    Nilai awal ialah contoh daripada nota (buku teks) jika ada.
    Laluan: #kalkulator, #kalkulator-t4, #kalkulator-t4-b2, #kalkulator-<id>
@@ -1991,6 +1991,362 @@
       { n: "Pakaian A → B", v: { x0: 0, y0: 25, x1: 5, y1: 20 } }
     ],
     kira: kiraKosLepas
+  });
+
+  /* =========================================================
+     STPM PENGGAL 1 · BAB 2 · Pasaran Barang dan Harga
+     ========================================================= */
+  tambah({
+    id: "stpm-pasaran-linear",
+    bab: "stpm-p1-b2",
+    no: "2.3 & 2.7",
+    tajuk: "Keseimbangan pasaran daripada fungsi, dengan cukai atau subsidi",
+    kunci: "persamaan fungsi permintaan penawaran keseimbangan lebihan pengguna pengeluar cukai subsidi beban",
+    rumus: ["DD: P = a − bQ &nbsp; SS: P = c + dQ", "Keseimbangan: a − bQ = c + dQ → Q = " + frac("a − c", "b + d"), "Lebihan pengguna = ½ × Q × (a − P)"],
+    petunjuk: "Masukkan cukai seunit sebagai nilai positif dan subsidi seunit sebagai nilai negatif. Contoh modul: daging kambing import.",
+    medan: [
+      { k: "a", l: "a (pintasan harga DD)" },
+      { k: "b", l: "b (kecerunan DD)" },
+      { k: "c", l: "c (pintasan harga SS)" },
+      { k: "d", l: "d (kecerunan SS)" },
+      { k: "t", l: "Cukai (+) atau subsidi (−) seunit (RM)", opsyenal: true }
+    ],
+    contoh: [
+      { n: "Daging kambing, cukai RM3", v: { a: 70, b: 2, c: 10, d: 1, t: 3 } },
+      { n: "Barang X, subsidi RM10", v: { a: 50, b: 2.5, c: -10, d: 2.5, t: -10 } },
+      { n: "Cukai RM5", v: { a: 50, b: 2, c: 10, d: 3, t: 5 } }
+    ],
+    kira: function (x) {
+      if (x.b + x.d === 0) return { ralat: "b + d tidak boleh sifar." };
+      var t = x.t || 0;
+      var q0 = (x.a - x.c) / (x.b + x.d);
+      if (q0 <= 0) return { ralat: "Keluk tidak bersilang pada kuantiti positif. Semak a dan c." };
+      var p0 = x.a - x.b * q0;
+      var cs0 = 0.5 * q0 * (x.a - p0);
+      var ps0 = 0.5 * q0 * (p0 - x.c);
+      var L = [
+        x.a + " − " + kr(x.b) + "Q = " + kr(x.c) + " + " + kr(x.d) + "Q → Q = (" + nom(x.a) + " − " + kr(x.c) + ") ÷ (" + nom(x.b) + " + " + nom(x.d) + ") = <b>" + nom(q0) + "</b>",
+        "P = " + nom(x.a) + " − " + nom(x.b) + " × " + nom(q0) + " = <b>" + wang(p0) + "</b>",
+        "Lebihan pengguna = ½ × " + nom(q0) + " × (" + nom(x.a) + " − " + nom(p0) + ") = <b>" + wang(cs0) + "</b>",
+        "Lebihan pengeluar = ½ × " + nom(q0) + " × (" + nom(p0) + " − " + kr(x.c) + ") = <b>" + wang(ps0) + "</b>"
+      ];
+      var out = { hasil: [H("Harga keseimbangan", wang(p0)), H("Kuantiti keseimbangan", nom(q0)), H("Lebihan pengguna", wang(cs0))], langkah: L };
+      if (t) {
+        var q1 = (x.a - x.c - t) / (x.b + x.d);
+        if (q1 <= 0) return { ralat: "Cukai terlalu besar: kuantiti baharu tidak positif." };
+        var p1 = x.a - x.b * q1;
+        var cs1 = 0.5 * q1 * (x.a - p1);
+        var cukai = t > 0;
+        L.push(
+          "SS baharu: P = " + kr(x.c) + (cukai ? " + " : " − ") + nom(Math.abs(t)) + " + " + nom(x.d) + "Q → Q = (" + nom(x.a) + " − " + kr(x.c + t) + ") ÷ " + nom(x.b + x.d) + " = <b>" + nom(q1) + "</b>, P = <b>" + wang(p1) + "</b>",
+          "Lebihan pengguna baharu = ½ × " + nom(q1) + " × (" + nom(x.a) + " − " + nom(p1) + ") = <b>" + wang(cs1) + "</b>; perubahan = <b>" + (cs1 >= cs0 ? "+" : "−") + wang(Math.abs(cs1 - cs0)) + "</b>"
+        );
+        var bebanP = Math.abs(p1 - p0) * q1;
+        var jumlah = Math.abs(t) * q1;
+        L.push(
+          (cukai ? "Hasil cukai kerajaan" : "Perbelanjaan subsidi kerajaan") + " = " + nom(Math.abs(t)) + " × " + nom(q1) + " = <b>" + wang(jumlah) + "</b>; " +
+            (cukai ? "beban" : "faedah") + " pengguna = " + nom(Math.abs(p1 - p0)) + " × " + nom(q1) + " = " + wang(bebanP) + " (" + pc((bebanP / jumlah) * 100, 1) + "), " +
+            (cukai ? "beban" : "faedah") + " pengeluar = " + wang(jumlah - bebanP) + " (" + pc(((jumlah - bebanP) / jumlah) * 100, 1) + ")"
+        );
+        out.hasil.push(H((cukai ? "Selepas cukai" : "Selepas subsidi") + ": P, Q", wang(p1) + ", " + nom(q1), cukai ? "amaran" : "baik"), H("Lebihan pengguna baharu", wang(cs1)));
+        out.nota = cukai
+          ? "Cukai menganjak SS ke kiri (ke atas): harga naik, kuantiti turun dan lebihan pengguna berkurang."
+          : "Subsidi menganjak SS ke kanan (ke bawah): harga turun, kuantiti naik dan lebihan pengguna bertambah.";
+      }
+      return out;
+    }
+  });
+
+  tambah({
+    id: "stpm-ec-ey",
+    bab: "stpm-p1-b2",
+    no: "2.5",
+    tajuk: "Keanjalan permintaan silang (Ec) dan pendapatan (Ey)",
+    kunci: "ec ey keanjalan silang pendapatan pengganti penggenap mewah normal bawahan",
+    rumus: ["E = " + frac("Q₁ − Q₀", "Q₀") + " × " + frac("X₀", "X₁ − X₀"), "X = harga barang lain (Ec) atau pendapatan (Ey)"],
+    medan: [
+      { k: "jenis", jenis: "pilih", l: "Jenis keanjalan", pilihan: [["ec", "Silang (Ec)"], ["ey", "Pendapatan (Ey)"]] },
+      { k: "q0", l: "Kuantiti diminta asal Q₀" },
+      { k: "q1", l: "Kuantiti diminta baharu Q₁" },
+      {
+        k: "x0",
+        l: function (x) {
+          return x.jenis === "ey" ? "Pendapatan asal (RM)" : "Harga asal barang lain (RM)";
+        }
+      },
+      {
+        k: "x1",
+        l: function (x) {
+          return x.jenis === "ey" ? "Pendapatan baharu (RM)" : "Harga baharu barang lain (RM)";
+        }
+      }
+    ],
+    contoh: [
+      { n: "Ec modul", v: { jenis: "ec", q0: 10, q1: 20, x0: 2, x1: 3 } },
+      { n: "Ey modul", v: { jenis: "ey", q0: 10, q1: 50, x0: 1000, x1: 2000 } }
+    ],
+    kira: function (x) {
+      if (x.q0 === 0 || x.x1 === x.x0) return { ralat: "Q₀ tidak boleh sifar dan X mesti berubah." };
+      var e = ((x.q1 - x.q0) / x.q0) * (x.x0 / (x.x1 - x.x0));
+      var nama = x.jenis === "ey" ? "Ey" : "Ec";
+      var jenis;
+      if (x.jenis === "ey") jenis = e < 0 ? "Barang bawahan" : e === 0 ? "Barang mesti (Ey = 0)" : e > 1 ? "Barang mewah" : "Barang normal";
+      else jenis = e > 0 ? "Barang pengganti" : e < 0 ? "Barang penggenap" : "Tiada kaitan";
+      return {
+        hasil: [H(nama, nom(e)), H("Tafsiran", jenis, "neutral")],
+        langkah: [
+          "%ΔQ = (" + nom(x.q1) + " − " + kr(x.q0) + ") ÷ " + nom(x.q0) + " × 100 = " + pc(((x.q1 - x.q0) / x.q0) * 100),
+          "%ΔX = (" + nom(x.x1) + " − " + kr(x.x0) + ") ÷ " + nom(x.x0) + " × 100 = " + pc(((x.x1 - x.x0) / x.x0) * 100),
+          nama + " = " + pc(((x.q1 - x.q0) / x.q0) * 100) + " ÷ " + krp(((x.x1 - x.x0) / x.x0) * 100) + " = <b>" + nom(e) + "</b>"
+        ],
+        nota: x.jenis === "ey" ? "Tafsiran mengikut modul: 0 < Ey ≤ 1 normal, Ey > 1 mewah, Ey = 0 mesti, Ey < 0 bawahan." : "Ec positif: pengganti; negatif: penggenap; sifar: tiada kaitan."
+      };
+    }
+  });
+
+  /* =========================================================
+     STPM PENGGAL 1 · BAB 3 · Teori Pengeluaran dan Kos
+     ========================================================= */
+  tambah({
+    id: "stpm-kos-purata",
+    bab: "stpm-p1-b3",
+    no: "3.3",
+    tajuk: "Mencari Q, AVC, TFC dan TVC daripada TC, AFC dan AC",
+    kunci: "kos purata kos tetap purata kos berubah purata jumlah kos tetap berubah",
+    rumus: ["Q = " + frac("TC", "AC") + " &nbsp; AVC = AC − AFC", "TFC = AFC × Q &nbsp; TVC = TC − TFC"],
+    medan: [
+      { k: "tc", l: "Jumlah kos TC (RM)" },
+      { k: "afc", l: "Kos tetap purata AFC (RM)" },
+      { k: "ac", l: "Kos purata AC (RM)" }
+    ],
+    contoh: [
+      { n: "Firma A (modul)", v: { tc: 400, afc: 4, ac: 5 } },
+      { n: "Firma B (modul)", v: { tc: 600, afc: 5, ac: 8 } }
+    ],
+    kira: function (x) {
+      if (x.ac === 0) return { ralat: "AC tidak boleh sifar." };
+      var q = x.tc / x.ac,
+        avc = x.ac - x.afc,
+        tfc = x.afc * q,
+        tvc = x.tc - tfc;
+      var out = {
+        hasil: [H("Q", nom(q) + " unit"), H("AVC", wang(avc)), H("TFC", wang(tfc)), H("TVC", wang(tvc))],
+        langkah: [
+          "Q = " + wang(x.tc) + " ÷ " + wang(x.ac) + " = <b>" + nom(q) + " unit</b>",
+          "AVC = " + wang(x.ac) + " − " + wang(x.afc) + " = <b>" + wang(avc) + "</b>",
+          "TFC = " + wang(x.afc) + " × " + nom(q) + " = <b>" + wang(tfc) + "</b>",
+          "TVC = " + wang(x.tc) + " − " + wang(tfc) + " = <b>" + wang(tvc) + "</b>"
+        ]
+      };
+      if (avc < 0) out.amaran = "AFC melebihi AC: data tidak munasabah kerana AVC menjadi negatif.";
+      return out;
+    }
+  });
+
+  /* =========================================================
+     STPM PENGGAL 2 · BAB 2 · Perakaunan Pendapatan Negara
+     ========================================================= */
+  tambah({
+    id: "stpm-knk",
+    bab: "stpm-p2-b2",
+    no: "2.1",
+    tajuk: "Daripada KDNK kepada KNK, kos faktor, keluaran bersih dan KNK benar",
+    kunci: "kdnk knk pfbln cukai tak langsung subsidi susut nilai harga pasaran kos faktor benar nominal pendapatan negara",
+    rumus: ["KNK<sub>hp</sub> = KDNK<sub>hp</sub> + PFBLN", "KNK<sub>kf</sub> = KNK<sub>hp</sub> − CTL + subsidi", "KNB<sub>kf</sub> (pendapatan negara) = KNK<sub>kf</sub> − susut nilai", "KNK benar = " + frac("IHP tahun asas", "IHP tahun semasa") + " × KNK nominal"],
+    medan: [
+      { k: "kdnk", l: "KDNK harga pasaran (RM juta)" },
+      { k: "terima", l: "Penerimaan pendapatan faktor dari luar (RM juta)" },
+      { k: "bayar", l: "Pembayaran pendapatan faktor ke luar (RM juta)" },
+      { k: "ctl", l: "Cukai tak langsung (RM juta)" },
+      { k: "sub", l: "Subsidi (RM juta)" },
+      { k: "susut", l: "Susut nilai (RM juta)", opsyenal: true },
+      { k: "ihp", l: "IHP tahun semasa (asas = 100)", opsyenal: true }
+    ],
+    contoh: [{ n: "Soalan objektif modul", v: { kdnk: 65000, terima: 6000, bayar: 8000, ctl: 4000, sub: 10000, susut: 3000 } }],
+    kira: function (x) {
+      var pfbln = x.terima - x.bayar;
+      var knkhp = x.kdnk + pfbln;
+      var knkkf = knkhp - x.ctl + x.sub;
+      var L = [
+        "PFBLN = " + nom(x.terima, 0) + " − " + nom(x.bayar, 0) + " = " + nom(pfbln, 0),
+        "KNK<sub>hp</sub> = " + nom(x.kdnk, 0) + " + " + kr(pfbln, 0) + " = <b>" + nom(knkhp, 0) + "</b>",
+        "KNK<sub>kf</sub> = " + nom(knkhp, 0) + " − " + nom(x.ctl, 0) + " + " + nom(x.sub, 0) + " = <b>" + nom(knkkf, 0) + "</b>"
+      ];
+      var hasil = [H("PFBLN", "RM" + nom(pfbln, 0) + " juta", pfbln < 0 ? "amaran" : "baik"), H("KNK harga pasaran", "RM" + nom(knkhp, 0) + " juta"), H("KNK kos faktor", "RM" + nom(knkkf, 0) + " juta")];
+      if (x.susut != null) {
+        var knb = knkkf - x.susut;
+        L.push("KNB<sub>kf</sub> = " + nom(knkkf, 0) + " − " + nom(x.susut, 0) + " = <b>" + nom(knb, 0) + "</b> (pendapatan negara)");
+        hasil.push(H("Pendapatan negara (KNB kf)", "RM" + nom(knb, 0) + " juta", "baik"));
+      }
+      if (x.ihp != null) {
+        if (x.ihp === 0) return { ralat: "IHP tidak boleh sifar." };
+        var benar = (knkhp * 100) / x.ihp;
+        L.push("KNK benar = 100 ÷ " + nom(x.ihp) + " × " + nom(knkhp, 0) + " = <b>" + nom(benar) + "</b>");
+        hasil.push(H("KNK benar", "RM" + nom(benar) + " juta"));
+      }
+      return { hasil: hasil, langkah: L, nota: pfbln < 0 ? "PFBLN negatif: KDNK lebih besar daripada KNK." : "PFBLN positif: KNK lebih besar daripada KDNK." };
+    }
+  });
+
+  /* =========================================================
+     STPM PENGGAL 2 · BAB 3 · Keseimbangan Pendapatan Negara
+     ========================================================= */
+  tambah({
+    id: "stpm-ae-y",
+    bab: "stpm-p2-b3",
+    no: "3.1",
+    tajuk: "Keseimbangan pendapatan negara, pengganda dan lompang",
+    kunci: "ae y keseimbangan pendapatan negara pengganda mpc mps lompang deflasi inflasi jurang knk suntikan bocoran ekonomi terbuka import",
+    rumus: [
+      "Y = C + I + G + (X − M), C = a + b(Y − T), M = M₀ + mY",
+      "Y = " + frac("a − bT + I + G + X − M₀", "1 − b + m"),
+      "Pengganda k = " + frac("1", "1 − b + m") + " &nbsp; Lompang = " + frac("Jurang KNK", "k")
+    ],
+    petunjuk: "Biarkan X, M₀ dan m kosong untuk ekonomi tertutup. Nilai dalam RM juta.",
+    medan: [
+      { k: "a", l: "Penggunaan autonomi a" },
+      { k: "b", l: "MPC (b)" },
+      { k: "i", l: "Pelaburan I" },
+      { k: "g", l: "Perbelanjaan kerajaan G" },
+      { k: "t", l: "Cukai sekali gus T" },
+      { k: "x", l: "Eksport X", opsyenal: true },
+      { k: "m0", l: "Import autonomi M₀", opsyenal: true },
+      { k: "m", l: "Kecenderungan mengimport sut m", opsyenal: true },
+      { k: "yf", l: "Pendapatan guna tenaga penuh Yf", opsyenal: true }
+    ],
+    contoh: [
+      { n: "Tiga sektor (modul)", v: { a: 100, b: 0.8, i: 50, g: 50, t: 30 } },
+      { n: "Ekonomi terbuka (modul)", v: { a: 100, b: 0.8, i: 50, g: 50, t: 30, x: 60, m: 0.2 } },
+      { n: "Lompang deflasi (Bahagian C)", v: { a: 500, b: 0.9, i: 600, g: 400, t: 200, yf: 14000 } },
+      { n: "Terbuka: M = 100 + 0.2Y", v: { a: 260, b: 0.8, i: 400, g: 300, t: 200, x: 500, m0: 100, m: 0.2 } }
+    ],
+    kira: function (x) {
+      var X = x.x || 0,
+        m0 = x.m0 || 0,
+        m = x.m || 0;
+      var penyebut = 1 - x.b + m;
+      if (penyebut <= 0) return { ralat: "1 − MPC + m mesti positif." };
+      var autonomi = x.a - x.b * x.t + x.i + x.g + X - m0;
+      var y = autonomi / penyebut;
+      var k = 1 / penyebut;
+      var L = [
+        "Y = " + nom(x.a) + " + " + nom(x.b) + "(Y − " + nom(x.t) + ") + " + nom(x.i) + " + " + nom(x.g) + (X || m0 || m ? " + " + nom(X) + " − (" + nom(m0) + " + " + nom(m) + "Y)" : ""),
+        "Y = " + nom(autonomi) + " + " + nom(x.b - m) + "Y → " + nom(penyebut) + "Y = " + nom(autonomi),
+        "Y = " + nom(autonomi) + " ÷ " + nom(penyebut) + " = <b>RM" + nom(y) + " juta</b>",
+        "Pengganda = 1 ÷ " + nom(penyebut) + " = <b>" + nom(k) + "</b>"
+      ];
+      var hasil = [H("Y keseimbangan", "RM" + nom(y) + " juta", "baik"), H("Pengganda", nom(k))];
+      if (X || m0 || m) {
+        var nx = X - (m0 + m * y);
+        L.push("Eksport bersih = " + nom(X) + " − (" + nom(m0) + " + " + nom(m) + " × " + nom(y) + ") = <b>" + nom(nx) + "</b>");
+        hasil.push(H("Eksport bersih", "RM" + nom(nx) + " juta", nx < 0 ? "amaran" : "baik"));
+      }
+      var out = { hasil: hasil, langkah: L };
+      if (x.yf != null) {
+        var jurang = x.yf - y;
+        var lompang = Math.abs(jurang) / k;
+        L.push("Jurang KNK = " + nom(x.yf) + " − " + nom(y) + " = " + nom(jurang) + "; lompang = " + nom(Math.abs(jurang)) + " ÷ " + nom(k) + " = <b>" + nom(lompang) + "</b>");
+        hasil.push(H(jurang > 0 ? "Lompang deflasi" : jurang < 0 ? "Lompang inflasi" : "Guna tenaga penuh", "RM" + nom(lompang) + " juta", jurang > 0 ? "amaran" : jurang < 0 ? "merah" : "baik"));
+        out.nota = jurang > 0 ? "G perlu ditambah sebanyak lompang deflasi untuk mencapai guna tenaga penuh." : jurang < 0 ? "G perlu dikurangkan sebanyak lompang inflasi." : "Ekonomi berada pada guna tenaga penuh.";
+      }
+      return out;
+    }
+  });
+
+  /* =========================================================
+     STPM PENGGAL 2 · BAB 4 · Wang, Bank dan Dasar Kewangan
+     ========================================================= */
+  tambah({
+    id: "stpm-kredit",
+    bab: "stpm-p2-b4",
+    no: "4.2",
+    tajuk: "Penciptaan kredit dan pengganda wang",
+    kunci: "penciptaan kredit pengganda wang nisbah rizab deposit pinjaman bank perdagangan",
+    rumus: ["Pengganda wang = " + frac("1", "nisbah rizab"), "Jumlah deposit = pengganda × deposit awal", "Kredit baharu = jumlah deposit − deposit awal"],
+    medan: [
+      { k: "d", l: "Deposit awal (RM)" },
+      { k: "r", l: "Nisbah rizab (%)" }
+    ],
+    contoh: [
+      { n: "Modul: RM10 000, 20%", v: { d: 10000, r: 20 } },
+      { n: "RM100 juta, 10%", v: { d: 100000000, r: 10 } }
+    ],
+    kira: function (x) {
+      if (x.r <= 0 || x.r > 100) return { ralat: "Nisbah rizab mesti antara 0% dan 100%." };
+      var nr = x.r / 100,
+        k = 1 / nr;
+      var dep = k * x.d,
+        rizab = x.d,
+        pinjam = dep - x.d;
+      return {
+        hasil: [H("Pengganda wang", nom(k)), H("Jumlah deposit", wang(dep)), H("Jumlah pinjaman (kredit baharu)", wang(pinjam), "baik"), H("Jumlah rizab", wang(rizab))],
+        langkah: [
+          "Pengganda = 1 ÷ " + nom(nr) + " = <b>" + nom(k) + "</b>",
+          "Jumlah deposit = " + nom(k) + " × " + wang(x.d) + " = <b>" + wang(dep) + "</b>",
+          "Jumlah pinjaman = " + nom(k) + " × " + wang(x.d * (1 - nr)) + " = <b>" + wang(pinjam) + "</b>",
+          "Jumlah rizab = " + nom(k) + " × " + wang(x.d * nr) + " = <b>" + wang(rizab) + "</b>"
+        ],
+        nota: "Andaian: urus niaga dengan cek, semua lebihan rizab dipinjamkan, tiada bocoran tunai."
+      };
+    }
+  });
+
+  tambah({
+    id: "stpm-fisher",
+    bab: "stpm-p2-b4",
+    no: "4.2",
+    tajuk: "Teori Kuantiti Wang Fisher (MV = PT)",
+    kunci: "fisher mv pt teori kuantiti wang halaju tingkat harga urus niaga",
+    rumus: ["MV = PT → P = " + frac("MV", "T")],
+    medan: [
+      { k: "m", l: "Bekalan wang M (RM)" },
+      { k: "v", l: "Halaju wang V" },
+      { k: "t", l: "Jumlah urus niaga T" },
+      { k: "dm", l: "Perubahan M (%)", opsyenal: true }
+    ],
+    contoh: [
+      { n: "M naik 20%", v: { m: 300, v: 5, t: 400, dm: 20 } },
+      { n: "M turun 25%", v: { m: 320, v: 5, t: 400, dm: -25 } }
+    ],
+    kira: function (x) {
+      if (x.t === 0) return { ralat: "T tidak boleh sifar." };
+      var p0 = (x.m * x.v) / x.t;
+      var L = ["P = (" + nom(x.m) + " × " + nom(x.v) + ") ÷ " + nom(x.t) + " = <b>" + wang(p0) + "</b>"];
+      var hasil = [H("Tingkat harga P", wang(p0))];
+      if (x.dm != null) {
+        var m1 = x.m * (1 + x.dm / 100),
+          p1 = (m1 * x.v) / x.t;
+        L.push("M baharu = " + nom(x.m) + " × (1 " + (x.dm < 0 ? "− " : "+ ") + nom(Math.abs(x.dm) / 100) + ") = " + nom(m1), "P baharu = (" + nom(m1) + " × " + nom(x.v) + ") ÷ " + nom(x.t) + " = <b>" + wang(p1) + "</b>");
+        hasil.push(H("P baharu", wang(p1), x.dm > 0 ? "amaran" : "baik"), H("Perubahan P", (p1 >= p0 ? "+" : "−") + wang(Math.abs(p1 - p0))));
+      }
+      return { hasil: hasil, langkah: L, nota: "Dengan V dan T tetap, P berubah pada kadar yang sama dengan M." };
+    }
+  });
+
+  /* =========================================================
+     STPM PENGGAL 3 · BAB 3 · Perdagangan Antarabangsa
+     ========================================================= */
+  tambah({
+    id: "stpm-keterbukaan",
+    bab: "stpm-p3-b3",
+    no: "3.1",
+    tajuk: "Keterbukaan ekonomi",
+    kunci: "keterbukaan ekonomi eksport import kdnk nisbah perdagangan",
+    rumus: ["Keterbukaan = " + frac("Eksport + Import", "KDNK")],
+    medan: [
+      { k: "x", l: "Eksport" },
+      { k: "m", l: "Import" },
+      { k: "y", l: "KDNK" }
+    ],
+    contoh: [{ n: "Malaysia 2007 (RM bilion)", v: { x: 617.35, m: 548.21, y: 503.6 } }],
+    kira: function (x) {
+      if (x.y === 0) return { ralat: "KDNK tidak boleh sifar." };
+      var r = (x.x + x.m) / x.y;
+      return {
+        hasil: [H("Keterbukaan", nom(r)), H("Tafsiran", r > 1 ? "Ekonomi sangat terbuka" : "Kurang terbuka", r > 1 ? "biru" : "neutral")],
+        langkah: ["(" + nom(x.x) + " + " + nom(x.m) + ") ÷ " + nom(x.y) + " = <b>" + nom(r) + "</b>", "Nisbah eksport kepada KDNK = " + nom(x.x) + " ÷ " + nom(x.y) + " = " + nom(x.x / x.y)]
+      };
+    }
   });
 
   /* =========================================================

@@ -72,7 +72,7 @@ assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 qu
 assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
 assets/js/data/percubaan-terengganu-2025.js   Same shape; not loaded and not deployed (hidden)
 assets/img/percubaan/<paper>/   Figures cropped from the original PDFs (WebP, 200 dpi)
-assets/js/kalkulator.js       EKO.kalkulator: 39 formula calculators with worked steps + the #kalkulator view
+assets/js/kalkulator.js       EKO.kalkulator: 48 formula calculators with worked steps + the #kalkulator view
 assets/js/app.js              Router + all views
 assets/js/akaun.js            Account button + sign-out in the header
 assets/js/masuk.js            Login page logic (ES module)
@@ -91,7 +91,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 `index.html` loads classic scripts with `defer`, so they execute in document order after parsing:
 
 1. `eko-core.js` creates `window.EKO` (alias `E`).
-2. `graf.js`, `graf-t4.js`, `graf-t5.js` attach `EKO.graf` (alias `G`) and register graph widgets.
+2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js` attach `EKO.graf` (alias `G`) and register graph widgets.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
@@ -103,7 +103,7 @@ Every file is an IIFE that reads and extends `window.EKO`. No file uses `import`
 
 | API | Purpose |
 | --- | --- |
-| `daftarBab(bab)` | Register a chapter; keeps `E.bab` sorted by form then number; indexes `E.babIkut[id]` |
+| `daftarBab(bab)` | Register a chapter; keeps `E.bab` sorted by level (SPM, then STPM), form/penggal, then number; indexes `E.babIkut[id]` |
 | `daftarSet(set)` | Register an extra MCQ set (e.g. trial Kertas 1) in `E.setKuiz` |
 | `daftarK2(paper)`, `kertas2Ikut(id)` | Register and look up Kertas 2 papers (`E.kertas2Set`) |
 | `soalanBab(id)` | Chapter quiz = chapter questions + any trial-paper questions tagged `bab: id` |
@@ -121,12 +121,12 @@ Routing is **hash-based** (`location.hash`), so the site works from `file://`, a
 | `#utama` (default) | `pUtama` | Hero, progress, continue reading, tools |
 | `#nota` | `pNota` | Chapter grid by form |
 | `#t4-b1` … `#t5-b2` | `pBab` | Chapter notes, sticky table of contents, "mark as read", next chapter |
-| `#graf` | `pGraf` | "Makmal graf": every `<figure data-graf>` from all chapters, grouped |
 | `#kad`, `#kad-<filter>` | `pKad` | Flashcards; filter `semua`, `t4`, `t5` or a chapter id; search; keyboard `Space`/`1`/`2`/`←`/`→` |
 | `#kuiz` | `pKuizSenarai` | Quiz picker with best scores |
 | `#kuiz-<id>` | `pKuizMula` | `id` = chapter id, `t4`, `t5`, `semua`, or a set id such as `kel25-k1`; timer, per-question explanation, review |
 | `#percubaan` | `pPercubaan` | One section per registered paper (K1 + K2 cards) |
-| `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = `t4`, `t5` or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
+| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM); `<level>` = `t4`, `t5` or `stpm` mounts only that level's graphs |
+| `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = a group key (`t4`, `t5`, `p1`, `p2`, `p3`) or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
 | `#k2`, `#k2-<paperId>` | `pK2` | Kertas 2 with answer boxes, self-marking against the scheme, level rubrics |
 
 `papar()` is the single render entry point. Before each render, `bersih()` tears down the previous view: it calls `G.tanggal()` (destroys graph widgets), disconnects the TOC observer, clears the quiz timer and removes view-level key listeners. After rendering, `G.pasang(app)` mounts any graph placeholders in the new HTML.
@@ -147,7 +147,7 @@ flowchart TB
   D -->|G.tanggal on route change| X[cleanup]
 ```
 
-- **Registry.** `G.daftar(name, fn, {tajuk, bab})` registers a widget, and `G.info` holds metadata. 31 widgets are used in the notes: 6 in `graf.js`, 12 in `graf-t4.js` and 13 in `graf-t5.js`.
+- **Registry.** `G.daftar(name, fn, {tajuk, bab})` registers a widget, and `G.info` holds metadata. 36 widgets are used in the notes: 6 in `graf.js`, 12 in `graf-t4.js`, 13 in `graf-t5.js` and 5 in `graf-stpm.js`. `kkp` and `keseimbangan` also accept custom data through `data-opt` (used by the STPM notes).
 - **Mounting.** `G.pasang(root)` finds `[data-graf]:not([data-dipasang])`, parses `data-opt` JSON and calls the widget. Errors are caught per widget and shown as a muted message.
 - **Plot.** A plot has world coordinates (`x`, `y` ranges) and pixel mapping (`X()`, `Y()`, `invX()`, `invY()`). Its responsive size comes from `nisbah` (aspect ratio function) and is capped at 780 px. Layers, in paint order: `latar, zon, grid, kawasan, paksi, hantu, lengkung, panduan, tanda, label, pemegang, atas`.
 - **Drawing primitives.**

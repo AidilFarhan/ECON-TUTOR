@@ -515,7 +515,12 @@
             var no = o.bab.map(function (b) {
               return b.no;
             });
-            var bab = o.bab.length > 1 ? "Bab " + no[0] + "–" + no[no.length - 1] : "Bab " + no[0];
+            var bab =
+              o.kunci === "stpm"
+                ? "Penggal " + o.bab[0].tingkatan + (o.bab[o.bab.length - 1].tingkatan !== o.bab[0].tingkatan ? "–" + o.bab[o.bab.length - 1].tingkatan : "") + " · " + o.bab.length + " bab"
+                : o.bab.length > 1
+                  ? "Bab " + no[0] + "–" + no[no.length - 1]
+                  : "Bab " + no[0];
             return (
               '<a class="kad-alat kaca" href="#graf-' + o.kunci + '">' +
               '<span class="ikon-bulat">' + E.ikon("graf") + "</span>" +
