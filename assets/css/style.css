@@ -1247,6 +1247,15 @@ main {
   margin-bottom: 4px;
 }
 
+/* teks tebal di dalam perenggan kad-mini kekal sebaris (bukan tajuk) */
+.kad-mini p b,
+.kad-mini li b {
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+}
+
 .kad-mini p,
 .kad-mini li {
   font-size: 15px;

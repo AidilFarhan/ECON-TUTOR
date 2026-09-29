@@ -228,7 +228,9 @@
     t5: ["Makroekonomi & ekonomi global", "Peranan kerajaan, penunjuk ekonomi, dasar fiskal dan kewangan, globalisasi, perdagangan antarabangsa serta pertukaran asing."],
     p1: ["Mikroekonomi", "Ekonomi STPM (944) Penggal 1: masalah asas ekonomi, pasaran barang dan harga, teori pengeluaran dan kos, struktur pasaran serta pasaran faktor."],
     p2: ["Makroekonomi", "Ekonomi STPM (944) Penggal 2: pendapatan negara, penentuan pendapatan, wang dan bank, dasar ekonomi serta ekonomi terbuka."],
-    p3: ["Isu ekonomi Malaysia", "Ekonomi STPM (944) Penggal 3: isu-isu ekonomi Malaysia."]
+    p3: ["Isu ekonomi Malaysia", "Ekonomi STPM (944) Penggal 3: isu-isu ekonomi Malaysia."],
+    m1: ["Mikroekonomi (AE015)", "Matrikulasi Semester 1: pengenalan ekonomi, permintaan dan penawaran, keanjalan, teori perlakuan pengguna, pengeluaran dan kos, serta struktur pasaran."],
+    m2: ["Makroekonomi (AE025)", "Matrikulasi Semester 2: pendapatan negara, keseimbangan pendapatan, wang dan bank, inflasi dan pengangguran, dasar fiskal dan kewangan, ekonomi antarabangsa serta pertumbuhan ekonomi."]
   };
 
   function gridKumpulan(kunci, tajuk, huraian) {
@@ -265,7 +267,7 @@
       '<div class="bekas pandangan">' +
       '<section class="wira">' +
       "<div>" +
-      '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5' + (E.babPeringkat("stpm").length ? " · STPM" : "") + "</span>" +
+      '<span class="label-kecil"><span class="titik"></span>Ekonomi SPM · KSSM Tingkatan 4 &amp; 5' + (E.babPeringkat("stpm").length ? " · STPM" : "") + (E.babPeringkat("matrik").length ? " · Matrikulasi" : "") + "</span>" +
       "<h1>Nota Ekonomi <em>Interaktif</em></h1>" +
       '<p class="pengenalan">Nota lengkap setiap bab, graf dengan nod yang boleh diseret, kad study untuk menghafal fakta, kuiz mengikut bab dan kalkulator untuk setiap rumus. Termasuk ' + esc(senaraiKertas()) + " bersama skema.</p>" +
       '<div class="tindakan"><a class="btn btn-utama" href="#' + (akhir ? akhir.id : E.bab[0] ? E.bab[0].id : "nota") + '">' + (akhir ? "Sambung " + esc(E.labelBab(akhir)) : "Mula dari Bab 1") + " " + E.ikon("kanan") + '</a><a class="btn" href="#kuiz">Cuba kuiz</a></div>' +
@@ -289,7 +291,7 @@
     html +=
       '<section class="bahagian"><div class="bahagian-kepala"><div><span class="label-kecil"><span class="titik"></span>Alat belajar</span><h2>Ulang kaji dengan cara sendiri</h2></div></div>' +
       '<div class="grid-alat">' +
-      alat("graf", "graf", "Makmal graf", "Keluk interaktif mengikut Tingkatan 4, Tingkatan 5 dan STPM.") +
+      alat("graf", "graf", "Makmal graf", "Keluk interaktif mengikut Tingkatan 4, Tingkatan 5, STPM dan Matrikulasi.") +
       alat("kad", "kad", "Kad study", "Hafal istilah dan rumus. Tandakan kad yang dah diingat.") +
       alat("kuiz", "kuiz", "Kuiz mengikut bab", "Soalan objektif dengan penerangan untuk setiap jawapan.") +
       alat("kalkulator", "kalkulator", "Kalkulator Ekonomi", "Semua rumus dan pengiraan silibus, dengan jalan kira langkah demi langkah.") +
@@ -316,7 +318,7 @@
     app.innerHTML =
       '<div class="bekas pandangan">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Nota</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Nota mengikut bab</h1><p>Setiap bab mengikut susunan buku teks (SPM) atau sukatan pelajaran (STPM). Graf dalam nota boleh terus diseret.</p></div></div>' +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Nota mengikut bab</h1><p>Setiap bab mengikut susunan buku teks (SPM), sukatan pelajaran (STPM) atau modul kolej (Matrikulasi). Graf dalam nota boleh terus diseret.</p></div></div>' +
       E.kumpulan()
         .map(function (k) {
           return gridKumpulan(k.kunci, esc(k.label));
@@ -331,7 +333,7 @@
       d.akhir = b.id;
     });
     var d = E.data();
-    // Sebelum/Seterusnya kekal dalam peringkat yang sama (SPM atau STPM).
+    // Sebelum/Seterusnya kekal dalam peringkat yang sama (SPM, STPM atau Matrikulasi).
     var semua = E.babPeringkat(b.peringkat);
     var idx = semua.indexOf(b);
     var sebelum = semua[idx - 1];
@@ -456,18 +458,19 @@
   }
 
   /* ---------- GRAF (galeri) ---------- */
-  // Makmal graf: pengguna pilih peringkat dahulu (Tingkatan 4, Tingkatan 5 atau STPM),
-  // kemudian hanya graf peringkat itu dipasang. Laluan: #graf, #graf-t4, #graf-t5, #graf-stpm
+  // Makmal graf: pengguna pilih peringkat dahulu (Tingkatan 4, Tingkatan 5, STPM atau Matrikulasi),
+  // kemudian hanya graf peringkat itu dipasang. Laluan: #graf, #graf-t4, #graf-t5, #graf-stpm, #graf-matrik
+  var LABEL_PERINGKAT_GRAF = { stpm: "STPM", matrik: "Matrikulasi" };
   function pilihanGraf() {
     var out = [];
     E.kumpulan().forEach(function (k) {
-      var kunci = k.peringkat === "stpm" ? "stpm" : k.kunci;
+      var kunci = LABEL_PERINGKAT_GRAF[k.peringkat] ? k.peringkat : k.kunci;
       var ada = null;
       out.forEach(function (o) {
         if (o.kunci === kunci) ada = o;
       });
       if (!ada) {
-        ada = { kunci: kunci, label: k.peringkat === "stpm" ? "STPM" : k.label, bab: [] };
+        ada = { kunci: kunci, label: LABEL_PERINGKAT_GRAF[k.peringkat] || k.label, bab: [] };
         out.push(ada);
       }
       ada.bab = ada.bab.concat(k.bab);
@@ -516,8 +519,8 @@
               return b.no;
             });
             var bab =
-              o.kunci === "stpm"
-                ? "Penggal " + o.bab[0].tingkatan + (o.bab[o.bab.length - 1].tingkatan !== o.bab[0].tingkatan ? "–" + o.bab[o.bab.length - 1].tingkatan : "") + " · " + o.bab.length + " bab"
+              o.kunci === "stpm" || o.kunci === "matrik"
+                ? (o.kunci === "stpm" ? "Penggal " : "Semester ") + o.bab[0].tingkatan + (o.bab[o.bab.length - 1].tingkatan !== o.bab[0].tingkatan ? "–" + o.bab[o.bab.length - 1].tingkatan : "") + " · " + o.bab.length + " bab"
                 : o.bab.length > 1
                   ? "Bab " + no[0] + "–" + no[no.length - 1]
                   : "Bab " + no[0];

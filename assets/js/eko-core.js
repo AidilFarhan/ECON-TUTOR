@@ -12,12 +12,14 @@ window.EKO = (function () {
   E.babIkut = {};
   E.setKuiz = [];
 
-  // peringkat: "spm" (lalai, tingkatan 4/5) atau "stpm" (tingkatan = penggal 1/2/3).
-  var TERTIB_PERINGKAT = { spm: 0, stpm: 1 };
+  // peringkat: "spm" (lalai, tingkatan 4/5), "stpm" (tingkatan = penggal 1/2/3)
+  // atau "matrik" (tingkatan = semester 1/2: AE015 Mikroekonomi, AE025 Makroekonomi).
+  var TERTIB_PERINGKAT = { spm: 0, stpm: 1, matrik: 2 };
+  var KOD_MATRIK = { 1: "AE015", 2: "AE025" };
 
   E.daftarBab = function (b) {
     if (!b || !b.id) return;
-    b.peringkat = b.peringkat === "stpm" ? "stpm" : "spm";
+    b.peringkat = TERTIB_PERINGKAT[b.peringkat] != null ? b.peringkat : "spm";
     b.kad = b.kad || [];
     b.kuiz = b.kuiz || [];
     b.seksyen = b.seksyen || [];
@@ -28,20 +30,22 @@ window.EKO = (function () {
     });
   };
 
-  /* ---------- kumpulan bab (Tingkatan 4, Tingkatan 5, STPM Penggal 1…) ---------- */
-  // Kunci kumpulan: "t4", "t5" (SPM) atau "p1", "p2", "p3" (STPM).
+  /* ---------- kumpulan bab (Tingkatan 4, Tingkatan 5, STPM Penggal 1…, Matrikulasi) ---------- */
+  // Kunci kumpulan: "t4", "t5" (SPM), "p1", "p2", "p3" (STPM) atau "m1", "m2" (Matrikulasi).
   E.kunciKumpulan = function (b) {
-    return (b.peringkat === "stpm" ? "p" : "t") + b.tingkatan;
+    return (b.peringkat === "stpm" ? "p" : b.peringkat === "matrik" ? "m" : "t") + b.tingkatan;
   };
-  // "Tingkatan 4" atau "STPM Penggal 1"
+  // "Tingkatan 4", "STPM Penggal 1" atau "Matrikulasi Semester 1 · AE015"
   E.labelKumpulan = function (b) {
+    if (b.peringkat === "matrik") return "Matrikulasi Semester " + b.tingkatan + " · " + KOD_MATRIK[b.tingkatan];
     return b.peringkat === "stpm" ? "STPM Penggal " + b.tingkatan : "Tingkatan " + b.tingkatan;
   };
-  // "T4" atau "STPM P1"
+  // "T4", "STPM P1" atau "AE015"
   E.labelPendek = function (b) {
+    if (b.peringkat === "matrik") return KOD_MATRIK[b.tingkatan];
     return b.peringkat === "stpm" ? "STPM P" + b.tingkatan : "T" + b.tingkatan;
   };
-  // "T4 Bab 1" atau "STPM P1 Bab 1"
+  // "T4 Bab 1", "STPM P1 Bab 1" atau "AE015 Bab 1"
   E.labelBab = function (b) {
     return E.labelPendek(b) + " Bab " + b.no;
   };

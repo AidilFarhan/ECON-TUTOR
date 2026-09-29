@@ -1,6 +1,6 @@
 /* =========================================================
    Econ Tutor · Kalkulator Ekonomi
-   Semua rumus dan pengiraan dalam silibus Ekonomi KSSM T4 & T5 serta STPM.
+   Semua rumus dan pengiraan dalam silibus Ekonomi KSSM T4 & T5, STPM serta Matrikulasi.
    Setiap kalkulator memaparkan jawapan, jalan kira dan tafsiran.
    Nilai awal ialah contoh daripada nota (buku teks) jika ada.
    Laluan: #kalkulator, #kalkulator-t4, #kalkulator-t4-b2, #kalkulator-<id>
@@ -2350,6 +2350,171 @@
   });
 
   /* =========================================================
+     MATRIKULASI AE015 · BAB 3 · Keanjalan
+     ========================================================= */
+  tambah({
+    id: "matrik-ed-lengkuk",
+    bab: "m1-b3",
+    no: "3.1",
+    tajuk: "Keanjalan lengkuk: kaedah biasa dan kaedah titik tengah",
+    kunci: "ed keanjalan lengkuk titik tengah midpoint kaedah biasa arc",
+    rumus: [
+      "Kaedah biasa: Ed = " + frac("Q₁ − Q₀", "Q₀") + " × " + frac("P₀", "P₁ − P₀"),
+      "Titik tengah: Ed = " + frac("Q₁ − Q₀", "½(Q₀ + Q₁)") + " × " + frac("½(P₀ + P₁)", "P₁ − P₀")
+    ],
+    petunjuk: "Contoh modul AE015: keluk DD barang X melalui (RM2, 10 unit) dan (RM4, 8 unit).",
+    medan: [
+      { k: "p0", l: "Harga asal P₀ (RM)" },
+      { k: "p1", l: "Harga baharu P₁ (RM)" },
+      { k: "q0", l: "Kuantiti asal Q₀" },
+      { k: "q1", l: "Kuantiti baharu Q₁" }
+    ],
+    contoh: [
+      { n: "Harga naik RM2 → RM4", v: { p0: 2, p1: 4, q0: 10, q1: 8 } },
+      { n: "Harga turun RM4 → RM2", v: { p0: 4, p1: 2, q0: 8, q1: 10 } },
+      { n: "Rambutan (modul)", v: { p0: 2, p1: 4, q0: 50, q1: 40 } }
+    ],
+    kira: function (x) {
+      if (x.q0 === 0 || x.p1 === x.p0) return { ralat: "Kuantiti asal tidak boleh sifar dan harga mesti berubah." };
+      if (x.q0 + x.q1 === 0) return { ralat: "Jumlah kuantiti tidak boleh sifar." };
+      var biasa = ((x.q1 - x.q0) / x.q0) * (x.p0 / (x.p1 - x.p0));
+      var tengah = ((x.q1 - x.q0) / ((x.q0 + x.q1) / 2)) * (((x.p0 + x.p1) / 2) / (x.p1 - x.p0));
+      var m = Math.abs(tengah);
+      var jenis = sama(m, 0) ? "Tidak anjal sempurna" : sama(m, 1) ? "Anjal satu" : m > 1 ? "Anjal" : "Tidak anjal";
+      return {
+        hasil: [H("Ed kaedah biasa", nom(biasa)), H("Ed titik tengah", nom(tengah), "biru"), H("Darjah (titik tengah)", jenis)],
+        langkah: [
+          "Kaedah biasa = (" + nom(x.q1) + " − " + nom(x.q0) + ")/" + nom(x.q0) + " × " + nom(x.p0) + "/(" + nom(x.p1) + " − " + nom(x.p0) + ") = <b>" + nom(biasa) + "</b>",
+          "Titik tengah = (" + nom(x.q1) + " − " + nom(x.q0) + ")/½(" + nom(x.q0) + " + " + nom(x.q1) + ") × ½(" + nom(x.p0) + " + " + nom(x.p1) + ")/(" + nom(x.p1) + " − " + nom(x.p0) + ") = <b>" + nom(tengah) + "</b>"
+        ],
+        nota: "Kaedah biasa memberi nilai berbeza bagi harga naik dan harga turun dalam julat yang sama; kaedah titik tengah memberi nilai yang sama."
+      };
+    }
+  });
+
+  /* =========================================================
+     MATRIKULASI AE015 · BAB 4 · Teori Perlakuan Pengguna
+     ========================================================= */
+  tambah({
+    id: "matrik-utiliti",
+    bab: "m1-b4",
+    no: "4.2.1(c)",
+    tajuk: "Semak keseimbangan pengguna dua barang",
+    kunci: "utiliti sut mu keseimbangan pengguna mux px muy py pendapatan kardinal",
+    rumus: [frac("MUx", "Px") + " = " + frac("MUy", "Py"), "Px·X + Py·Y = I"],
+    petunjuk: "Masukkan MU unit terakhir bagi setiap barang pada kombinasi yang disemak.",
+    medan: [
+      { k: "mux", l: "MUx unit terakhir (util)" },
+      { k: "px", l: "Harga X, Px (RM)" },
+      { k: "x", l: "Kuantiti X" },
+      { k: "muy", l: "MUy unit terakhir (util)" },
+      { k: "py", l: "Harga Y, Py (RM)" },
+      { k: "y", l: "Kuantiti Y" },
+      { k: "i", l: "Pendapatan, I (RM)" }
+    ],
+    contoh: [
+      { n: "3X + 5Y (modul)", v: { mux: 18, px: 3, x: 3, muy: 12, py: 2, y: 5, i: 19 } },
+      { n: "4X + 6Y (modul)", v: { mux: 12, px: 3, x: 4, muy: 8, py: 2, y: 6, i: 19 } },
+      { n: "4X + 5Y harga sama (modul)", v: { mux: 12, px: 5, x: 4, muy: 12, py: 5, y: 5, i: 45 } }
+    ],
+    kira: function (x) {
+      if (x.px <= 0 || x.py <= 0) return { ralat: "Harga mesti lebih daripada sifar." };
+      var rx = x.mux / x.px,
+        ry = x.muy / x.py,
+        belanja = x.px * x.x + x.py * x.y;
+      var syarat1 = sama(E.bundar(rx, 6), E.bundar(ry, 6)),
+        syarat2 = sama(belanja, x.i);
+      var out = {
+        hasil: [
+          H("MUx/Px", nom(rx)),
+          H("MUy/Py", nom(ry)),
+          H("Jumlah belanja", wang(belanja)),
+          H("Keputusan", syarat1 && syarat2 ? "Keseimbangan" : "Bukan keseimbangan", syarat1 && syarat2 ? "baik" : "amaran")
+        ],
+        langkah: [
+          "MUx/Px = " + nom(x.mux) + " ÷ " + nom(x.px) + " = " + nom(rx) + "; MUy/Py = " + nom(x.muy) + " ÷ " + nom(x.py) + " = " + nom(ry) + (syarat1 ? " → <b>sama</b>" : " → tidak sama"),
+          "Belanja = " + nom(x.px) + "(" + nom(x.x, 0) + ") + " + nom(x.py) + "(" + nom(x.y, 0) + ") = " + wang(belanja) + (syarat2 ? " = pendapatan" : " ≠ pendapatan " + wang(x.i))
+        ]
+      };
+      if (!syarat1) out.nota = rx > ry ? "MUx/Px > MUy/Py: tambah X dan kurangkan Y." : "MUx/Px < MUy/Py: kurangkan X dan tambah Y.";
+      else if (!syarat2) out.nota = belanja < x.i ? "Syarat utiliti dipenuhi tetapi pendapatan belum habis dibelanjakan." : "Kombinasi ini melebihi pendapatan.";
+      return out;
+    }
+  });
+
+  /* =========================================================
+     MATRIKULASI AE015 · BAB 5 · Teori Kos
+     ========================================================= */
+  tambah({
+    id: "matrik-kos-implisit",
+    bab: "m1-b5",
+    no: "5.2.1(a)",
+    tajuk: "Kos eksplisit dan kos implisit",
+    kunci: "kos eksplisit implisit tersembunyi nyata kos lepas gaji sewa bunga modal sendiri",
+    rumus: ["Kos implisit = gaji dilepaskan + (kadar bunga × modal sendiri) + sewa dilepaskan", "Jumlah kos = kos eksplisit + kos implisit"],
+    petunjuk: "Contoh modul: perniagaan Justin (sewa premis RM1 400 sebulan × 12).",
+    medan: [
+      { k: "eks", l: "Jumlah kos eksplisit (RM)" },
+      { k: "gaji", l: "Gaji setahun yang dilepaskan (RM)" },
+      { k: "modal", l: "Modal sendiri (RM)" },
+      { k: "r", l: "Kadar bunga (%)" },
+      { k: "sewa", l: "Sewa sebulan yang dilepaskan (RM)" }
+    ],
+    contoh: [{ n: "Justin (modul)", v: { eks: 65000, gaji: 30000, modal: 50000, r: 7, sewa: 1400 } }],
+    kira: function (x) {
+      var bunga = (x.r / 100) * x.modal,
+        sewa = x.sewa * 12,
+        imp = x.gaji + bunga + sewa;
+      return {
+        hasil: [H("Kos implisit", wang(imp)), H("Kos eksplisit", wang(x.eks)), H("Jumlah kos", wang(x.eks + imp), "biru")],
+        langkah: [
+          "Bunga dilepaskan = " + nom(x.r) + "% × " + wang(x.modal) + " = " + wang(bunga),
+          "Sewa dilepaskan = " + wang(x.sewa) + " × 12 = " + wang(sewa),
+          "Kos implisit = " + wang(x.gaji) + " + " + wang(bunga) + " + " + wang(sewa) + " = <b>" + wang(imp) + "</b>",
+          "Jumlah kos = " + wang(x.eks) + " + " + wang(imp) + " = <b>" + wang(x.eks + imp) + "</b>"
+        ]
+      };
+    }
+  });
+
+  /* =========================================================
+     MATRIKULASI AE015 · BAB 6 · Struktur Pasaran
+     ========================================================= */
+  tambah({
+    id: "matrik-monopoli",
+    bab: "m1-b6",
+    no: "6.3.4",
+    tajuk: "Keseimbangan monopoli: MR = MC",
+    kunci: "monopoli mr mc keseimbangan untung maksimum ar permintaan linear",
+    rumus: ["AR = P = a − bQ &nbsp; MR = a − 2bQ", "MC = c + dQ &nbsp; MR = MC → Q = " + frac("a − c", "2b + d")],
+    medan: [
+      { k: "a", l: "Pemalar permintaan a (P = a − bQ)" },
+      { k: "b", l: "Kecerunan b" },
+      { k: "c", l: "Pemalar kos sut c (MC = c + dQ)" },
+      { k: "d", l: "Kecerunan kos sut d" }
+    ],
+    contoh: [{ n: "P = 93 − 5Q, MC = 5 + 12Q (modul)", v: { a: 93, b: 5, c: 5, d: 12 } }],
+    kira: function (x) {
+      if (x.b <= 0) return { ralat: "Kecerunan permintaan b mesti positif." };
+      if (2 * x.b + x.d === 0) return { ralat: "2b + d tidak boleh sifar." };
+      var q = (x.a - x.c) / (2 * x.b + x.d),
+        p = x.a - x.b * q,
+        mr = x.a - 2 * x.b * q;
+      if (q <= 0) return { ralat: "Tiada keluaran positif: a mesti melebihi c." };
+      return {
+        hasil: [H("Keluaran Q", nom(q) + " unit"), H("Harga P", wang(p), "biru"), H("MR = MC", wang(mr)), H("Jumlah hasil TR", wang(p * q))],
+        langkah: [
+          "MR = " + nom(x.a) + " − " + nom(2 * x.b) + "Q",
+          nom(x.a) + " − " + nom(2 * x.b) + "Q = " + nom(x.c) + " + " + nom(x.d) + "Q → " + nom(2 * x.b + x.d) + "Q = " + nom(x.a - x.c),
+          "Q = " + nom(x.a - x.c) + " ÷ " + nom(2 * x.b + x.d) + " = <b>" + nom(q) + " unit</b>",
+          "P = " + nom(x.a) + " − " + nom(x.b) + "(" + nom(q) + ") = <b>" + wang(p) + "</b>"
+        ],
+        nota: "Harga monopoli (P) lebih tinggi daripada MC pada keseimbangan, maka kecekapan peruntukan tidak tercapai."
+      };
+    }
+  });
+
+  /* =========================================================
      ENJIN PAPARAN
      ========================================================= */
   var ikutId = {};
@@ -2641,7 +2806,7 @@
     var html =
       '<div class="bekas pandangan halaman-kalk">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><span>Kalkulator</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kalkulator Ekonomi</h1><p>Semua rumus dan pengiraan dalam silibus Ekonomi Tingkatan 4 dan 5' + (E.babPeringkat("stpm").length ? " serta STPM" : "") + '. Tukar nilai, jawapan dan jalan kira dikemas kini serta-merta. Nilai awal ialah contoh daripada buku teks.</p></div></div>' +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Kalkulator Ekonomi</h1><p>Semua rumus dan pengiraan dalam silibus Ekonomi Tingkatan 4 dan 5' + (E.babPeringkat("stpm").length ? (E.babPeringkat("matrik").length ? ", STPM" : " serta STPM") : "") + (E.babPeringkat("matrik").length ? " serta Matrikulasi" : "") + '. Tukar nilai, jawapan dan jalan kira dikemas kini serta-merta. Nilai awal ialah contoh daripada buku teks.</p></div></div>' +
       '<div class="penapis kaca kalk-penapis">' +
       '<div class="baris"><b>Pilih</b>' +
       '<button type="button" class="cip" data-tapis="semua">Semua</button>' +
