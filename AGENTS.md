@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive SPM Economics (KSSM Form 4 and 5) study site. It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google or email sign-in with an allowlist.
+Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5) and STPM (Ekonomi 944, Penggal 1–3). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google or email sign-in with an allowlist.
 
 Claude Code loads this file through [CLAUDE.md](CLAUDE.md), which adds a few Claude-specific notes.
 
@@ -13,9 +13,10 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 **Always**
 - Keep the content app **build-free and dependency-free**. It must still work by opening `index.html` directly or with `python3 -m http.server`.
 - Write student-facing text in **Bahasa Melayu** using textbook terminology. Identifiers, CSS classes and code comments are also Malay; follow the existing names (glossary in §9).
-- Stay **faithful to the textbooks**: subtopic numbers, definitions, data and figures. Label anything not from the textbook or official scheme as *cadangan*.
+- Stay **faithful to the textbooks** (SPM) and the owner's source modules (STPM): subtopic numbers, definitions, data and figures. Label anything not from the source as *cadangan* or *nilai contoh*. When a source contains a numeric error, correct it and flag it in a `kotak info` titled "Nota semakan".
 - Use design tokens (`var(--…)`) for every colour. Give every new token a light value **and both** dark-mode blocks.
 - Stack related graphs **vertically**. Never put graphs side by side (the owner asked for this explicitly).
+- Show every curve **in full**: each curve ends at an axis intercept or at a clear end point inside the plot, with its label visible. No curve may run into the top or right frame, and no label or tick may be clipped at 390 px (owner request).
 - Format numbers with `EKO.fmt` / `EKO.rm` (space thousands separator, `.` decimal, `−` minus).
 - Escape plain-text values inserted into HTML with `EKO.esc`.
 - Verify your change (§4) before committing, including dark mode and a 360–390 px viewport.
@@ -26,7 +27,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 - Weaken token checks in `lib/token-firebase.js`: algorithm pin, `kid`, `aud`/`iss`/`exp`/`iat`/`auth_time`, and `email_verified` in `api/sesi.js`.
 - Deploy source PDFs or the hidden Terengganu paper. Keep `.vercelignore` as it is unless the owner asks.
 - Add npm dependencies to browser code, a bundler, a framework or a CSS library.
-- Push directly to `main`. `main` auto-deploys to production (§6).
+- Push directly to `main`. Changes go through a feature branch and a PR; `main` auto-deploys to production (§6).
 - Rename existing `localStorage` keys or ids (`t4-b1`, `kel25`, card and quiz ids). Students' saved progress depends on them.
 
 ---
@@ -132,7 +133,8 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | --- | --- |
 | **Fix or extend notes** | Edit the chapter's `assets/js/data/tX-babN.js` → verify the section renders → check the quiz and flashcard counts still load |
 | **Add a chapter** | New data file with `EKO.daftarBab` → add `<script src="assets/js/data/…" defer>` to `index.html` **before `app.js`** → pick a `--bab-rm*` colour → update counts in README and PRD |
-| **Add a graph** | In `graf-t4.js` / `graf-t5.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
+| **Add an STPM chapter** | File `assets/js/data/stpm-p<penggal>-bab<no>.js` with `peringkat: "stpm"`, `tingkatan: <penggal>`, id `stpm-p<penggal>-b<no>` and `kuiz: []` (no STPM quizzes for now). Add the script tag after the other STPM chapters. Labels, groups (`p1`–`p3`), the graph-lab chooser and the calculator filters update automatically. STPM-only graphs go in `graf-stpm.js` |
+| **Add a graph** | In `graf-t4.js` / `graf-t5.js` / `graf-stpm.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
 | **Add or fix a calculator** | In `assets/js/kalkulator.js`, add `tambah({ id, bab, no, tajuk, kunci, rumus[], medan[], contoh[], kira })` under the chapter's heading (ARCHITECTURE §3.5). Use the textbook's worked example as the first `contoh` and check the answer matches the notes. `kira` must be pure and return `ralat` instead of dividing by zero. Run the Node check in §4 |
 | **Add a trial paper** | New `assets/js/data/percubaan-<state>-<year>.js`: `EKO.daftarSet` for K1 (tag each question with `bab`) and `EKO.daftarK2` for K2 (unique `id`, and **no** `kunciLama`). Add the script tag. Home, Percubaan and Kuiz update automatically. Check every K1 answer against the scheme PDF |
 | **Pictures from a paper** | Crop each figure from the PDF with PyMuPDF at 200 dpi (`page.get_pixmap(dpi=200, clip=rect)`), trim white margins, save as WebP in `assets/img/percubaan/<paper>/`. Reference it with `gambar: { src, alt, w, h, kapsyen }` (w and h in pixels), put question text that comes after the figure in `s2`, and use `EKO.gambar(g, true)` for images inside answer options. Always write a meaningful `alt` |
@@ -148,6 +150,12 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 ## 6. Git and deployment
 
 - Work on a feature branch and open a PR into `main`. **Merging to `main` deploys to production** on the Vercel project `econwebsite` (`econwebsite.vercel.app`), the only domain authorised in Firebase.
+- **Auto-merge (standing permission from the owner).** When every issue is settled, the agent merges the PR itself as soon as every check passes, then tells the owner exactly **"SAYA DAH MERGE KE MAIN"**. Merge only when all of these hold:
+  1. The checks in §4 pass (syntax, content integrity, browser check at 390 px and desktop in light and dark mode, no console errors, no horizontal scroll).
+  2. The PR has no merge conflict, and the Vercel preview status on the PR head is **success**.
+  3. The change is not one of the exceptions in §8 (access control, publishing exam material, deleting projects or data). Those still need the owner's explicit yes.
+
+  After merging, confirm the Vercel production deployment for the merge commit is **Ready**, then report. If the base branch moved, merge `main` into the branch and re-run the checks first. If the preview build fails, do not merge; fix it or report it.
 - Preview deployments (branches) sit behind Vercel SSO, and Google sign-in does not work on preview domains because they are not authorised in Firebase.
 - Env var changes apply only to **new** deployments, so redeploy after editing.
 - Commit messages and PR titles are in Malay, in the imperative ("Tambah…", "Betulkan…", "Tulis semula…"). Put a short summary on the first line and bullets for details.
@@ -169,7 +177,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 
 ## 8. Working with the owner
 
-The owner is an Economics teacher, not a full-time developer. Communicate in casual Bahasa Melayu with English technical terms. Explain steps in terms of the UI they will click (Vercel dashboard, Firebase console). Ask before anything that changes who can access the site, publishes exam material, or deletes projects or data.
+The owner is an Economics teacher, not a full-time developer. Communicate in casual Bahasa Melayu with English technical terms. Explain steps in terms of the UI they will click (Vercel dashboard, Firebase console). Ask before anything that changes who can access the site, publishes exam material, or deletes projects or data. Everything else is merged to `main` automatically once it passes the checks (§6), followed by the message "SAYA DAH MERGE KE MAIN".
 
 ---
 
@@ -179,7 +187,8 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | --- | --- |
 | `EKO` / `E` | Global app namespace (`window.EKO`) |
 | `G` / `EKO.graf` | Graph engine |
-| `bab`, `tingkatan`, `no`, `tajuk`, `ringkas` | chapter, form (4/5), number, title, summary |
+| `bab`, `tingkatan`, `no`, `tajuk`, `ringkas` | chapter, form (4/5) or STPM term (1–3), number, title, summary |
+| `peringkat`, `penggal`, `kumpulan` | level (`spm`/`stpm`), STPM term, chapter group (`t4`, `t5`, `p1`–`p3`) |
 | `seksyen`, `soalan`, `html` | section, guiding questions, note markup |
 | `kad` `{d, b, t}` | flashcard: front (*depan*), back (*belakang*), subtopic tag |
 | `kuiz` `{s, p, j, e}` | question: stem (*soalan*), options (*pilihan*), answer index (*jawapan*), explanation (*penerangan*) |

@@ -2,11 +2,11 @@
 
 | | |
 | --- | --- |
-| **Product** | Econ Tutor: interactive SPM Economics (KSSM) study site |
+| **Product** | Econ Tutor: interactive SPM Economics (KSSM) and STPM Economics (944) study site |
 | **Owner** | Economics teacher (repo owner, GitHub `AidilFarhan`) |
-| **Audience** | The owner's Form 4 and Form 5 Economics students |
+| **Audience** | The owner's Form 4 and Form 5 Economics students, and STPM (Form 6) Economics students |
 | **Status** | v1 live at `econwebsite.vercel.app` (sign-in required) |
-| **Last updated** | 26 September 2026 |
+| **Last updated** | 29 September 2026 |
 
 Related: [ARCHITECTURE.md](ARCHITECTURE.md) · [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) · [AGENTS.md](AGENTS.md)
 
@@ -47,7 +47,8 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 | --- | --- | --- |
 | **Form 4 student** | First exposure to economics; phone-first; studies in short bursts | Clear notes, "see it move" graphs, quick recall drills |
 | **Form 5 student (SPM candidate)** | Revising all chapters; practising papers before SPM | Chapter and mixed quizzes, trial papers with schemes, knowing what is left to revise |
-| **Teacher (owner/admin)** | Curates content, controls access, low time for tooling | Faithful content, simple access list, deploys by merging to `main`, no maintenance burden |
+| **STPM student** | Form 6, preparing for STPM Ekonomi 944 across three terms | Complete notes per penggal, interactive graphs, flashcards, calculators for STPM formulas |
+| **Teacher (owner/admin)** | Curates content, controls access, low time for tooling | Faithful content, simple access list, changes go live without manual merging, no maintenance burden |
 
 ## 4. User stories
 
@@ -71,7 +72,8 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 
 ### 5.1 Notes: ✅
-- **FR-1** Six chapters: T4 Bab 1–4 and T5 Bab 1–2. Subtopics are numbered as in the textbook (e.g. 1.3.4).
+- **FR-1** Six SPM chapters: T4 Bab 1–4 and T5 Bab 1–2. Subtopics are numbered as in the textbook (e.g. 1.3.4).
+- **FR-1a** Sixteen STPM chapters (Ekonomi 944): Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6, written from the owner's modules. Numeric errors in a module are corrected and flagged with a "Nota semakan" box. STPM chapters have notes and flashcards; STPM quizzes are not included for now.
 - **FR-2** Each chapter shows guiding questions, definitions, formulas, worked calculations, tables, examples and exam tips as styled callouts.
 - **FR-3** A sticky table of contents highlights the current section. "Tandakan selesai dibaca" records completion, and there is a link to the next chapter.
 - **FR-4** Data, examples and exercises follow the textbook. The T5 notes include the textbook's *Latihan Sumatif*. Teacher notes are used as reference only.
@@ -82,7 +84,8 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - No page scrolls horizontally at 360 px.
 
 ### 5.2 Interactive graphs: ✅
-- **FR-5** 36 graphs are embedded in the notes (31 widget types), and a *Makmal graf* page lists them all by chapter.
+- **FR-5** 65 graphs are embedded in the notes (36 SPM, 29 STPM; 36 widget types). The *Makmal graf* page first asks the user to choose Tingkatan 4, Tingkatan 5 or STPM, then lists that level's graphs by chapter.
+- **FR-5a** Every curve is shown in full: it ends at an axis intercept or a clear end point inside the plot, with its label visible, and never runs into the frame.
 - **FR-6** Curves, price lines and nodes can be dragged with mouse, touch or keyboard.
 - **FR-7** Each graph has a live reading panel with values and a one-to-two-sentence explanation that includes the calculation.
 - **FR-8** Market graphs cover individual and market demand/supply, equilibrium, price controls, elasticity, taxes and subsidies. In the market demand/supply graphs, each individual curve can be dragged independently.
@@ -107,11 +110,11 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - Graphs are usable with a finger on a 360 px screen and by keyboard.
 
 ### 5.3 Flashcards: ✅
-- **FR-12** 263 cards. Filter by all, Form 4, Form 5 or a chapter, and search.
+- **FR-12** 549 cards (263 SPM, 286 STPM). Filter by all, Form 4, Form 5, STPM Penggal 1–3 or a chapter, and search.
 - **FR-13** Cards flip on tap or `Space`. Keys `1` ("Ulang lagi") and `2` ("Dah ingat") mark a card, and `←`/`→` navigate. The "dah ingat" state is saved.
 
 ### 5.4 Quizzes: ✅
-- **FR-14** 178 chapter questions. Each chapter quiz also includes trial-paper questions tagged to that chapter.
+- **FR-14** 178 chapter questions (SPM only). Each chapter quiz also includes trial-paper questions tagged to that chapter.
 - **FR-15** Mixed sets: Form 4 (20 questions), Form 5 (20) and Form 4 + 5 (25), drawn at random.
 - **FR-16** Options are shuffled, except numbered or I/II/III combinations. The quiz shows an instant right/wrong result with an explanation, a timer, a score and a review screen. The best score is saved per set.
 
@@ -142,7 +145,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-31** A session lasts 12 hours and renews silently while the Firebase sign-in is still valid. Removing an email blocks that user after the next redeploy.
 
 ### 5.8 Teacher operations: ✅
-- **FR-32** Deploy by merging to `main` (Vercel auto-deploys).
+- **FR-32** Deploy by merging to `main` (Vercel auto-deploys). The AI agent merges its own PRs as soon as all checks pass and tells the teacher "SAYA DAH MERGE KE MAIN"; changes to access, exam material or deletions still wait for the teacher.
 - **FR-33** Manage access by editing `EMAIL_DIBENARKAN` in Vercel, then redeploying.
 - **FR-34** Add or correct content by editing one data file (documented in the README and AGENTS.md).
 
@@ -183,9 +186,11 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 | T4 Bab 4 · Pengeluaran | 2 | 28 | 22 | 4 |
 | T5 Bab 1 · Ekonomi dan Kerajaan | 3 | 71 | 42 | 11 |
 | T5 Bab 2 · Malaysia dan Ekonomi Global | 4 | 64 | 45 | 5 |
-| **Total** | **16** | **263** | **178** | **36** |
+| **Total SPM** | **16** | **263** | **178** | **36** |
 
-Calculators: 39 (T4 Bab 1: 1 · Bab 2: 7 · Bab 3: 7 · Bab 4: 6 · T5 Bab 1: 13 · Bab 2: 5).
+STPM (Ekonomi 944): 16 chapters (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6), 286 flashcards, 0 quiz questions, 29 graphs.
+
+Calculators: 48 (SPM 39: T4 Bab 1: 1 · Bab 2: 7 · Bab 3: 7 · Bab 4: 6 · T5 Bab 1: 13 · Bab 2: 5; STPM 9).
 
 Trial papers:
 - **Kelantan 2025** (live): K1 40 MCQs and K2 7 questions.
@@ -219,12 +224,17 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-26 | Trial papers Seberang Perai 2025 and Perak 2024 with images from the original papers |
 | 2026-09-26 | Home title "Buku Teks Ekonomi Interaktif"; Kalkulator Ekonomi tab with 39 calculators |
 | 2026-09-26 | Home title renamed to "Nota Ekonomi Interaktif" (matches the promo video) |
+| 2026-09-29 | STPM level added; graph lab asks for Tingkatan 4, Tingkatan 5 or STPM first (PR #13) |
+| 2026-09-29 | All 16 STPM chapters, 4 new STPM graphs and 9 STPM calculators (PR #14) |
+| 2026-09-29 | STPM graphs show every curve in full (PR #15); agent auto-merges when checks pass |
 
 ## 10. Roadmap and open questions
 
 | Priority | Item | Notes |
 | --- | --- | --- |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
+| Medium | STPM quizzes | Deferred by the owner; module practice questions are available as a source |
+| Medium | Block account sharing (one email, one device at a time) | Owner wants this later; needs server-side session storage |
 | Medium | Self-service allowlist page for the teacher | Avoids editing env vars and redeploying |
 | Medium | Progress sync and teacher dashboard | Firestore in the existing Firebase project, keyed by verified email; needs a privacy note for students |
 | Medium | More trial papers | Existing format supports this with no code changes |
