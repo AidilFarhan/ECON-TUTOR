@@ -136,8 +136,8 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Add a chapter** | New data file with `EKO.daftarBab` → add `<script src="assets/js/data/…" defer>` to `index.html` **before `app.js`** → pick a `--bab-rm*` colour → update counts in README and PRD |
 | **Add an STPM chapter** | File `assets/js/data/stpm-p<penggal>-bab<no>.js` with `peringkat: "stpm"`, `tingkatan: <penggal>`, id `stpm-p<penggal>-b<no>` and `kuiz: []` (no STPM quizzes for now). Add the script tag after the other STPM chapters. Labels, groups (`p1`–`p3`), the graph-lab chooser and the calculator filters update automatically. STPM-only graphs go in `graf-stpm.js` |
 | **Add a Matrikulasi chapter** | File `assets/js/data/matrik-ae015-bab<no>.js` (Semester 1) or `matrik-ae025-bab<no>.js` (Semester 2) with `peringkat: "matrik"`, `tingkatan: <semester>` (1 = AE015, 2 = AE025), id `m<semester>-b<no>` and `kuiz: []`. Add the script tag after the other Matrikulasi chapters. Plot data tables from the slides with `<figure data-graf="carta-jadual" data-opt='{…}'>` (see the comment in `graf-matrik.js`); inside `data-opt`, write `<` and `>` as `&lt;` and `&gt;` so the graph lab can collect the figure |
-| **Add a graph** | In `graf-t4.js` / `graf-t5.js` / `graf-stpm.js` / `graf-matrik.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
-| **Add or fix a calculator** | In `assets/js/kalkulator.js`, add `tambah({ id, bab, no, tajuk, kunci, rumus[], medan[], contoh[], kira })` under the chapter's heading (ARCHITECTURE §3.5). Use the textbook's worked example as the first `contoh` and check the answer matches the notes. `kira` must be pure and return `ralat` instead of dividing by zero. Run the Node check in §4 |
+| **Add a graph** | In `graf-t4.js` / `graf-t5.js` / `graf-stpm.js` / `graf-matrik.js`: `G.daftar("name", function (host, opt) { var K = G.kad(host, {tajuk, petunjuk}); … return { musnah: … }; }, { tajuk, bab })`. Follow DESIGN_SYSTEM §10 (axes, colours, reading panel, smooth 0.01 motion rather than node-by-node steps). Embed it with `<figure data-graf="name" data-opt='{…}'></figure>` |
+| **Add or fix a calculator** | In `assets/js/kalkulator.js`, add `tambah({ id, bab, no, tajuk, kunci, rumus[], medan[], contoh[], kira })` under the chapter's heading (ARCHITECTURE §3.5). Use the textbook's worked example as the first `contoh` and check the answer matches the notes. `kira` must be pure and return `ralat` instead of dividing by zero. Start every `langkah` entry with `ay("…")`, a sentence in economic terms that names each quantity (for a division, say which is the *pengangka* and which the *penyebut*), then the numeric line. Run the Node check in §4 |
 | **Add a trial paper** | New `assets/js/data/percubaan-<state>-<year>.js`: `EKO.daftarSet` for K1 (tag each question with `bab`) and `EKO.daftarK2` for K2 (unique `id`, and **no** `kunciLama`). Add the script tag. Home, Percubaan and Kuiz update automatically. Check every K1 answer against the scheme PDF |
 | **Pictures from a paper** | Crop each figure from the PDF with PyMuPDF at 200 dpi (`page.get_pixmap(dpi=200, clip=rect)`), trim white margins, save as WebP in `assets/img/percubaan/<paper>/`. Reference it with `gambar: { src, alt, w, h, kapsyen }` (w and h in pixels), put question text that comes after the figure in `s2`, and use `EKO.gambar(g, true)` for images inside answer options. Always write a meaningful `alt` |
 | **Show the Terengganu paper** | Only when the owner confirms permission: (1) add its script tag after the Kelantan one; (2) remove its line from `.vercelignore`; (3) update the footer and meta description in `index.html` |
@@ -173,7 +173,22 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 - [ ] Graphs: draggable by pointer and keyboard, reading panel correct, stacked vertically
 - [ ] No new public paths in `middleware.js`; no secrets in the diff
 - [ ] Saved-progress ids and keys unchanged (or migrated)
-- [ ] README, PRD counts or ARCHITECTURE updated if behaviour or structure changed
+- [ ] Every doc in the table below that mentions what you changed is updated in the same commit (check first; leave docs that are already correct alone)
+
+### Keeping the docs aligned
+
+The same facts appear in several files. When one changes, update every place listed here. Get counts from code, not memory: run the §4 content script (chapters, cards, quiz questions, calculators), count `data-graf="` in the notes for graphs, and count `G.daftar(` in `graf*.js` for widget types.
+
+| Fact | Where it appears |
+| --- | --- |
+| Counts: chapters, flashcards, quiz questions, graphs (with SPM/STPM/Matrikulasi split), widget types, calculators | README "Kandungan" table and file list · PRD §5.2, §5.3, §5.4, §5.9 and §7 · ARCHITECTURE §2 (`kalkulator.js` line), §3.4 (widgets per file) and §3.6 "Current volume" · DESIGN_SYSTEM §9.5a (cards on one page) and §10 (widget count) |
+| Levels and chapters (SPM, STPM, Matrikulasi, Ijazah) | README intro and "Kandungan" · PRD header, §3 personas, §5.1 · ARCHITECTURE intro, §3.3 routes, §3.6 · AGENTS intro, §5 recipes, §9 glossary |
+| Routes (`#nota-…`, `#graf-…`, `#kad-…`, `#kalkulator-…`) | ARCHITECTURE §3.3 · README file list (`app.js` line) · PRD FR-1c, FR-39 |
+| Graph behaviour (smooth motion, reset buttons, KKP cases) | DESIGN_SYSTEM §10 · ARCHITECTURE §3.4 · PRD §5.2 · README "Graf interaktif" |
+| Calculator behaviour (steps as sentences, list per level) | ARCHITECTURE §3.5 · DESIGN_SYSTEM §9.5a · PRD FR-35, FR-36 · README "Kalkulator Ekonomi" and "Menambah kalkulator" |
+| Header, home and login look (brand, hero, level buttons) | DESIGN_SYSTEM §9.1, §9.6 · PRD FR-1c |
+| Trial papers (live or hidden) | README "Kertas percubaan" and Terengganu section · PRD §5.5 and §7 · ARCHITECTURE §2, §3.6 · `index.html` meta description and footer |
+| Every release | PRD §9 release history (one row per shipped change) |
 
 ---
 
@@ -199,6 +214,8 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | `papar`, `pergi`, `laluan`, `bersih` | render, navigate, current route, tear down |
 | `pUtama`, `pNota`, `pBab`, `pGraf`, `pKad`, `pKuizSenarai`, `pKuizMula`, `pPercubaan`, `pK2` | view functions (home, notes list, chapter, graph lab, flashcards, quiz list, quiz run, trial papers, Kertas 2) |
 | `kalkulator`, `tambah`, `rumus`, `medan`, `contoh`, `kira`, `hasil`, `langkah`, `jalan kira` | calculator, register, formula, input field, worked example, compute, answer boxes, steps, worked solution |
+| `ay`, `pengangka`, `penyebut` | economic-sentence line at the start of a worked step, numerator, denominator |
+| `KES_KKP`, `PUNCA`, `Situasi asal` | PPC-shift cases, cause templates (increase and reversed decrease), reset-to-original button |
 | `pasang` / `tanggal` / `musnah` | mount graphs / unmount all / destroy one widget |
 | `plot`, `lapis`, `paksi`, `keluk`, `nod`, `pegang`/`seret`, `panduan`, `cip` | plot, layers, axis, curve, node, handle/drag, guide line, chip |
 | `baca`/`bacaan`, `julat`, `pilih`, `butang`, `legenda`, `carta`, `selanjar` | reading panel, slider, segmented control, button, legend, series chart, continuous tracker |

@@ -2,9 +2,9 @@
 
 | | |
 | --- | --- |
-| **Product** | Econ Tutor: interactive SPM Economics (KSSM) and STPM Economics (944) study site |
+| **Product** | Econ Tutor: interactive SPM Economics (KSSM), STPM Economics (944) and Matrikulasi Economics (AE015, AE025) study site |
 | **Owner** | Economics teacher (repo owner, GitHub `AidilFarhan`) |
-| **Audience** | The owner's Form 4 and Form 5 Economics students, and STPM (Form 6) Economics students |
+| **Audience** | The owner's Form 4 and Form 5 Economics students, STPM (Form 6) Economics students and Matrikulasi (Semester 1–2) Economics students |
 | **Status** | v1 live at `econwebsite.vercel.app` (sign-in required) |
 | **Last updated** | 29 September 2026 |
 
@@ -25,7 +25,7 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 ## 2. Goals and non-goals
 
 ### Goals
-1. Cover **every chapter** of the Form 4 and Form 5 textbooks with complete notes in textbook order and wording.
+1. Cover **every chapter** of the Form 4 and Form 5 textbooks with complete notes in textbook order and wording, plus the STPM 944 and Matrikulasi AE015/AE025 syllabi from the owner's modules and slides.
 2. Make every important diagram **interactive**. Students drag curves, price lines and nodes, and immediately see values and reasoning.
 3. Support **active recall**: flashcards and quizzes per chapter and per form, with explanations.
 4. Let students **practise every syllabus calculation** with a calculator that shows the formula, the answer and the worked steps.
@@ -48,6 +48,7 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 | **Form 4 student** | First exposure to economics; phone-first; studies in short bursts | Clear notes, "see it move" graphs, quick recall drills |
 | **Form 5 student (SPM candidate)** | Revising all chapters; practising papers before SPM | Chapter and mixed quizzes, trial papers with schemes, knowing what is left to revise |
 | **STPM student** | Form 6, preparing for STPM Ekonomi 944 across three terms | Complete notes per penggal, interactive graphs, flashcards, calculators for STPM formulas |
+| **Matrikulasi student** | Semester 1 (AE015 Mikroekonomi) or Semester 2 (AE025 Makroekonomi) | Notes that follow the lecture slides, graphs from the slide tables, flashcards, calculators for the course formulas |
 | **Teacher (owner/admin)** | Curates content, controls access, low time for tooling | Faithful content, simple access list, changes go live without manual merging, no maintenance burden |
 
 ## 4. User stories
@@ -89,8 +90,10 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-5** 103 graphs are embedded in the notes (36 SPM, 29 STPM, 38 Matrikulasi; 38 widget types). The *Makmal graf* page first asks the user to choose Tingkatan 4, Tingkatan 5, STPM or Matrikulasi, then lists that level's graphs by chapter.
 - **FR-5a** Every curve is shown in full: it ends at an axis intercept or a clear end point inside the plot, with its label visible, and never runs into the frame.
 - **FR-6** Curves, price lines and nodes can be dragged with mouse, touch or keyboard.
+- **FR-6a** Every curve and tracker moves smoothly (0.01-unit steps with decimal readings), not node by node. Series charts snap to a table row only when the pointer is within 5 px of it. Yearly data series (employment by sector, the Matrikulasi growth chart) still move one year at a time.
 - **FR-7** Each graph has a live reading panel with values and a one-to-two-sentence explanation that includes the calculation.
 - **FR-8** Market graphs cover individual and market demand/supply, equilibrium, price controls, elasticity, taxes and subsidies. In the market demand/supply graphs, each individual curve can be dragged independently.
+- **FR-8a** The STPM PPC-shift graph (`kkp-anjakan`) offers 8 cases: shift right, shift left, only Y or only X increases, only Y or only X decreases, and one good increases while the other decreases. For each cause (resource endowment, technology, capital-goods composition) the reading names the cause of an increase and, for a decrease, the reverse cause (for resources: depletion of minerals, fewer foreign workers, lower investment). A *Situasi asal* button resets the curve to the dashed original.
 - **FR-9** The short-run cost graph tracks continuously along the curves and shows decimal values. AC and AVC are derived as TC ÷ Q and VC ÷ Q, so decimal readings are consistent with the formula. A full Jadual 4.3 table is shown, and its rows are clickable.
 - **FR-10** Form 5 graphs cover:
   - price index
@@ -113,7 +116,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 
 ### 5.3 Flashcards: ✅
 - **FR-12** 799 cards (263 SPM, 286 STPM, 250 Matrikulasi). Filter by all, Form 4, Form 5, STPM Penggal 1–3, Matrikulasi Semester 1–2 or a chapter, and search.
-- **FR-13** Cards flip on tap or `Space`. Keys `1` ("Ulang lagi") and `2` ("Dah ingat") mark a card, and `←`/`→` navigate. The "dah ingat" state is saved.
+- **FR-13** Cards flip on tap or `Space`. The *Dah ingat* and *Ulang lagi* buttons, or keys `2` and `1`, mark a card and move straight to the next one; `←`/`→` navigate. The "dah ingat" state is saved.
 
 ### 5.4 Quizzes: ✅
 - **FR-14** 178 chapter questions (SPM only). Each chapter quiz also includes trial-paper questions tagged to that chapter.
@@ -152,13 +155,15 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-34** Add or correct content by editing one data file (documented in the README and AGENTS.md).
 
 ### 5.9 Economics calculator (Kalkulator Ekonomi): ✅
-- **FR-35** A **Kalkulator** tab (`#kalkulator`) holds 48 calculators covering every formula and calculation in the T4 and T5 syllabus, plus 9 for STPM, grouped by chapter:
+- **FR-35** A **Kalkulator** tab (`#kalkulator`) holds 56 calculators, grouped by chapter: 39 covering every formula and calculation in the T4 and T5 syllabus, 9 for STPM and 8 for Matrikulasi:
   - T4 Bab 1: opportunity cost on the PPC.
   - T4 Bab 2: market demand/supply, equilibrium and surpluses, Ed with total revenue, Es, finding Q₁ or P₁ from a given elasticity, tax burden, subsidy benefit.
   - T4 Bab 3: personal income, real wage, disposable income, taxable income and income tax (YA 2016 table in the textbook), personal budget, hire purchase instalment, savings and investment return.
   - T4 Bab 4: TP/AP/MP with production stages, short-run cost table (TC, VC, AFC, AVC, AC, MC), total revenue and profit, economic profit, productivity, social cost and benefit.
   - T5 Bab 1: price index, weighted and unweighted CPI, inflation rate, cost-push pricing, real income, unemployment rate and LFPR, GDP (expenditure), real GDP, growth rate, national budget balance, progressive/regressive/proportional tax, company tax, statutory reserve ratio.
   - T5 Bab 2: comparative advantage, specific and ad valorem tariffs, current account, currency conversion (buying/selling rates), effect of exchange-rate changes on exports and imports.
+  - STPM: opportunity cost on the PPC, equilibrium from linear functions with tax or subsidy, Ec/Ey, cost derivations (Q, AVC, TFC, TVC), GDP to GNP (KNK), AE–Y equilibrium with multiplier and gaps, credit creation, Fisher equation, openness of the economy.
+  - Matrikulasi: arc elasticity (ordinary and midpoint), consumer equilibrium with two goods, explicit and implicit cost, monopoly equilibrium (MR = MC), two- and three-sector equilibrium with multiplier and gaps, money supply M1/M2 and growth, money-value index, nominal terms of trade (KSP).
 - **FR-36** Each calculator shows the formula, live answers, numbered worked steps (*jalan kira*), each written first as an economic sentence (naming the numerator and denominator of every division) and then in numbers, and an interpretation. Invalid or missing input shows a clear message instead of a wrong number.
 - **FR-37** Initial values are the textbook's worked examples and reproduce the textbook answers. Some calculators offer several example chips.
 - **FR-38** Table calculators (market, equilibrium, TP/AP/MP, cost, CPI) allow editing cells and adding or removing rows; tapping a row shows that row's working.
@@ -168,7 +173,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 
 | Area | Requirement |
 | --- | --- |
-| Performance | No framework or build. Each page load fetches only static files: about 0.7 MB of uncompressed JS (mostly notes data and graph widgets) and 60 KB of CSS, plus a 36 KB gzipped auth SDK on the login page only. It should be interactive in under 2 s on a mid-range phone over 4G. |
+| Performance | No framework or build. Each page load fetches only static files: about 1.6 MB of uncompressed JS (mostly notes data and graph widgets) and 72 KB of CSS, plus a 36 KB gzipped auth SDK on the login page only. It should be interactive in under 2 s on a mid-range phone over 4G. |
 | Responsiveness | 360 px to desktop. Bottom navigation at 860 px and below. No horizontal scroll. |
 | Accessibility | Keyboard-operable graphs and flashcards, visible focus, `aria-live` readings, colour never the only cue, reduced-motion support (see DESIGN_SYSTEM §12). |
 | Offline / local | Opening `index.html` locally or with `python3 -m http.server` works without sign-in (for the teacher's own use and for development). |
@@ -193,7 +198,9 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 STPM (Ekonomi 944): 16 chapters (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6), 286 flashcards, 0 quiz questions, 29 graphs.
 Matrikulasi (AE015, AE025): 14 chapters (AE015 Bab 1–6, AE025 Bab 1–8), 250 flashcards, 0 quiz questions, 38 graphs, 8 calculators.
 
-Calculators: 48 (SPM 39: T4 Bab 1: 1 · Bab 2: 7 · Bab 3: 7 · Bab 4: 6 · T5 Bab 1: 13 · Bab 2: 5; STPM 9).
+Calculators: 56 (SPM 39: T4 Bab 1: 1 · Bab 2: 7 · Bab 3: 7 · Bab 4: 6 · T5 Bab 1: 13 · Bab 2: 5; STPM 9; Matrikulasi 8).
+
+All levels: 36 chapters, 799 flashcards, 178 quiz questions, 103 graphs in the notes (38 widget types), 56 calculators.
 
 Trial papers:
 - **Kelantan 2025** (live): K1 40 MCQs and K2 7 questions.
@@ -230,6 +237,9 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-29 | STPM level added; graph lab asks for Tingkatan 4, Tingkatan 5 or STPM first (PR #13) |
 | 2026-09-29 | All 16 STPM chapters, 4 new STPM graphs and 9 STPM calculators (PR #14) |
 | 2026-09-29 | STPM graphs show every curve in full (PR #15); agent auto-merges when checks pass |
+| 2026-09-29 | Matrikulasi level: AE015 Bab 1–6 and AE025 Bab 1–8 notes, 2 new graph widgets (`carta-jadual`, `lrac`) and 8 calculators |
+| 2026-09-29 | Home and Nota pages get level buttons (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi, Ijazah Sarjana Muda); "SPM" chip and hero eyebrow removed; home intro no longer lists the trial papers |
+| 2026-09-29 | PPC-shift graph with 8 cases and *Situasi asal*; all curves move smoothly; calculator steps written as economic sentences; *Dah ingat* button fixed |
 
 ## 10. Roadmap and open questions
 
@@ -237,6 +247,9 @@ Measuring these automatically needs the planned progress sync (§10).
 | --- | --- | --- |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
 | Medium | STPM quizzes | Deferred by the owner; module practice questions are available as a source |
+| Medium | Matrikulasi: replace *cadangan* sections (AE015 2.2–2.4, 6.5 Oligopoli) | Waiting for the owner to find the slides |
+| Medium | Matrikulasi quizzes | Kept empty for now by the owner's decision |
+| Low | Ijazah Sarjana Muda notes | The level button exists and shows "Akan datang" |
 | Medium | Block account sharing (one email, one device at a time) | Owner wants this later; needs server-side session storage |
 | Medium | Self-service allowlist page for the teacher | Avoids editing env vars and redeploying |
 | Medium | Progress sync and teacher dashboard | Firestore in the existing Firebase project, keyed by verified email; needs a privacy note for students |

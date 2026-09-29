@@ -73,7 +73,7 @@ assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 qu
 assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
 assets/js/data/percubaan-terengganu-2025.js   Same shape; not loaded and not deployed (hidden)
 assets/img/percubaan/<paper>/   Figures cropped from the original PDFs (WebP, 200 dpi)
-assets/js/kalkulator.js       EKO.kalkulator: 48 formula calculators with worked steps + the #kalkulator view
+assets/js/kalkulator.js       EKO.kalkulator: 56 formula calculators with worked steps + the #kalkulator view
 assets/js/app.js              Router + all views
 assets/js/akaun.js            Account button + sign-out in the header
 assets/js/masuk.js            Login page logic (ES module)
@@ -109,6 +109,9 @@ Every file is an IIFE that reads and extends `window.EKO`. No file uses `import`
 | `daftarK2(paper)`, `kertas2Ikut(id)` | Register and look up Kertas 2 papers (`E.kertas2Set`) |
 | `soalanBab(id)` | Chapter quiz = chapter questions + any trial-paper questions tagged `bab: id` |
 | `kadBab(id)`, `babTingkatan(t)` | Flashcards with stable ids; chapters of a form |
+| `kumpulan()`, `kunciKumpulan(b)`, `babKumpulan(k)`, `babPeringkat(p)` | Chapter groups (`t4`, `t5`, `p1`–`p3`, `m1`, `m2`) and chapters by group or level (`spm`, `stpm`, `matrik`) |
+| `labelKumpulan(b)`, `labelPendek(b)`, `labelBab(b)` | Display labels ("Matrikulasi Semester 1 · AE015", "AE015", "AE015 Bab 3") |
+| `gambar(g, sebaris?)` | Render a cropped question image (or an array of them); `sebaris` = inside an answer option |
 | `data()`, `kemas(fn)`, `setSemula()` | Safe `localStorage` read, mutate-and-save, reset |
 | `fmt`, `rm`, `peratus`, `bundar`, `clamp`, `lerp` | Number formatting in textbook style (`1 234.5`, `RM`, `−`) |
 | `esc`, `kocok`, `kurangGerak`, `toast`, `ikon`, `tandaJenama` | HTML escaping, shuffle, reduced-motion check, toast, SVG icons, brand mark |
@@ -119,14 +122,14 @@ Routing is **hash-based** (`location.hash`), so the site works from `file://`, a
 
 | Hash | View function | Notes |
 | --- | --- | --- |
-| `#utama` (default) | `pUtama` | Hero, progress, continue reading, tools |
+| `#utama` (default) | `pUtama` | Hero with level buttons (links to `#nota-<peringkat>`), progress, continue reading, tools |
 | `#nota`, `#nota-<peringkat>` | `pNota` | Chapter grid by group, with level buttons (`t4`, `t5`, `stpm`, `matrik`, `ijazah`) that filter the groups |
-| `#t4-b1` … `#t5-b2` | `pBab` | Chapter notes, sticky table of contents, "mark as read", next chapter |
-| `#kad`, `#kad-<filter>` | `pKad` | Flashcards; filter `semua`, `t4`, `t5` or a chapter id; search; keyboard `Space`/`1`/`2`/`←`/`→` |
+| `#t4-b1`, `#stpm-p1-b1`, `#m1-b1` … (any chapter id) | `pBab` | Chapter notes, sticky table of contents, "mark as read", next chapter |
+| `#kad`, `#kad-<filter>` | `pKad` | Flashcards; filter `semua`, a group key (`t4`, `t5`, `p1`–`p3`, `m1`, `m2`) or a chapter id; search; "Dah ingat" saves the card and moves to the next one; keyboard `Space`/`1`/`2`/`←`/`→` |
 | `#kuiz` | `pKuizSenarai` | Quiz picker with best scores |
 | `#kuiz-<id>` | `pKuizMula` | `id` = chapter id, `t4`, `t5`, `semua`, or a set id such as `kel25-k1`; timer, per-question explanation, review |
 | `#percubaan` | `pPercubaan` | One section per registered paper (K1 + K2 cards) |
-| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM); `<level>` = `t4`, `t5` or `stpm` mounts only that level's graphs |
+| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi); `<level>` = `t4`, `t5`, `stpm` or `matrik` mounts only that level's graphs |
 | `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = a group key (`t4`, `t5`, `p1`, `p2`, `p3`, `m1`, `m2`) or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
 | `#k2`, `#k2-<paperId>` | `pK2` | Kertas 2 with answer boxes, self-marking against the scheme, level rubrics |
 
@@ -148,7 +151,7 @@ flowchart TB
   D -->|G.tanggal on route change| X[cleanup]
 ```
 
-- **Registry.** `G.daftar(name, fn, {tajuk, bab})` registers a widget, and `G.info` holds metadata. 38 widgets are used in the notes: 6 in `graf.js`, 12 in `graf-t4.js`, 13 in `graf-t5.js`, 5 in `graf-stpm.js` and 2 in `graf-matrik.js` (`carta-jadual` plots any table from `data-opt` as vertically stacked, synchronised panels; `lrac` draws LRAC as the envelope of SAC curves). `kkp` and `keseimbangan` also accept custom data through `data-opt` (used by the STPM notes).
+- **Registry.** `G.daftar(name, fn, {tajuk, bab})` registers a widget, and `G.info` holds metadata. 38 widgets are used in the notes: 6 in `graf.js`, 12 in `graf-t4.js`, 13 in `graf-t5.js`, 5 in `graf-stpm.js` and 2 in `graf-matrik.js` (`carta-jadual` plots any table from `data-opt` as vertically stacked, synchronised panels; `lrac` draws LRAC as the envelope of SAC curves). `kkp` and `keseimbangan` also accept custom data through `data-opt` (used by the STPM notes). `kkp-anjakan` (STPM) lists 8 shift cases (`KES_KKP`: right, left, one axis up or down, one up and one down); the reading builds its sentence from `PUNCA` (per cause: `tambah`/`kurang` when both goods change, `naik`/`turun` templates for one good, where `turun` is the reverse of `naik`), a *Situasi asal* button resets to the dashed original curve, and the curve body itself can be dragged.
 - **Mounting.** `G.pasang(root)` finds `[data-graf]:not([data-dipasang])`, parses `data-opt` JSON and calls the widget. Errors are caught per widget and shown as a muted message.
 - **Plot.** A plot has world coordinates (`x`, `y` ranges) and pixel mapping (`X()`, `Y()`, `invX()`, `invY()`). Its responsive size comes from `nisbah` (aspect ratio function) and is capped at 780 px. Layers, in paint order: `latar, zon, grid, kawasan, paksi, hantu, lengkung, panduan, tanda, label, pemegang, atas`.
 - **Drawing primitives.**
@@ -191,6 +194,7 @@ tambah({
 
 - **Parsing.** Inputs are `type="text" inputmode="decimal"`. Spaces, commas, a leading `RM` and a trailing `%` are stripped; blank required fields or non-numbers produce an error message instead of calling `kira`.
 - **Rendering.** A `pilih` change or a new example re-renders only that card (`lukisSemula`); typing only repaints the result block and computed table cells, so focus is never lost. Focusing or clicking a table row selects it and `kira` shows that row's working.
+- **Worked steps.** Each `langkah` entry starts with `ay("…")`, a `.kalk-ayat` sentence in economic terms that names every quantity (for a division, which is the numerator, *pengangka*, and which the denominator, *penyebut*), followed by the numeric line.
 - **State.** Per card, in memory only (`keadaan[id]`), reset on navigation. Nothing is stored in `localStorage`.
 - **Integration.** `EKO.kalkulator.bilanganBab(id)` feeds the "Kalkulator (n)" button in each chapter header; `senarai.length` feeds the home statistics.
 - **Sources.** Initial values are the worked examples in the notes (textbook). The income tax calculator uses the textbook's YA 2016 table up to RM100 000 chargeable income.
@@ -225,7 +229,7 @@ EKO.daftarK2({
 - `j` is the index of the correct option. Chapter quiz options are shuffled, except numbered options and I/II/III combinations.
 - Question figures come in two forms. `g` (K1) and `rajah` (K2 scheme) are `G.statik` specs rendered as SVG. `gambar` holds images cropped from the original PDF: `{ src, alt, w, h, kapsyen }` or an array, rendered by `EKO.gambar()` (use `EKO.gambar(g, true)` inside answer options). `s2` is question text shown after the figure. In Kertas 2, `gambar` can sit on a question or a part, and `gambarSkema` shows the scheme's answer diagram.
 - Images live under `assets/img/percubaan/<paper>/` and are gated by the middleware like any other content file.
-- Current volume: 6 chapters, 263 flashcards, 178 chapter questions, 36 graphs in the notes, 39 calculators, and 4 trial papers (Kelantan 2025, Seberang Perai 2025 and Perak 2024 live; Terengganu hidden).
+- Current volume: 36 chapters (6 SPM, 16 STPM, 14 Matrikulasi), 799 flashcards, 178 chapter questions (SPM only), 103 graphs in the notes, 56 calculators, and 4 trial papers (Kelantan 2025, Seberang Perai 2025 and Perak 2024 live; Terengganu hidden).
 
 ### 3.7 Persistence
 
@@ -336,7 +340,7 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | --- | --- | --- |
 | No framework, no build | A teacher can open `index.html` offline, edit data files on GitHub, and deploy anywhere | Views are string templates; no component reuse beyond helpers |
 | Hash routing | Works on `file://`, any static host, and behind the middleware without rewrites | URLs contain `#`; the hash is lost across the login redirect |
-| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 6 500 lines across three files) |
+| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 7 700 lines across five `graf*.js` files) |
 | Content as JS files | No fetch, works offline, one file per chapter is easy to review | Content editors must keep valid JS syntax |
 | Progress in `localStorage` | No accounts or database needed for learning features | Progress does not follow a student across devices |
 | Firebase Auth instead of Supabase | Free tier does not pause after inactivity; Google sign-in is a toggle; the owner's Supabase free slots were full | Adds a third-party identity provider |

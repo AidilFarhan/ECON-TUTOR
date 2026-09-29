@@ -196,9 +196,10 @@ The **brand mark** (`EKO.tandaJenama()`) is a dark rounded square with a blue de
 ## 9. Components
 
 ### 9.1 Navigation
-- **Top bar** (`.bar-atas` > `.bar-dalam.kaca`): a sticky glass pill with the brand (`.jenama` + `SPM` chip), nav links (`.nav-atas a`, where the current page is an inverted ink pill), the theme button (`.ikon-btn`, 40 px round) and the account button (`.akaun-btn`, a 40 px accent circle with the initial).
+- **Top bar** (`.bar-atas` > `.bar-dalam.kaca`): a sticky glass pill with the brand (`.jenama`: mark + "Econ Tutor", no level chip because the site covers SPM, STPM and Matrikulasi), nav links (`.nav-atas a`, where the current page is an inverted ink pill), the theme button (`.ikon-btn`, 40 px round) and the account button (`.akaun-btn`, a 40 px accent circle with the initial).
 - **Bottom bar** (`.bar-bawah`, ≤ 860 px) is a floating glass pill with icon + label tabs and respects `safe-area-inset-bottom`. It shows six equal columns (Utama, Nota, Graf, Kad, Kuiz, Kira); Percubaan is reached from the home page. Long labels get a short form (`LABEL_BAWAH` in `app.js`: "Kad", "Kira") so six tabs fit at 360 px.
 - **Breadcrumbs** (`.remah`) sit above page titles.
+- **Level buttons.** The home hero has no eyebrow label above the title; under the introduction, `.wira .pilih-tahap` is a wrapping row of `.cip` links (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi, Ijazah Sarjana Muda) to `#nota-<peringkat>`. The Nota page repeats them as a `.penapis` chip row ("Semua" + levels, `aria-pressed` on the current one), the same pattern as the graph-lab chooser.
 
 ### 9.2 Buttons
 | Class | Look | Use |
@@ -228,14 +229,14 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 
 ### 9.5 Study and assessment
 - **Question image** (`.gambar-soalan`): a figure cropped from the original paper, shown at its print size (max 100% width) inside a white rounded frame with a hairline border. The frame stays white in dark mode (slightly dimmed) because the originals are black on white. The caption (`.kapsyen-gambar`) is small muted text. Inside answer options the frame is smaller (max 260 px) and aligned left.
-- **Flashcard** (`.kad-flip` > `.dalam` > `.muka.depan` / `.muka.belakang`): a 0.6 s 3D flip on tap or `Space`. Buttons `.btn-ulang` ("Ulang lagi") and `.btn-ingat` ("Dah ingat"), with a keyboard hint row of `kbd` elements.
+- **Flashcard** (`.kad-flip` > `.dalam` > `.muka.depan` / `.muka.belakang`): a 0.6 s 3D flip on tap or `Space`. Buttons `.btn-ulang` ("Ulang lagi") and `.btn-ingat` ("Dah ingat"), with a keyboard hint row of `kbd` elements. Both buttons act immediately and show the next card face down; there is no extra confirmation step.
 - **Quiz**: a glass header (`.kuiz-kepala`) with question count, score, timer and progress bar. After answering, options turn green (`.betul`) or red (`.salah`) and an explanation (`.penerangan`) appears. The results screen shows a review list.
 - **Kertas 2**: question cards with a `textarea` answer, a "Tunjuk skema" reveal, and checkable scheme points (`data-m` marks) that give an estimated score. Rubric tables show levels.
 - **Status pills** (`.status.baik | .buruk | .amaran | .neutral | .biru | .merah`) are 12.5 px, weight 750 pills.
 - **Toast** (`#toast`) is an ink pill at the bottom centre (above the bottom bar on phones) that shows for 2.2 s.
 
 ### 9.5a Calculator card (`.kalk`)
-- **Surface:** `.kalk.kaca-pekat` with a solid `--glass-3` fill and **no backdrop blur** (39 cards on one page). `--warna-bab` colours the tag dot, the selected table row and the interpretation rule. Cards sit in `.grid-kalk` (two columns from about 900 px, one on phones); cards with a table (`.kalk.lebar`) span the full width.
+- **Surface:** `.kalk.kaca-pekat` with a solid `--glass-3` fill and **no backdrop blur** (56 cards on one page). `--warna-bab` colours the tag dot, the selected table row and the interpretation rule. Cards sit in `.grid-kalk` (two columns from about 900 px, one on phones); cards with a table (`.kalk.lebar`) span the full width.
 - **Anatomy, top to bottom:**
   - tag (`.kalk-tag`: dot + "T4 · 2.2.2") and title (`h3`, 18 px)
   - formula box (`.kotak.rumus` with `.rumus-baris` and `.pecahan`)
@@ -280,7 +281,9 @@ These rules are shared by all 38 widgets. Follow them for new graphs.
 | Grid | `--line`, 1 px; off by default in static figures |
 | Guides (`.g-panduan`) | 1.3 px dashed `--ink-3` lines dropping from a point to both axes, with a value chip on the axis |
 | Nodes (`.g-nod`) | `--glass-3` fill, 2.5 px coloured ring; tracker nodes 6 px |
-| Handles (`[data-pegang]`) | 8 px node + 14 px soft halo + invisible 22 px hit area; cursor `grab` |
+| Handles (`[data-pegang]`) | 8 px node + 14 px soft halo + invisible 22 px hit area; cursor `grab`. A whole curve can also be a handle through an invisible thick hit path (`.tebal-hit`) |
+| Motion | Smooth, not node by node (owner request): dragged values round to 0.01 and trackers interpolate between table rows, snapping to a row only within 5 px. Arrow keys move 1% of the range; Shift + arrow jumps to the next table row. Only yearly series jump year by year |
+| Reset | A graph that can move away from a dashed original curve gets a "↺ Situasi asal" button (`G.butang`) that restores it |
 | Value chips (`.cip` in SVG) | Ink pill with background-coloured text, kept inside the canvas; stagger chips that would overlap |
 | Areas (`.g-kawasan`) | `-soft` fills for surplus, revenue, deadweight loss |
 | Tracker (`.g-garis-silang`) | Dashed vertical line; value labels next to each node with a halo stroke (`.g-teks-nilai`), stacked so they never overlap, flipping side near the right edge |

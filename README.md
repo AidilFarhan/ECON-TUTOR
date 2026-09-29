@@ -6,11 +6,11 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), **Ekonom
 
 | Bahagian | Isi |
 | --- | --- |
-| **Nota** | Nota lengkap 6 bab SPM mengikut subtopik buku teks (T4 Bab 1–4, T5 Bab 1–2) 16 bab STPM Ekonomi 944 (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6) dan 14 bab Matrikulasi (AE015 Bab 1–6, AE025 Bab 1–8, ditulis semula daripada slaid kuliah). Nota STPM dan Matrikulasi disertakan kad study; kuiz hanya untuk SPM buat masa ini. Laman Utama dan halaman Nota ada butang peringkat: Tingkatan 4, Tingkatan 5, STPM, Matrikulasi dan Ijazah Sarjana Muda (akan datang) |
-| **Graf interaktif** | 103 rajah SVG dalam nota (36 SPM, 29 STPM, 38 Matrikulasi). Makmal graf meminta pengguna memilih Tingkatan 4, Tingkatan 5, STPM atau Matrikulasi dahulu. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah |
-| **Kad study** | 799 kad fakta (263 SPM, 286 STPM, 250 Matrikulasi). Terbalikkan kad, tandakan *Dah ingat* atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
+| **Nota** | Nota lengkap 6 bab SPM mengikut subtopik buku teks (T4 Bab 1–4, T5 Bab 1–2), 16 bab STPM Ekonomi 944 (Penggal 1 Bab 1–5, Penggal 2 Bab 1–5, Penggal 3 Bab 1–6) dan 14 bab Matrikulasi (AE015 Bab 1–6, AE025 Bab 1–8, ditulis semula daripada slaid kuliah). Nota STPM dan Matrikulasi disertakan kad study; kuiz hanya untuk SPM buat masa ini. Laman Utama dan halaman Nota ada butang peringkat: Tingkatan 4, Tingkatan 5, STPM, Matrikulasi dan Ijazah Sarjana Muda (akan datang) |
+| **Graf interaktif** | 103 rajah SVG dalam nota (36 SPM, 29 STPM, 38 Matrikulasi). Makmal graf meminta pengguna memilih Tingkatan 4, Tingkatan 5, STPM atau Matrikulasi dahulu. Nod, garis harga dan keluk boleh diseret dengan tetikus, jari atau kekunci anak panah, dan bergerak secara lancar (nilai perpuluhan), bukan melompat nod demi nod. Graf anjakan KKP STPM ada 8 situasi (termasuk satu barang bertambah, satu berkurang) dengan punca setiap situasi dan butang *Situasi asal* |
+| **Kad study** | 799 kad fakta (263 SPM, 286 STPM, 250 Matrikulasi). Terbalikkan kad, tandakan *Dah ingat* (terus ke kad seterusnya) atau *Ulang lagi*. Kemajuan disimpan dalam pelayar |
 | **Kuiz** | 178 soalan mengikut bab (termasuk Latihan Sumatif buku teks T5), set campuran T4, T5 dan T4 + T5. Setiap jawapan ada penerangan |
-| **Kalkulator Ekonomi** | 56 kalkulator (termasuk 9 untuk STPM: keseimbangan dengan cukai/subsidi, Ec/Ey, kos, KNK, AE–Y dan lompang, penciptaan kredit, Fisher, keterbukaan ekonomi; dan 8 untuk Matrikulasi: keanjalan titik tengah, keseimbangan pengguna, kos implisit, keseimbangan monopoli, pengganda dan lompang, bekalan wang, indeks nilai wang, KSP) untuk semua rumus dan pengiraan dalam silibus T4 dan T5 (kos lepas, Ed/Es, beban cukai, PBG, cukai pendapatan, sewa beli, TP/AP/MP, kos, untung, IHP, inflasi, pengangguran, KDNK, belanjawan negara, faedah berbanding, akaun semasa, pertukaran asing dan lain-lain). Setiap satu memaparkan jawapan, jalan kira langkah demi langkah dan tafsiran. Nilai awal ialah contoh buku teks |
+| **Kalkulator Ekonomi** | 56 kalkulator (termasuk 9 untuk STPM: kos lepas pada KKP, keseimbangan dengan cukai/subsidi, Ec/Ey, kos, KNK, AE–Y dan lompang, penciptaan kredit, Fisher, keterbukaan ekonomi; dan 8 untuk Matrikulasi: keanjalan titik tengah, keseimbangan pengguna, kos implisit, keseimbangan monopoli, pengganda dan lompang, bekalan wang, indeks nilai wang, kadar syarat perdagangan) untuk semua rumus dan pengiraan dalam silibus T4 dan T5 (kos lepas, Ed/Es, beban cukai, PBG, cukai pendapatan, sewa beli, TP/AP/MP, kos, untung, IHP, inflasi, pengangguran, KDNK, belanjawan negara, faedah berbanding, akaun semasa, pertukaran asing dan lain-lain). Setiap satu memaparkan jawapan, jalan kira langkah demi langkah (setiap langkah ditulis dahulu dalam ayat ekonomi, termasuk pengangka dan penyebut, kemudian dalam nombor) dan tafsiran. Nilai awal ialah contoh buku teks |
 | **Kertas percubaan** | Kelantan 2025, Seberang Perai 2025 dan Perak 2024 (Modul Gempur SPM): setiap satu Kertas 1 (40 soalan objektif mengikut susunan asal) dan Kertas 2 (7 soalan, skema boleh ditanda, rubrik tahap). Rajah dan gambar dalam kertas asal dipaparkan terus. Kertas MPP3 Terengganu sudah siap tetapi disorok buat masa ini (lihat di bawah) |
 
 Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
@@ -32,12 +32,9 @@ Soalan Kertas 1 percubaan turut dimasukkan ke dalam kuiz bab yang berkaitan.
 
 Kemajuan kad, skor kuiz dan jawapan Kertas 2 disimpan dalam `localStorage` pelayar pelajar sahaja. Log masuk hanya menggunakan Firebase Authentication untuk mengenal pasti pelajar; tiada data pembelajaran dihantar ke mana-mana.
 
-## Hosting percuma dengan GitHub Pages
+## Jangan guna GitHub Pages
 
-1. Gabungkan (*merge*) cawangan ini ke `main`.
-2. Di GitHub, buka **Settings → Pages**.
-3. Di bahagian **Build and deployment**, pilih **Deploy from a branch**, kemudian `main` dan folder `/ (root)`. Tekan **Save**.
-4. Selepas satu atau dua minit, laman boleh dibuka di `https://<nama-pengguna>.github.io/<nama-repo>/`. Kongsi pautan itu dengan pelajar.
+GitHub Pages tidak menjalankan `middleware.js` dan tidak membaca `.vercelignore`. Jika diaktifkan, semua nota boleh dibuka tanpa log masuk, dan fail PDF serta kertas Terengganu yang disorok akan turut diterbitkan. Gunakan Vercel sahaja (di bawah).
 
 ## Hosting dengan Vercel
 
@@ -167,13 +164,17 @@ tambah({
   contoh: [{ n: "IHP 120 → 123", v: { i0: 120, i1: 123 } }],   // contoh pertama = nilai awal
   kira: function (x) {
     var r = ((x.i1 - x.i0) / x.i0) * 100;
-    return { hasil: [H("Kadar inflasi", pc(r))], langkah: ["(" + nom(x.i1) + " − " + nom(x.i0) + ") ÷ " + nom(x.i0) + " × 100 = " + pc(r)] };
+    return { hasil: [H("Kadar inflasi", pc(r))], langkah: [
+      ay("Kadar inflasi = (IHP tahun semasa − IHP tahun sebelum) ÷ IHP tahun sebelum × 100") +   // ayat ekonomi dahulu
+      "Kadar inflasi = (" + nom(x.i1) + " − " + nom(x.i0) + ") ÷ " + nom(x.i0) + " × 100 = " + pc(r)   // kemudian nombor
+    ] };
   }
 });
 ```
 
 - Jenis medan: nombor (lalai), `teks: true`, `opsyenal: true`, `jenis: "pilih"` (senarai pilihan) dan `jenis: "jadual"` (jadual yang boleh ditambah baris). `bila: function (x) {...}` menyorok medan mengikut pilihan.
 - `kira` memulangkan `hasil` (kotak jawapan), `langkah` (jalan kira), `nota`, `amaran`, `ralat` dan `sel` (nilai lajur hasil dalam jadual).
+- Setiap langkah dimulakan dengan `ay("…")`: ayat ekonomi yang menamakan setiap sebutan (untuk bahagi, sebut pengangka dan penyebut), diikuti baris nombor.
 - Butang **Kalkulator** dalam halaman bab dan kiraan di muka depan dikemas kini secara automatik.
 
 ## Sumber kandungan
