@@ -4,6 +4,7 @@
    Penggal 1 Bab 4: keseimbangan firma (PPS, monopoli, bermonopoli)
    Penggal 2 Bab 3: keseimbangan pendapatan negara AE–Y
    Penggal 2 Bab 4: pasaran wang (Md, MS, perangkap kecairan)
+   Penggal 3 Bab 6: keluk Lorenz dan pekali Gini
    ========================================================= */
 (function () {
   "use strict";
@@ -606,5 +607,91 @@
       return { musnah: henti };
     },
     { tajuk: "Keseimbangan pasaran wang", bab: "stpm-p2-b4" }
+  );
+
+  /* =========================================================
+     PENGGAL 3 · BAB 6 · Keluk Lorenz dan pekali Gini (nilai contoh)
+     L(x) = x^k, Gini = (k − 1) ÷ (k + 1)
+     ========================================================= */
+  G.daftar(
+    "lorenz",
+    function (host, opt) {
+      var K = G.kad(host, {
+        tajuk: opt.tajuk || "Keluk Lorenz dan pekali Gini",
+        petunjuk: "Seret titik L pada keluk · anak panah ↑↓",
+        kawalan: false
+      });
+      var st = { y: 0.25 };
+      var plot = G.plot(K.kanvas, {
+        x: [0, 100],
+        y: [0, 100],
+        tikX: [0, 20, 40, 60, 80, 100],
+        tikY: [0, 20, 40, 60, 80, 100],
+        labelX: "% kumulatif penduduk",
+        labelY: "% kumulatif pendapatan",
+        nisbah: function (w) {
+          return w < 480 ? 1 : 0.7;
+        },
+        aria: "Keluk Lorenz interaktif"
+      });
+      function k() {
+        return Math.log(st.y) / Math.log(0.5);
+      }
+      function L(x) {
+        return 100 * Math.pow(x / 100, k());
+      }
+      function lukis() {
+        plot.kosong();
+        plot.paksi();
+        var pts = [];
+        for (var i = 0; i <= 60; i++) pts.push([(100 * i) / 60, L((100 * i) / 60)]);
+        plot.laluan([[0, 0]].concat(pts.slice().reverse()), "g-kawasan c4", "kawasan", true);
+        plot.garis(0, 0, 100, 100, "g-lengkung c5", "lengkung");
+        plot.teks(70, 70, "Garis kesaksamaan", "g-teks c5", "end", "label", -8, -6);
+        plot.fungsi(L, 0, 100, "g-lengkung d", "lengkung", 80);
+        plot.teks(80, L(80), "Keluk Lorenz", "g-teks d", "start", "label", 6, 16);
+        for (var q = 20; q < 100; q += 20) plot.bulat(q, L(q), 3.5, "g-nod isi d", "tanda");
+        plot.nod(50, 100 * st.y, { pegang: "L", kelas: "d", label: "L", dx: 10, dy: -10, kelasLabel: "d" });
+        baca();
+      }
+      function baca() {
+        var gini = (k() - 1) / (k() + 1);
+        var bahagian = [];
+        for (var i = 1; i <= 5; i++) bahagian.push(L(20 * i) - L(20 * (i - 1)));
+        var bits = [
+          ["Pekali Gini", E.fmt(gini, 3), gini < 0.35 ? "baik" : gini < 0.45 ? "c4" : "buruk"],
+          ["40% terbawah", E.fmt(bahagian[0] + bahagian[1], 1) + "%", "d"],
+          ["20% teratas", E.fmt(bahagian[4], 1) + "%", "s"]
+        ];
+        var ayat =
+          "Pekali Gini = kawasan antara garis kesaksamaan dengan keluk Lorenz ÷ jumlah kawasan di bawah garis kesaksamaan. Nilainya antara <b>0</b> (agihan saksama sepenuhnya) dan <b>1</b> (paling tidak saksama). " +
+          "Semakin jauh keluk Lorenz daripada garis 45°, semakin tidak setara agihan pendapatan. Bahagian pendapatan setiap 20% penduduk (terbawah ke teratas): " +
+          bahagian
+            .map(function (b) {
+              return E.fmt(b, 1) + "%";
+            })
+            .join(", ") +
+          ".";
+        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + ' <span class="teks-lemah">(Nilai contoh.)</span></div>';
+      }
+      G.interaksi(plot, {
+        seret: function (n, pt) {
+          if (n !== "L" || pt.y == null) return;
+          st.y = E.clamp(pt.y / 100, 0.05, 0.49);
+          lukis();
+        },
+        kekunci: function (kk) {
+          st.y = E.clamp(st.y + kk.dy * 0.01, 0.05, 0.49);
+          lukis();
+        }
+      });
+      lukis();
+      var henti = G.pantauSaiz(K.kanvas, function () {
+        plot.ukur();
+        lukis();
+      });
+      return { musnah: henti };
+    },
+    { tajuk: "Keluk Lorenz dan pekali Gini", bab: "stpm-p3-b6" }
   );
 })();
