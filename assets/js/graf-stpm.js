@@ -2,6 +2,8 @@
    Econ Tutor · graf interaktif STPM (Ekonomi 944)
    Penggal 1 Bab 1: perubahan keluk kemungkinan pengeluaran
    Penggal 1 Bab 4: keseimbangan firma (PPS, monopoli, bermonopoli)
+   Penggal 2 Bab 3: keseimbangan pendapatan negara AE–Y
+   Penggal 2 Bab 4: pasaran wang (Md, MS, perangkap kecairan)
    ========================================================= */
 (function () {
   "use strict";
@@ -308,7 +310,7 @@
           plot.fungsi(function (x) {
             return st.A - 2 * b * x;
           }, 0, Math.min(20, qMR), "g-lengkung c4", "lengkung", 40);
-          var xa = Math.min(19, qAR * 0.92),
+          var xa = Math.min(15.5, qAR * 0.92),
             xm = Math.min(19, qMR * 0.9);
           plot.teks(xa, st.A - b * xa, "DD = AR", "g-teks d", "start", "label", 6, -6);
           plot.teks(xm, st.A - 2 * b * xm, "MR", "g-teks c4", "end", "label", -6, 14);
@@ -372,5 +374,237 @@
       return { musnah: henti };
     },
     { tajuk: "Keseimbangan firma: MR = MC", bab: "stpm-p1-b4" }
+  );
+
+  /* =========================================================
+     PENGGAL 2 · BAB 3 · Keseimbangan pendapatan negara AE–Y
+     (contoh modul: C = 100 + 0.8Yd, I = 50, G = 50, T = 30)
+     ========================================================= */
+  G.daftar(
+    "ae-y",
+    function (host, opt) {
+      var K = G.kad(host, {
+        tajuk: opt.tajuk || "Keseimbangan pendapatan negara: AE = Y",
+        petunjuk: "Seret pemegang G · pilih MPC · anak panah ↑↓"
+      });
+      var st = { a: 100, b: 0.8, I: 50, G: 50, T: 30, Yf: opt.yf || 1200 };
+      var G0 = 50;
+      var MAKS = 2000;
+
+      G.segmen(
+        K.kawalan,
+        [
+          ["0.5", "MPC 0.5"],
+          ["0.75", "MPC 0.75"],
+          ["0.8", "MPC 0.8"],
+          ["0.9", "MPC 0.9"]
+        ],
+        "0.8",
+        function (v) {
+          st.b = parseFloat(v);
+          lukis();
+        }
+      );
+      G.pemisah(K.kawalan);
+      G.butang(
+        K.kawalan,
+        "Set semula",
+        function () {
+          st.G = G0;
+          lukis();
+        },
+        { tekan: false }
+      );
+
+      var plot = G.plot(K.kanvas, {
+        x: [0, MAKS],
+        y: [0, MAKS],
+        tikX: [0, 500, 1000, 1500, 2000],
+        tikY: [0, 500, 1000, 1500, 2000],
+        labelX: "Pendapatan negara, Y (RM juta)",
+        labelY: "AE (RM juta)",
+        nisbah: function (w) {
+          return w < 480 ? 1 : 0.7;
+        },
+        aria: "Keseimbangan pendapatan negara AE sama dengan Y"
+      });
+
+      function autonomi() {
+        return st.a - st.b * st.T + st.I + st.G;
+      }
+      function ae(y) {
+        return autonomi() + st.b * y;
+      }
+      function yKeseimbangan() {
+        return autonomi() / (1 - st.b);
+      }
+
+      function lukis() {
+        plot.kosong();
+        plot.paksi();
+        var k = 1 / (1 - st.b);
+        var Ye = yKeseimbangan();
+        plot.garis(0, 0, MAKS, MAKS, "g-lengkung c5", "lengkung");
+        plot.teks(MAKS * 0.93, MAKS * 0.93, "Y = AE (45°)", "g-teks c5", "end", "label", -8, -6);
+        plot.garis(st.Yf, 0, st.Yf, MAKS * 0.96, "g-panduan", "panduan");
+        plot.teks(st.Yf, MAKS * 0.96, "Yf", "g-teks lemah", "middle", "label", 0, -6);
+        var xHujung = Math.min(MAKS, (MAKS - autonomi()) / st.b);
+        plot.fungsi(ae, 0, xHujung, "g-lengkung d", "lengkung", 10);
+        var xl = xHujung * 0.8;
+        plot.teks(xl, ae(xl), "AE = C + I + G", "g-teks d", "start", "label", 4, 18);
+        var dalam = Ye > 0 && Ye < MAKS;
+        if (dalam) {
+          plot.bulat(Ye, Ye, 5, "g-nod isi d", "tanda");
+          plot.teks(Ye, Ye, "E", "g-teks d", "end", "label", -8, -6);
+          plot.panduanKePaksi(Ye, Ye, { labelX: E.fmt(Ye, 0), keY: false });
+        }
+        var gap = st.Yf - Ye;
+        if (Math.abs(gap) > 1 && dalam) {
+          var aeF = ae(st.Yf);
+          plot.garis(st.Yf, aeF, st.Yf, st.Yf, gap > 0 ? "g-lengkung s" : "g-lengkung c4", "tanda");
+        }
+        plot.nod(0, autonomi(), { pegang: "G", kelas: "d", label: "G", dx: 12, dy: -8, kelasLabel: "d" });
+        baca(k, Ye, gap);
+      }
+
+      function baca(k, Ye, gap) {
+        var lompang = Math.abs(gap) / k;
+        var bits = [
+          ["G", "RM" + E.fmt(st.G, 0) + " juta", "d"],
+          ["Pengganda 1 ÷ (1 − MPC)", E.fmt(k, 2), "c3"],
+          ["Y keseimbangan", "RM" + E.fmt(Ye, 1) + " juta", "d"]
+        ];
+        var kira =
+          "Y = " + E.fmt(st.a, 0) + " + " + E.fmt(st.b, 2) + "(Y − " + E.fmt(st.T, 0) + ") + " + E.fmt(st.I, 0) + " + " + E.fmt(st.G, 0) +
+          " → Y = " + E.fmt(st.a - st.b * st.T + st.I + st.G, 0) + " ÷ " + E.fmt(1 - st.b, 2) + " = <b>RM" + E.fmt(Ye, 1) + " juta</b>.";
+        var ayat;
+        if (Math.abs(gap) <= 1) ayat = '<span class="status baik">Guna tenaga penuh</span> Keseimbangan berada pada Yf. ' + kira;
+        else if (gap > 0) {
+          bits.push(["Lompang deflasi", "RM" + E.fmt(lompang, 1) + " juta", "buruk"]);
+          ayat = '<span class="status amaran">Lompang deflasi</span> Y keseimbangan lebih rendah daripada Yf (RM' + E.fmt(st.Yf, 0) + " juta). Jurang KNK = " + E.fmt(gap, 1) + "; lompang deflasi = jurang ÷ pengganda = " + E.fmt(gap, 1) + " ÷ " + E.fmt(k, 2) + " = <b>RM" + E.fmt(lompang, 1) + " juta</b>. Kerajaan boleh menambah G sebanyak itu (dasar fiskal mengembang). " + kira;
+        } else {
+          bits.push(["Lompang inflasi", "RM" + E.fmt(lompang, 1) + " juta", "c4"]);
+          ayat = '<span class="status amaran">Lompang inflasi</span> Y keseimbangan melebihi Yf (RM' + E.fmt(st.Yf, 0) + " juta): AE berlebihan pada guna tenaga penuh. Lompang inflasi = " + E.fmt(-gap, 1) + " ÷ " + E.fmt(k, 2) + " = <b>RM" + E.fmt(lompang, 1) + " juta</b>. Kerajaan boleh mengurangkan G (dasar fiskal menguncup). " + kira;
+        }
+        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + ' <span class="teks-lemah">(C, I, T daripada contoh modul; Yf ialah nilai contoh.)</span></div>';
+      }
+
+      G.interaksi(plot, {
+        seret: function (n, pt) {
+          if (n !== "G" || pt.y == null) return;
+          var g = pt.y - (st.a - st.b * st.T + st.I);
+          st.G = E.bundar(E.clamp(g, 0, 500), 0);
+          lukis();
+        },
+        kekunci: function (kk) {
+          st.G = E.clamp(st.G + kk.dy * 10, 0, 500);
+          lukis();
+        }
+      });
+
+      lukis();
+      var henti = G.pantauSaiz(K.kanvas, function () {
+        plot.ukur();
+        lukis();
+      });
+      return { musnah: henti };
+    },
+    { tajuk: "Keseimbangan pendapatan negara: AE = Y", bab: "stpm-p2-b3" }
+  );
+
+  /* =========================================================
+     PENGGAL 2 · BAB 4 · Pasaran wang: Md, MS dan kadar bunga
+     (Teori Keutamaan Kecairan Keynes; nilai contoh)
+     ========================================================= */
+  G.daftar(
+    "pasaran-wang",
+    function (host, opt) {
+      var K = G.kad(host, {
+        tajuk: opt.tajuk || "Keseimbangan pasaran wang: Md = MS",
+        petunjuk: "Seret keluk MS · pilih perubahan Md · anak panah ←→"
+      });
+      var LANTAI = 2; // perangkap kecairan
+      var st = { W: 80, s: 1 };
+      function md(w, s) {
+        return LANTAI + 12 * s * Math.pow(40 / w, 1.5);
+      }
+      G.segmen(
+        K.kawalan,
+        [
+          ["0.7", "Md berkurang"],
+          ["1", "Md asal"],
+          ["1.4", "Md bertambah"]
+        ],
+        "1",
+        function (v) {
+          st.s = parseFloat(v);
+          lukis();
+        }
+      );
+      var plot = G.plot(K.kanvas, {
+        x: [0, 340],
+        y: [0, 14],
+        tikX: [0, 50, 100, 150, 200, 250, 300],
+        tikY: [0, 2, 4, 6, 8, 10, 12, 14],
+        labelX: "Kuantiti wang (RM juta)",
+        labelY: "Kadar bunga (%)",
+        nisbah: function (w) {
+          return w < 480 ? 0.95 : 0.62;
+        },
+        aria: "Keseimbangan pasaran wang"
+      });
+
+      function lukis() {
+        plot.kosong();
+        plot.paksi();
+        if (st.s !== 1) {
+          plot.fungsi(function (w) {
+            return md(w, 1);
+          }, 40, 335, "g-lengkung d hantu", "hantu", 100);
+          plot.teks(335, md(335, 1), "Md₀", "g-teks lemah", "end", "label", -4, -8);
+        }
+        var x0 = 40 * Math.pow(st.s, 2 / 3);
+        plot.fungsi(function (w) {
+          return md(w, st.s);
+        }, x0, 335, "g-lengkung d", "lengkung", 100);
+        plot.teks(335, md(335, st.s), st.s === 1 ? "Md" : "Md₁", "g-teks d", "end", "label", -4, -8);
+        plot.garis(st.W, 0, st.W, 13.4, "g-lengkung s", "lengkung");
+        plot.teks(st.W, 13.4, "MS", "g-teks s", "start", "label", 6, 4);
+        var r = md(st.W, st.s);
+        plot.bulat(st.W, r, 5, "g-nod isi s", "tanda");
+        plot.teks(st.W, r, "E", "g-teks s", "start", "label", 8, -8);
+        plot.panduanKePaksi(st.W, r, { labelY: E.fmt(r, 2) + "%", keX: false });
+        plot.nod(st.W, 1, { pegang: "MS", kelas: "s", label: "", dx: 0, dy: 0 });
+        var trap = r - LANTAI < 0.6;
+        var bits = [
+          ["MS", "RM" + E.fmt(st.W, 0) + " juta", "s"],
+          ["Kadar bunga", E.fmt(r, 2) + "%", "d"]
+        ];
+        var ayat = trap
+          ? '<span class="status amaran">Perangkap kecairan</span> Kadar bunga sudah hampir paling rendah; harga bon paling tinggi, orang ramai memegang wang tunai. Keluk Md hampir mendatar, jadi pertambahan penawaran wang <b>tidak lagi menurunkan</b> kadar bunga.'
+          : "Keseimbangan pada Md = MS. Tambah MS (seret ke kanan): lebihan penawaran wang, orang ramai membeli bon, harga bon naik dan kadar bunga <b>turun</b>. Md bertambah: lebihan permintaan wang, orang ramai menjual bon dan kadar bunga <b>naik</b>. Kadar bunga lebih rendah menggalakkan pelaburan, AE, AD dan Y.";
+        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + ' <span class="teks-lemah">(Nilai contoh.)</span></div>';
+      }
+
+      G.interaksi(plot, {
+        seret: function (n, pt) {
+          if (n !== "MS" || pt.x == null) return;
+          st.W = E.bundar(E.clamp(pt.x, 45, 330), 0);
+          lukis();
+        },
+        kekunci: function (k) {
+          st.W = E.clamp(st.W + k.dx * 5, 45, 330);
+          lukis();
+        }
+      });
+
+      lukis();
+      var henti = G.pantauSaiz(K.kanvas, function () {
+        plot.ukur();
+        lukis();
+      });
+      return { musnah: henti };
+    },
+    { tajuk: "Keseimbangan pasaran wang", bab: "stpm-p2-b4" }
   );
 })();
