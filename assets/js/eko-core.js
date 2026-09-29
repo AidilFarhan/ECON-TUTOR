@@ -12,15 +12,61 @@ window.EKO = (function () {
   E.babIkut = {};
   E.setKuiz = [];
 
+  // peringkat: "spm" (lalai, tingkatan 4/5) atau "stpm" (tingkatan = penggal 1/2/3).
+  var TERTIB_PERINGKAT = { spm: 0, stpm: 1 };
+
   E.daftarBab = function (b) {
     if (!b || !b.id) return;
+    b.peringkat = b.peringkat === "stpm" ? "stpm" : "spm";
     b.kad = b.kad || [];
     b.kuiz = b.kuiz || [];
     b.seksyen = b.seksyen || [];
     E.babIkut[b.id] = b;
     E.bab.push(b);
     E.bab.sort(function (x, y) {
-      return x.tingkatan - y.tingkatan || x.no - y.no;
+      return TERTIB_PERINGKAT[x.peringkat] - TERTIB_PERINGKAT[y.peringkat] || x.tingkatan - y.tingkatan || x.no - y.no;
+    });
+  };
+
+  /* ---------- kumpulan bab (Tingkatan 4, Tingkatan 5, STPM Penggal 1…) ---------- */
+  // Kunci kumpulan: "t4", "t5" (SPM) atau "p1", "p2", "p3" (STPM).
+  E.kunciKumpulan = function (b) {
+    return (b.peringkat === "stpm" ? "p" : "t") + b.tingkatan;
+  };
+  // "Tingkatan 4" atau "STPM Penggal 1"
+  E.labelKumpulan = function (b) {
+    return b.peringkat === "stpm" ? "STPM Penggal " + b.tingkatan : "Tingkatan " + b.tingkatan;
+  };
+  // "T4" atau "STPM P1"
+  E.labelPendek = function (b) {
+    return b.peringkat === "stpm" ? "STPM P" + b.tingkatan : "T" + b.tingkatan;
+  };
+  // "T4 Bab 1" atau "STPM P1 Bab 1"
+  E.labelBab = function (b) {
+    return E.labelPendek(b) + " Bab " + b.no;
+  };
+  // Kumpulan yang ada bab, mengikut tertib: [{ kunci, label, peringkat, bab: [...] }]
+  E.kumpulan = function () {
+    var out = [];
+    var ikut = {};
+    E.bab.forEach(function (b) {
+      var k = E.kunciKumpulan(b);
+      if (!ikut[k]) {
+        ikut[k] = { kunci: k, label: E.labelKumpulan(b), pendek: E.labelPendek(b), peringkat: b.peringkat, tingkatan: b.tingkatan, bab: [] };
+        out.push(ikut[k]);
+      }
+      ikut[k].bab.push(b);
+    });
+    return out;
+  };
+  E.babKumpulan = function (kunci) {
+    return E.bab.filter(function (b) {
+      return E.kunciKumpulan(b) === kunci;
+    });
+  };
+  E.babPeringkat = function (p) {
+    return E.bab.filter(function (b) {
+      return b.peringkat === p;
     });
   };
 
@@ -42,7 +88,7 @@ window.EKO = (function () {
 
   E.babTingkatan = function (t) {
     return E.bab.filter(function (b) {
-      return b.tingkatan === t;
+      return b.peringkat === "spm" && b.tingkatan === t;
     });
   };
 

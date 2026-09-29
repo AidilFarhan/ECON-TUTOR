@@ -116,6 +116,7 @@ assets/favicon.svg              ikon laman
 assets/js/eko-core.js           pendaftaran bab, storan, utiliti
 assets/js/graf.js               enjin graf SVG + graf permintaan, penawaran, keseimbangan, keanjalan, cukai dan subsidi
 assets/js/graf-t4.js            graf T4 (KKP, sistem ekonomi, kos, TP/AP/MP, untung, produktiviti, PBG, sewa beli dan lain-lain)
+assets/js/graf-stpm.js          graf STPM (anjakan KKP)
 assets/js/graf-t5.js            graf T5 (IHP, AD-AS, pengangguran, KDNK, belanjawan, cukai, faedah berbanding, tarif/subsidi/kuota, akaun semasa, penukaran mata wang, kadar pertukaran)
 assets/js/data/t4-bab1.js ...   nota, kad dan kuiz setiap bab
 assets/js/data/percubaan-kelantan-2025.js     Kertas 1 dan Kertas 2 percubaan Kelantan

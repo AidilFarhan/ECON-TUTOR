@@ -66,6 +66,7 @@ assets/js/eko-core.js         window.EKO: registries, storage, formatting, icons
 assets/js/graf.js             EKO.graf: SVG plot engine + market graphs (demand, supply, equilibrium…)
 assets/js/graf-t4.js          Form 4 graph widgets + chart helpers (G.carta, G.legenda…)
 assets/js/graf-t5.js          Form 5 graph widgets
+assets/js/graf-stpm.js        STPM graph widgets
 assets/js/data/t4-bab1.js …   One file per chapter: notes, flashcards, quiz
 assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 questions, marking scheme)
 assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
@@ -200,6 +201,8 @@ Content lives in JavaScript data files so it works offline and from `file://`, w
 ```js
 EKO.daftarBab({
   id: "t4-b2", tingkatan: 4, no: 2, tajuk: "Pasaran", warna: "var(--bab-rm5)",
+  // peringkat: "stpm" (optional; default "spm"). For STPM, tingkatan = penggal (1–3) and ids are stpm-p<penggal>-b<no>.
+  // Labels come from EKO.labelKumpulan/labelPendek/labelBab; groups ("t4", "t5", "p1"…) from EKO.kumpulan().
   ringkas: "Chapter summary",
   seksyen: [{ no: "2.1", tajuk: "…", soalan: ["Guiding question"], html: `<h3>…</h3> <figure data-graf="keseimbangan" data-opt='{"preset":"kawalan"}'></figure>` }],
   kad:  [{ d: "Front", b: "Back (HTML allowed)", t: "2.1.3" }],
