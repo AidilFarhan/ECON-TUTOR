@@ -218,6 +218,14 @@
     return 12 - 2.4 * q + 0.18 * q * q;
   }
   var AVC_MIN = avc(10); // 6.00 pada Q = 10
+  var Q_HUJUNG = 20; // keluk AC, AVC, AR berakhir di sini (paksi hingga 24)
+  var Q_MC = 20; // MC(20) = 36, di bawah paksi atas 40
+  // AC bermula apabila nilainya turun ke 36 (90% paksi) supaya tidak terpotong di atas
+  var Q_AC = (function () {
+    var q = 0.5;
+    while (ac(q) > 36) q += 0.01;
+    return q;
+  })();
 
   var JENIS_PASARAN = {
     pps: { nama: "Persaingan sempurna", b: 0 },
@@ -263,7 +271,7 @@
       );
 
       var plot = G.plot(K.kanvas, {
-        x: [0, 20],
+        x: [0, 24],
         y: [0, 40],
         tikX: [0, 5, 10, 15, 20],
         tikY: [0, 10, 20, 30, 40],
@@ -276,7 +284,7 @@
       });
 
       function hadA() {
-        return st.jenis === "pps" ? [4, 20] : st.jenis === "mono" ? [16, 40] : [12, 36];
+        return st.jenis === "pps" ? [4, 20] : st.jenis === "mono" ? [16, 36] : [12, 34];
       }
 
       function lukis() {
@@ -292,28 +300,29 @@
         if (q != null && !tutup && Math.abs(P - ACq) > 0.05)
           plot.segi(0, P, q, ACq, "g-kawasan " + (P > ACq ? "baik" : "buruk"), "kawasan");
 
-        plot.fungsi(ac, 1.6, 20, "g-lengkung c3", "lengkung", 120);
-        plot.fungsi(avc, 0.2, 20, "g-lengkung c5", "lengkung", 120);
-        plot.fungsi(mc, 0.2, 18.5, "g-lengkung s", "lengkung", 120);
-        plot.teks(20, ac(20), "AC", "g-teks c3", "end", "label", -4, -8);
-        plot.teks(20, avc(20), "AVC", "g-teks c5", "end", "label", -4, 16);
-        plot.teks(18.5, mc(18.5), "MC", "g-teks s", "start", "label", 6, 4);
+        // Semua keluk berakhir di dalam graf (Q = 20 atau pintasan paksi) supaya nampak lengkap.
+        plot.fungsi(ac, Q_AC, Q_HUJUNG, "g-lengkung c3", "lengkung", 120);
+        plot.fungsi(avc, 0.2, Q_HUJUNG, "g-lengkung c5", "lengkung", 120);
+        plot.fungsi(mc, 0.2, Q_MC, "g-lengkung s", "lengkung", 120);
+        plot.teks(Q_HUJUNG, ac(Q_HUJUNG), "AC", "g-teks c3", "start", "label", 5, 4);
+        plot.teks(Q_HUJUNG, avc(Q_HUJUNG), "AVC", "g-teks c5", "start", "label", 5, 12);
+        plot.teks(Q_MC, mc(Q_MC), "MC", "g-teks s", "start", "label", 5, 4);
 
         if (st.jenis === "pps") {
-          plot.garis(0, st.A, 20, st.A, "g-lengkung d", "lengkung");
-          plot.teks(20, st.A, "AR = MR", "g-teks d", "end", "label", -4, -8);
+          plot.garis(0, st.A, Q_HUJUNG, st.A, "g-lengkung d", "lengkung");
+          plot.teks(Q_HUJUNG, st.A, "AR = MR", "g-teks d", "end", "label", 0, -8);
         } else {
-          var qAR = st.A / b,
+          var qAR = Math.min(Q_HUJUNG, st.A / b),
             qMR = st.A / (2 * b);
           plot.fungsi(function (x) {
             return st.A - b * x;
-          }, 0, Math.min(20, qAR), "g-lengkung d", "lengkung", 40);
+          }, 0, qAR, "g-lengkung d", "lengkung", 40);
           plot.fungsi(function (x) {
             return st.A - 2 * b * x;
-          }, 0, Math.min(20, qMR), "g-lengkung c4", "lengkung", 40);
-          var xa = Math.min(15.5, qAR * 0.92),
-            xm = Math.min(19, qMR * 0.9);
-          plot.teks(xa, st.A - b * xa, "DD = AR", "g-teks d", "start", "label", 6, -6);
+          }, 0, Math.min(Q_HUJUNG, qMR), "g-lengkung c4", "lengkung", 40);
+          var xd = qAR * 0.62;
+          plot.teks(xd, st.A - b * xd, "DD = AR", "g-teks d", "start", "label", 6, -8);
+          var xm = Math.min(Q_HUJUNG, qMR) * 0.9;
           plot.teks(xm, st.A - 2 * b * xm, "MR", "g-teks c4", "end", "label", -6, 14);
         }
 
@@ -420,8 +429,8 @@
       var plot = G.plot(K.kanvas, {
         x: [0, MAKS],
         y: [0, MAKS],
-        tikX: [0, 500, 1000, 1500, 2000],
-        tikY: [0, 500, 1000, 1500, 2000],
+        tikX: [0, 500, 1000, 1500],
+        tikY: [0, 500, 1000, 1500],
         labelX: "Pendapatan negara, Y (RM juta)",
         labelY: "AE (RM juta)",
         nisbah: function (w) {
@@ -439,20 +448,26 @@
       function yKeseimbangan() {
         return autonomi() / (1 - st.b);
       }
+      // Had G supaya titik keseimbangan E sentiasa kelihatan (Y ≤ 95% hujung garis)
+      function gMaks() {
+        return Math.max(0, MAKS * 0.9 * 0.95 * (1 - st.b) - (st.a - st.b * st.T + st.I));
+      }
 
       function lukis() {
+        st.G = Math.min(st.G, E.bundar(gMaks(), 0));
         plot.kosong();
         plot.paksi();
         var k = 1 / (1 - st.b);
         var Ye = yKeseimbangan();
-        plot.garis(0, 0, MAKS, MAKS, "g-lengkung c5", "lengkung");
-        plot.teks(MAKS * 0.93, MAKS * 0.93, "Y = AE (45°)", "g-teks c5", "end", "label", -8, -6);
-        plot.garis(st.Yf, 0, st.Yf, MAKS * 0.96, "g-panduan", "panduan");
-        plot.teks(st.Yf, MAKS * 0.96, "Yf", "g-teks lemah", "middle", "label", 0, -6);
-        var xHujung = Math.min(MAKS, (MAKS - autonomi()) / st.b);
+        // Garis berakhir pada 90% paksi supaya nampak lengkap dengan label di hujung.
+        var HAD = MAKS * 0.9;
+        plot.garis(0, 0, HAD, HAD, "g-lengkung c5", "lengkung");
+        plot.teks(HAD, HAD, "Y = AE (45°)", "g-teks c5", "end", "label", -4, -10);
+        plot.garis(st.Yf, 0, st.Yf, HAD * 0.8, "g-panduan", "panduan");
+        plot.teks(st.Yf, HAD * 0.8, "Yf", "g-teks lemah", "middle", "label", 0, -6);
+        var xHujung = Math.min(HAD, (HAD - autonomi()) / st.b);
         plot.fungsi(ae, 0, xHujung, "g-lengkung d", "lengkung", 10);
-        var xl = xHujung * 0.8;
-        plot.teks(xl, ae(xl), "AE = C + I + G", "g-teks d", "start", "label", 4, 18);
+        plot.teks(xHujung, ae(xHujung), "AE", "g-teks d", "start", "label", 6, 4);
         var dalam = Ye > 0 && Ye < MAKS;
         if (dalam) {
           plot.bulat(Ye, Ye, 5, "g-nod isi d", "tanda");
@@ -494,11 +509,11 @@
         seret: function (n, pt) {
           if (n !== "G" || pt.y == null) return;
           var g = pt.y - (st.a - st.b * st.T + st.I);
-          st.G = E.bundar(E.clamp(g, 0, 500), 0);
+          st.G = E.bundar(E.clamp(g, 0, gMaks()), 0);
           lukis();
         },
         kekunci: function (kk) {
-          st.G = E.clamp(st.G + kk.dy * 10, 0, 500);
+          st.G = E.clamp(st.G + kk.dy * 10, 0, gMaks());
           lukis();
         }
       });
@@ -528,6 +543,10 @@
       var st = { W: 80, s: 1 };
       function md(w, s) {
         return LANTAI + 12 * s * Math.pow(40 / w, 1.5);
+      }
+      // Kuantiti wang apabila Md = 12.6% supaya keluk bermula di bawah paksi atas (14%)
+      function mulaMd(s) {
+        return 40 * Math.pow((12 * s) / (12.6 - LANTAI), 2 / 3);
       }
       G.segmen(
         K.kawalan,
@@ -561,16 +580,15 @@
         if (st.s !== 1) {
           plot.fungsi(function (w) {
             return md(w, 1);
-          }, 40, 335, "g-lengkung d hantu", "hantu", 100);
-          plot.teks(335, md(335, 1), "Md₀", "g-teks lemah", "end", "label", -4, -8);
+          }, mulaMd(1), 320, "g-lengkung d hantu", "hantu", 100);
+          plot.teks(320, md(320, 1), "Md₀", "g-teks lemah", "end", "label", -4, -8);
         }
-        var x0 = 40 * Math.pow(st.s, 2 / 3);
         plot.fungsi(function (w) {
           return md(w, st.s);
-        }, x0, 335, "g-lengkung d", "lengkung", 100);
-        plot.teks(335, md(335, st.s), st.s === 1 ? "Md" : "Md₁", "g-teks d", "end", "label", -4, -8);
-        plot.garis(st.W, 0, st.W, 13.4, "g-lengkung s", "lengkung");
-        plot.teks(st.W, 13.4, "MS", "g-teks s", "start", "label", 6, 4);
+        }, mulaMd(st.s), 320, "g-lengkung d", "lengkung", 100);
+        plot.teks(320, md(320, st.s), st.s === 1 ? "Md" : "Md₁", "g-teks d", "end", "label", -4, -8);
+        plot.garis(st.W, 0, st.W, 12.6, "g-lengkung s", "lengkung");
+        plot.teks(st.W, 12.6, "MS", "g-teks s", "start", "label", 6, 4);
         var r = md(st.W, st.s);
         plot.bulat(st.W, r, 5, "g-nod isi s", "tanda");
         plot.teks(st.W, r, "E", "g-teks s", "start", "label", 8, -8);
@@ -590,11 +608,11 @@
       G.interaksi(plot, {
         seret: function (n, pt) {
           if (n !== "MS" || pt.x == null) return;
-          st.W = E.bundar(E.clamp(pt.x, 45, 330), 0);
+          st.W = E.bundar(E.clamp(pt.x, 60, 320), 0);
           lukis();
         },
         kekunci: function (k) {
-          st.W = E.clamp(st.W + k.dx * 5, 45, 330);
+          st.W = E.clamp(st.W + k.dx * 5, 60, 320);
           lukis();
         }
       });
@@ -649,9 +667,9 @@
         plot.garis(0, 0, 100, 100, "g-lengkung c5", "lengkung");
         plot.teks(70, 70, "Garis kesaksamaan", "g-teks c5", "end", "label", -8, -6);
         plot.fungsi(L, 0, 100, "g-lengkung d", "lengkung", 80);
-        plot.teks(80, L(80), "Keluk Lorenz", "g-teks d", "start", "label", 6, 16);
+        plot.teks(62, L(62), "Keluk Lorenz", "g-teks d", "start", "label", 8, 14);
         for (var q = 20; q < 100; q += 20) plot.bulat(q, L(q), 3.5, "g-nod isi d", "tanda");
-        plot.nod(50, 100 * st.y, { pegang: "L", kelas: "d", label: "L", dx: 10, dy: -10, kelasLabel: "d" });
+        plot.nod(50, 100 * st.y, { pegang: "L", kelas: "d", label: "L", dx: -18, dy: -10, kelasLabel: "d" });
         baca();
       }
       function baca() {

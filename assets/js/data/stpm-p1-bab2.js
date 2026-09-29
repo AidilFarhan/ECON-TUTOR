@@ -102,7 +102,7 @@ EKO.daftarBab({
     <tbody><tr><td class="n">5</td><td class="n">80</td><td class="n">55</td><td>Lebihan permintaan</td></tr><tr><td class="n">10</td><td class="n">60</td><td class="n">60</td><td><b>Keseimbangan</b></td></tr><tr><td class="n">15</td><td class="n">40</td><td class="n">65</td><td>Lebihan penawaran</td></tr><tr><td class="n">20</td><td class="n">20</td><td class="n">70</td><td>Lebihan penawaran</td></tr><tr><td class="n">25</td><td class="n">0</td><td class="n">75</td><td>Lebihan penawaran</td></tr></tbody></table></div>
 </div>
 <p><b>(c) Pendekatan rajah:</b> keseimbangan di titik E (RM10, 60 unit). Pada harga di bawah RM10 berlaku <b>lebihan permintaan</b> (Qd &gt; Qs); pada harga di atas RM10 berlaku <b>lebihan penawaran</b> (Qs &gt; Qd).</p>
-<figure data-graf="keseimbangan" data-opt='{"tajuk":"Keseimbangan pasaran daging kambing import","data":{"a":70,"b":2,"c":10,"d":1,"x":[0,40],"y":[0,75],"tikX":[0,5,10,15,20,25,30,35,40],"tikY":[0,10,20,30,40,50,60,70],"labelX":"Kuantiti (kg)","labelY":"Harga (RM/kg)","hargaAwal":40,"pMin":12,"pMaks":68,"anjak":5,"unitQ":"kg"}}'></figure>
+<figure data-graf="keseimbangan" data-opt='{"tajuk":"Keseimbangan pasaran daging kambing import","data":{"a":70,"b":2,"c":10,"d":1,"x":[0,40],"y":[0,75],"tikX":[0,5,10,15,20,25,30,35,40],"tikY":[0,10,20,30,40,50,60,70],"labelX":"Kuantiti (kg)","labelY":"Harga (RM/kg)","hargaAwal":40,"pMin":12,"pMaks":68,"anjak":5,"unitQ":"kg","qHujung":35}}'></figure>
 
 <h3>Perubahan keseimbangan pasaran</h3>
 <div class="jadual"><table><caption>Kesan peralihan keluk (andaian keluk lain tetap)</caption>
@@ -245,7 +245,7 @@ EKO.daftarBab({
   <div class="kotak def"><span class="kotak-label">Harga minimum</span><p>Harga yang ditetapkan kerajaan <b>lebih tinggi</b> daripada harga pasaran. Kuantiti diminta berkurang (Q ke Q₁), kuantiti ditawar bertambah (Q ke Q₂): wujud <b>lebihan penawaran</b> Q₁Q₂ yang perlu dibeli kerajaan.</p></div>
 </div>
 <p>Kesan harga maksimum ke atas lebihan: lebihan pengeluar <b>berkurang</b> kerana harga dan kuantiti dijual lebih rendah. Lebihan pengguna berubah bergantung kepada keuntungan daripada harga lebih rendah berbanding kehilangan kerana kuantiti yang dapat dibeli terhad kepada Q₂.</p>
-<figure data-graf="keseimbangan" data-opt='{"preset":"kawalan","tajuk":"Dasar harga maksimum dan minimum: daging kambing","data":{"a":70,"b":2,"c":10,"d":1,"x":[0,40],"y":[0,75],"tikX":[0,5,10,15,20,25,30,35,40],"tikY":[0,10,20,30,40,50,60,70],"labelX":"Kuantiti (kg)","labelY":"Harga (RM/kg)","hargaAwal":24,"pMin":12,"pMaks":68,"anjak":5,"unitQ":"kg"}}'></figure>
+<figure data-graf="keseimbangan" data-opt='{"preset":"kawalan","tajuk":"Dasar harga maksimum dan minimum: daging kambing","data":{"a":70,"b":2,"c":10,"d":1,"x":[0,40],"y":[0,75],"tikX":[0,5,10,15,20,25,30,35,40],"tikY":[0,10,20,30,40,50,60,70],"labelX":"Kuantiti (kg)","labelY":"Harga (RM/kg)","hargaAwal":24,"pMin":12,"pMaks":68,"anjak":5,"unitQ":"kg","qHujung":35}}'></figure>
 
 <div class="kotak contoh"><span class="kotak-label">Panduan menjawab · Bahagian C</span>
 <p>Permintaan daging kambing import P = 70 − 2Q; penawaran P = 10 + Q (P dalam RM/kg, Q dalam kg).</p>

@@ -95,7 +95,7 @@ EKO.daftarBab({
 <div class="baris">MRP = MCF = RM35 pada 5 orang buruh</div>
 <div class="baris">Untung = TRP − TCF = 195 − (35 × 5)</div>
 <div class="baris jawapan">= RM20</div></div></div>
-<figure data-graf="keseimbangan" data-opt='{"tajuk":"Keseimbangan pasaran buruh (nilai contoh)","data":{"a":60,"b":2,"c":10,"d":0.5,"x":[0,30],"y":[0,64],"tikX":[0,5,10,15,20,25,30],"tikY":[0,10,20,30,40,50,60],"labelX":"Kuantiti buruh (orang)","labelY":"Upah (RM)","hargaAwal":36,"pMin":12,"pMaks":58,"anjak":4,"unitQ":"orang"}}'></figure>
+<figure data-graf="keseimbangan" data-opt='{"tajuk":"Keseimbangan pasaran buruh (nilai contoh)","data":{"a":60,"b":2,"c":10,"d":1.5,"x":[0,34],"y":[0,64],"tikX":[0,5,10,15,20,25,30],"tikY":[0,10,20,30,40,50,60],"labelX":"Kuantiti buruh (orang)","labelY":"Upah (RM)","hargaAwal":45,"pMin":14,"pMaks":54,"anjak":3,"unitQ":"orang","qHujung":30}}'></figure>
 <div class="grid-2">
   <div class="kotak contoh"><span class="kotak-label">Umur bersara dilanjutkan (58 → 60 tahun)</span><p>Penawaran buruh bertambah, keluk SS beralih ke kanan. Upah keseimbangan <b>turun</b> (W₀ ke W₁), kuantiti buruh <b>bertambah</b> (L₀ ke L₁).</p></div>
   <div class="kotak contoh"><span class="kotak-label">Lebih banyak pengeluar guna intensif modal</span><p>Buruh diganti dengan modal, permintaan buruh berkurang, keluk DD beralih ke kiri. Upah <b>turun</b>, kuantiti buruh <b>berkurang</b>.</p></div>
