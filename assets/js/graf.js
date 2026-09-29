@@ -1713,6 +1713,15 @@
 
   G.daftar("keseimbangan", function (host, opt) {
     var pr = Object.assign({}, PRESET_SS[opt.preset] || PRESET_SS.seluar);
+    // Data sendiri melalui data-opt (contoh nota STPM): { a, b, c, d, x, y, tikX, tikY, labelX, labelY,
+    // tajuk, hargaAwal, pMin, pMaks, anjak, unitQ }. Permintaan P = a − bQ, penawaran P = c + dQ.
+    if (opt.data) {
+      Object.assign(pr, opt.data);
+      if (opt.data.unitQ)
+        pr.fmtQ = function (q) {
+          return E.fmt(q, 1) + " " + opt.data.unitQ;
+        };
+    }
     var mod = pr.mod;
     var K = G.kad(host, {
       tajuk: opt.tajuk || pr.tajuk,

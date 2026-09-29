@@ -1,6 +1,7 @@
 /* =========================================================
    Econ Tutor · graf interaktif STPM (Ekonomi 944)
    Penggal 1 Bab 1: perubahan keluk kemungkinan pengeluaran
+   Penggal 1 Bab 4: keseimbangan firma (PPS, monopoli, bermonopoli)
    ========================================================= */
 (function () {
   "use strict";
@@ -196,5 +197,180 @@
       return { musnah: henti };
     },
     { tajuk: "Perubahan keluk kemungkinan pengeluaran", bab: "stpm-p1-b1" }
+  );
+
+  /* =========================================================
+     PENGGAL 1 · BAB 4 · Keseimbangan firma: persaingan sempurna,
+     monopoli dan persaingan bermonopoli (MR = MC)
+     ========================================================= */
+  // Kos contoh: TFC = 40, TVC = 12Q − 1.2Q² + 0.06Q³ (nilai contoh, bukan data modul)
+  var TFC = 40;
+  function avc(q) {
+    return 12 - 1.2 * q + 0.06 * q * q;
+  }
+  function ac(q) {
+    return TFC / q + avc(q);
+  }
+  function mc(q) {
+    return 12 - 2.4 * q + 0.18 * q * q;
+  }
+  var AVC_MIN = avc(10); // 6.00 pada Q = 10
+
+  var JENIS_PASARAN = {
+    pps: { nama: "Persaingan sempurna", b: 0 },
+    mono: { nama: "Monopoli", b: 1.2 },
+    bermono: { nama: "Persaingan bermonopoli", b: 0.6 }
+  };
+
+  // Q keseimbangan: MR = MC pada bahagian MC yang menaik (Q > 6.67)
+  function qSeimbang(A, b) {
+    // A − 2bQ = 12 − 2.4Q + 0.18Q²  →  0.18Q² + (2b − 2.4)Q + (12 − A) = 0
+    var qa = 0.18,
+      qb = 2 * b - 2.4,
+      qc = 12 - A;
+    var d = qb * qb - 4 * qa * qc;
+    if (d < 0) return null;
+    return (-qb + Math.sqrt(d)) / (2 * qa);
+  }
+
+  G.daftar(
+    "struktur-pasaran",
+    function (host, opt) {
+      var K = G.kad(host, {
+        tajuk: opt.tajuk || "Keseimbangan firma: MR = MC",
+        petunjuk: "Seret pemegang P (harga / permintaan) · anak panah ↑↓"
+      });
+      var st = { jenis: opt.jenis || "pps", A: 12 };
+      var AWAL = { pps: 12, mono: 30, bermono: 21 };
+      st.A = AWAL[st.jenis];
+
+      G.segmen(
+        K.kawalan,
+        [
+          ["pps", JENIS_PASARAN.pps.nama],
+          ["mono", JENIS_PASARAN.mono.nama],
+          ["bermono", JENIS_PASARAN.bermono.nama]
+        ],
+        st.jenis,
+        function (v) {
+          st.jenis = v;
+          st.A = AWAL[v];
+          lukis();
+        }
+      );
+
+      var plot = G.plot(K.kanvas, {
+        x: [0, 20],
+        y: [0, 40],
+        tikX: [0, 5, 10, 15, 20],
+        tikY: [0, 10, 20, 30, 40],
+        labelX: "Kuantiti (unit)",
+        labelY: "Harga / kos / hasil (RM)",
+        nisbah: function (w) {
+          return w < 480 ? 1 : 0.66;
+        },
+        aria: "Keseimbangan firma dalam pelbagai struktur pasaran"
+      });
+
+      function hadA() {
+        return st.jenis === "pps" ? [4, 20] : st.jenis === "mono" ? [16, 40] : [12, 36];
+      }
+
+      function lukis() {
+        var b = JENIS_PASARAN[st.jenis].b;
+        plot.kosong();
+        plot.paksi();
+        var q = qSeimbang(st.A, b);
+        var P = q == null ? null : st.A - b * q;
+        var ACq = q == null ? null : ac(q);
+        var untung = q == null ? 0 : (P - ACq) * q;
+        var tutup = q == null || P < avc(q) - 1e-9;
+
+        if (q != null && !tutup && Math.abs(P - ACq) > 0.05)
+          plot.segi(0, P, q, ACq, "g-kawasan " + (P > ACq ? "baik" : "buruk"), "kawasan");
+
+        plot.fungsi(ac, 1.6, 20, "g-lengkung c3", "lengkung", 120);
+        plot.fungsi(avc, 0.2, 20, "g-lengkung c5", "lengkung", 120);
+        plot.fungsi(mc, 0.2, 18.5, "g-lengkung s", "lengkung", 120);
+        plot.teks(20, ac(20), "AC", "g-teks c3", "end", "label", -4, -8);
+        plot.teks(20, avc(20), "AVC", "g-teks c5", "end", "label", -4, 16);
+        plot.teks(18.5, mc(18.5), "MC", "g-teks s", "start", "label", 6, 4);
+
+        if (st.jenis === "pps") {
+          plot.garis(0, st.A, 20, st.A, "g-lengkung d", "lengkung");
+          plot.teks(20, st.A, "AR = MR", "g-teks d", "end", "label", -4, -8);
+        } else {
+          var qAR = st.A / b,
+            qMR = st.A / (2 * b);
+          plot.fungsi(function (x) {
+            return st.A - b * x;
+          }, 0, Math.min(20, qAR), "g-lengkung d", "lengkung", 40);
+          plot.fungsi(function (x) {
+            return st.A - 2 * b * x;
+          }, 0, Math.min(20, qMR), "g-lengkung c4", "lengkung", 40);
+          var xa = Math.min(19, qAR * 0.92),
+            xm = Math.min(19, qMR * 0.9);
+          plot.teks(xa, st.A - b * xa, "DD = AR", "g-teks d", "start", "label", 6, -6);
+          plot.teks(xm, st.A - 2 * b * xm, "MR", "g-teks c4", "end", "label", -6, 14);
+        }
+
+        if (q != null) {
+          plot.bulat(q, mc(q), 5, "g-nod isi s", "tanda");
+          plot.teks(q, mc(q), "E", "g-teks s", "start", "label", 8, 14);
+          plot.panduanKePaksi(q, P, { labelX: E.fmt(q, 1), labelY: E.rm(P, 2) });
+          if (st.jenis !== "pps") plot.garis(q, mc(q), q, P, "g-panduan", "panduan");
+        }
+        plot.nod(0.6, st.A, { pegang: "P", kelas: "d", label: "P", dx: 10, dy: -10, kelasLabel: "d" });
+        baca(q, P, ACq, untung, tutup);
+      }
+
+      function baca(q, P, ACq, untung, tutup) {
+        var nama = JENIS_PASARAN[st.jenis].nama;
+        if (q == null) {
+          K.baca.innerHTML = '<div class="ayat">Tiada keluaran dengan MR = MC. Seret P ke atas.</div>';
+          return;
+        }
+        var bits = [
+          ["Q (MR = MC)", E.fmt(q, 1) + " unit", "s"],
+          ["Harga", E.rm(P, 2), "d"],
+          ["AC", E.rm(ACq, 2), "c3"],
+          [untung >= 0 ? "Untung" : "Rugi", E.rm(Math.abs(untung), 2), untung > 0.5 ? "baik" : untung < -0.5 ? "buruk" : ""]
+        ];
+        var ayat;
+        if (tutup)
+          ayat =
+            '<span class="status buruk">Tutup perniagaan</span> Harga ' + E.rm(P, 2) + " lebih rendah daripada AVC (" + E.rm(avc(q), 2) + "): TR tidak dapat menampung semua kos berubah. Titik tutup ialah AVC minimum " + E.rm(AVC_MIN, 2) + ".";
+        else if (untung > 0.5)
+          ayat = '<span class="status baik">Untung lebih normal</span> TR &gt; TC kerana harga (AR) melebihi AC pada Q keseimbangan. Untung = (P − AC) × Q = (' + E.fmt(P, 2) + " − " + E.fmt(ACq, 2) + ") × " + E.fmt(q, 1) + " = <b>" + E.rm(untung, 2) + "</b>.";
+        else if (untung < -0.5)
+          ayat = '<span class="status amaran">Untung kurang normal (rugi)</span> AC &gt; AR, tetapi harga masih melebihi AVC, maka firma <b>meneruskan</b> operasi dalam jangka pendek kerana TR menampung semua kos berubah dan sebahagian kos tetap.';
+        else ayat = '<span class="status neutral">Untung normal</span> AR = AC pada Q keseimbangan, maka TR = TC. Ini keadaan keseimbangan jangka panjang bagi persaingan sempurna dan persaingan bermonopoli.';
+        if (st.jenis === "pps") ayat += " Firma persaingan sempurna ialah <b>penerima harga</b>: P = AR = MR (keluk mendatar).";
+        else ayat += " " + nama + ": keluk DD = AR bercerun negatif dan MR di bawahnya; harga dibaca pada keluk AR di atas titik MR = MC.";
+        K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + ' <span class="teks-lemah">(Nilai contoh.)</span></div>';
+      }
+
+      G.interaksi(plot, {
+        seret: function (n, pt) {
+          if (n !== "P" || pt.y == null) return;
+          var h = hadA();
+          st.A = E.bundar(E.clamp(pt.y, h[0], h[1]), 1);
+          lukis();
+        },
+        kekunci: function (k) {
+          var h = hadA();
+          st.A = E.bundar(E.clamp(st.A + k.dy * 0.5, h[0], h[1]), 1);
+          lukis();
+        }
+      });
+
+      lukis();
+      var henti = G.pantauSaiz(K.kanvas, function () {
+        plot.ukur();
+        lukis();
+      });
+      return { musnah: henti };
+    },
+    { tajuk: "Keseimbangan firma: MR = MC", bab: "stpm-p1-b4" }
   );
 })();
