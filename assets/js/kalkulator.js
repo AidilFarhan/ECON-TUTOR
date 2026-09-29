@@ -2515,6 +2515,158 @@
   });
 
   /* =========================================================
+     MATRIKULASI AE025 · BAB 3 · Keseimbangan Pendapatan Negara
+     ========================================================= */
+  tambah({
+    id: "matrik-pengganda",
+    bab: "m2-b3",
+    no: "3.3",
+    tajuk: "Keseimbangan dua dan tiga sektor, pengganda dan lompang",
+    kunci: "keseimbangan pendapatan negara pengganda kg kt lompang inflasi deflasi mpc cukai lump-sum",
+    rumus: ["Y = a + b(Y − T) + I + G", "KG = " + frac("1", "1 − MPC") + " &nbsp; KT = " + frac("−MPC", "1 − MPC"), "ΔG = " + frac("Yf − Ye", "KG") + " &nbsp; ΔT = " + frac("Yf − Ye", "KT")],
+    petunjuk: "Biarkan G, T dan Yf kosong untuk ekonomi dua sektor tanpa sasaran guna tenaga penuh.",
+    medan: [
+      { k: "a", l: "Penggunaan autonomi a" },
+      { k: "b", l: "MPC (b)" },
+      { k: "i", l: "Pelaburan I" },
+      { k: "g", l: "Perbelanjaan kerajaan G", opsyenal: true },
+      { k: "t", l: "Cukai lump-sum T", opsyenal: true },
+      { k: "yf", l: "Pendapatan guna tenaga penuh Yf", opsyenal: true }
+    ],
+    contoh: [
+      { n: "Dua sektor (modul)", v: { a: 9000, b: 0.75, i: 1500 } },
+      { n: "Tiga sektor (modul)", v: { a: 80, b: 0.75, i: 20, g: 30, t: 20 } },
+      { n: "Lompang deflasi (modul)", v: { a: 150, b: 0.75, i: 150, g: 200, t: 200, yf: 1500 } },
+      { n: "Lompang inflasi (modul)", v: { a: 150, b: 0.75, i: 150, g: 200, t: 200, yf: 1000 } }
+    ],
+    kira: function (x) {
+      if (!(x.b > 0 && x.b < 1)) return { ralat: "MPC mesti antara 0 dan 1." };
+      var g = x.g || 0,
+        t = x.t || 0;
+      var autonomi = x.a - x.b * t + x.i + g;
+      var kg = 1 / (1 - x.b),
+        kt = -x.b / (1 - x.b);
+      var y = autonomi * kg;
+      var L = [
+        "Y = " + nom(x.a) + " + " + nom(x.b) + "(Y − " + nom(t) + ") + " + nom(x.i) + " + " + nom(g),
+        nom(1 - x.b) + "Y = " + nom(autonomi) + " → Y = <b>" + nom(y) + "</b>",
+        "KG = 1 ÷ " + nom(1 - x.b) + " = " + nom(kg) + "; KT = −" + nom(x.b) + " ÷ " + nom(1 - x.b) + " = " + nom(kt)
+      ];
+      var hasil = [H("Y keseimbangan", nom(y), "baik"), H("Pengganda KG", nom(kg)), H("Pengganda KT", nom(kt))];
+      var out = { hasil: hasil, langkah: L };
+      if (x.yf != null) {
+        var jurang = x.yf - y;
+        var dg = jurang / kg,
+          dt = jurang / kt;
+        L.push("Jurang = " + nom(x.yf) + " − " + nom(y) + " = " + nom(jurang));
+        L.push("ΔG = " + nom(jurang) + " ÷ " + nom(kg) + " = <b>" + nom(dg) + "</b>; ΔT = " + nom(jurang) + " ÷ " + nom(kt) + " = <b>" + nom(dt) + "</b>");
+        hasil.push(H(jurang > 0 ? "Lompang deflasi" : jurang < 0 ? "Lompang inflasi" : "Guna tenaga penuh", nom(Math.abs(dg)), jurang > 0 ? "amaran" : jurang < 0 ? "merah" : "baik"));
+        hasil.push(H("Perubahan G diperlukan", nom(dg)));
+        hasil.push(H("Perubahan T diperlukan", nom(dt)));
+        out.nota = jurang > 0 ? "Tambah G atau kurangkan T untuk menutup lompang deflasi. Perubahan T lebih besar kerana |KT| < KG." : jurang < 0 ? "Kurangkan G atau naikkan T untuk menutup lompang inflasi." : "Ekonomi berada pada guna tenaga penuh.";
+      }
+      return out;
+    }
+  });
+
+  /* =========================================================
+     MATRIKULASI AE025 · BAB 4 · Wang
+     ========================================================= */
+  tambah({
+    id: "matrik-bekalan-wang",
+    bab: "m2-b4",
+    no: "4.2",
+    tajuk: "Bekalan wang M1, M2 dan kadar pertumbuhannya",
+    kunci: "bekalan wang m1 m2 wang dalam edaran deposit semasa separa wang wang hampir pertumbuhan",
+    rumus: ["M1 = wang dalam edaran + deposit semasa", "M2 = M1 + separa wang", "Kadar pertumbuhan = " + frac("M tahun semasa − M tahun sebelum", "M tahun sebelum") + " × 100%"],
+    petunjuk: "Nilai dalam RM juta.",
+    medan: [
+      { k: "e0", l: "Wang dalam edaran, tahun sebelum" },
+      { k: "d0", l: "Deposit semasa, tahun sebelum" },
+      { k: "s0", l: "Separa wang, tahun sebelum" },
+      { k: "e1", l: "Wang dalam edaran, tahun semasa" },
+      { k: "d1", l: "Deposit semasa, tahun semasa" },
+      { k: "s1", l: "Separa wang, tahun semasa" }
+    ],
+    contoh: [{ n: "Malaysia 2004 → 2005 (modul)", v: { e0: 28617, d0: 85651.5, s0: 419894.2, e1: 30177.6, d1: 93845.5, s1: 492154.8 } }],
+    kira: function (x) {
+      var m10 = x.e0 + x.d0,
+        m11 = x.e1 + x.d1,
+        m20 = m10 + x.s0,
+        m21 = m11 + x.s1;
+      if (m10 === 0 || m20 === 0) return { ralat: "Bekalan wang tahun sebelum tidak boleh sifar." };
+      var g1 = ((m11 - m10) / m10) * 100,
+        g2 = ((m21 - m20) / m20) * 100;
+      return {
+        hasil: [H("M1 tahun semasa", nom(m11)), H("M2 tahun semasa", nom(m21)), H("Pertumbuhan M1", pc(g1), "biru"), H("Pertumbuhan M2", pc(g2), "biru")],
+        langkah: [
+          "M1 = " + nom(x.e0) + " + " + nom(x.d0) + " = " + nom(m10) + " → " + nom(x.e1) + " + " + nom(x.d1) + " = " + nom(m11),
+          "M2 = " + nom(m10) + " + " + nom(x.s0) + " = " + nom(m20) + " → " + nom(m11) + " + " + nom(x.s1) + " = " + nom(m21),
+          "Pertumbuhan M1 = (" + nom(m11) + " − " + nom(m10) + ") ÷ " + nom(m10) + " × 100 = <b>" + pc(g1) + "</b>",
+          "Pertumbuhan M2 = (" + nom(m21) + " − " + nom(m20) + ") ÷ " + nom(m20) + " × 100 = <b>" + pc(g2) + "</b>"
+        ]
+      };
+    }
+  });
+
+  /* =========================================================
+     MATRIKULASI AE025 · BAB 5 · Inflasi
+     ========================================================= */
+  tambah({
+    id: "matrik-inw",
+    bab: "m2-b5",
+    no: "5.1.3",
+    tajuk: "Indeks nilai wang dan perubahan nilai wang",
+    kunci: "indeks nilai wang inw kuasa beli nilai wang ihp tahun asas",
+    rumus: ["INW = " + frac("Indeks harga tahun asas", "Indeks harga tahun semasa") + " × 100", "Perubahan nilai wang = " + frac("INW semasa − INW asas", "INW asas") + " × 100"],
+    medan: [
+      { k: "asas", l: "Indeks harga tahun asas" },
+      { k: "semasa", l: "Indeks harga tahun semasa" }
+    ],
+    contoh: [
+      { n: "Tahun asas 100, 2003 = 120 (modul)", v: { asas: 100, semasa: 120 } },
+      { n: "IHP = 200 (modul)", v: { asas: 100, semasa: 200 } },
+      { n: "IHP = 50 (modul)", v: { asas: 100, semasa: 50 } }
+    ],
+    kira: function (x) {
+      if (x.semasa <= 0 || x.asas <= 0) return { ralat: "Indeks harga mesti positif." };
+      var inw = (x.asas / x.semasa) * 100,
+        ubah = ((inw - 100) / 100) * 100;
+      return {
+        hasil: [H("Indeks nilai wang", nom(inw)), H("Perubahan nilai wang", pc(ubah), ubah < 0 ? "merah" : ubah > 0 ? "baik" : "neutral")],
+        langkah: ["INW = " + nom(x.asas) + " ÷ " + nom(x.semasa) + " × 100 = <b>" + nom(inw) + "</b>", "Perubahan = (" + nom(inw) + " − 100) ÷ 100 × 100 = <b>" + pc(ubah) + "</b>"],
+        nota: ubah < 0 ? "Harga umum naik, maka kuasa beli wang jatuh." : ubah > 0 ? "Harga umum turun, maka kuasa beli wang naik." : "Tiada perubahan nilai wang."
+      };
+    }
+  });
+
+  /* =========================================================
+     MATRIKULASI AE025 · BAB 7 · Ekonomi Antarabangsa
+     ========================================================= */
+  tambah({
+    id: "matrik-ksp",
+    bab: "m2-b7",
+    no: "7.1.4",
+    tajuk: "Kadar syarat perdagangan (KSP) nominal",
+    kunci: "kadar syarat perdagangan ksp eksport import nominal",
+    rumus: ["KSP nominal = " + frac("Jumlah nilai eksport", "Jumlah nilai import") + " × 100"],
+    medan: [
+      { k: "x", l: "Jumlah nilai eksport (RM juta)" },
+      { k: "m", l: "Jumlah nilai import (RM juta)" }
+    ],
+    contoh: [{ n: "Malaysia 2005 (modul)", v: { x: 604625, m: 490494 } }],
+    kira: function (x) {
+      if (x.m <= 0) return { ralat: "Nilai import mesti positif." };
+      var k = (x.x / x.m) * 100;
+      return {
+        hasil: [H("KSP", nom(k), k > 100 ? "baik" : k < 100 ? "amaran" : "neutral")],
+        langkah: [nom(x.x) + " ÷ " + nom(x.m) + " × 100 = <b>" + nom(k) + "</b>"],
+        nota: k > 100 ? "KSP melebihi 100: dengan 100 unit eksport, negara memperoleh " + nom(k) + " unit import." : k < 100 ? "KSP kurang daripada 100: syarat perdagangan tidak menguntungkan." : "KSP sama dengan 100."
+      };
+    }
+  });
+
+  /* =========================================================
      ENJIN PAPARAN
      ========================================================= */
   var ikutId = {};
