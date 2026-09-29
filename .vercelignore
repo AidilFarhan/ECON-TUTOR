@@ -1,6 +1,6 @@
 # Fail sumber asal (buku teks, nota guru, kertas peperiksaan) tidak diterbitkan.
 *.pdf
-# Fail sumber STPM yang dimuat naik tanpa sambungan .pdf.
-STPM SEM 1
+# Fail sumber STPM yang dimuat naik tanpa sambungan .pdf (STPM SEM 1, STPM SEM 2).
+STPM SEM *
 # Kertas MPP3 Terengganu disorok sehingga kebenaran diperoleh.
 assets/js/data/percubaan-terengganu-2025.js
