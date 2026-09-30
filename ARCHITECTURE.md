@@ -196,15 +196,15 @@ GrafBina {
   - *Pergerakan di sepanjang keluk* drags point A → B along the same curve (`B.gerakTitik`).
   - *Peralihan keluk* drags the whole curve D₀ → D₁ (`B.anjakKeluk`), with the original shown dashed.
   - Each drag or key press records one `peristiwa`. `B.catat` merges consecutive events of the same kind.
-- **Limits.** A shift keeps the curve's end inside 95% of the axis and keeps at least 30% of the axis visible. Parts past an axis are clipped (`B.klipKotak`). Horizontal curves shift vertically; all others shift horizontally.
+- **Limits.** A shift keeps the curve's end inside 95% of the axis (so its label stays visible), and the far end of the curve at least 10% from the axis, so a curve can be moved almost to the axis. Parts past an axis are clipped (`B.klipKotak`). Horizontal curves shift vertically; all others shift horizontally.
 - **Equations (`EKO.persamaan`).** A hand-written recursive-descent parser. It does not use `eval`.
   - Syntax: `+ − × ÷ ^`, brackets, implicit multiplication (`2P`, `bP`) and textbook thousands spaces (`1 000`).
   - Variables: P goes on the Y axis; Q, Qd and Qs go on the X axis. `x`/`y` may be used instead, but a graph cannot mix the two systems.
   - Other lowercase letters are parameters (`Qd = a − bP; a = 100; b = 2`, default 1, at most 4).
   - Solving: the equation is solved for whichever variable it is linear in. This covers explicit forms, `2P + Q = 100`, `P = 10`, `Q = 40` and `P×Q = 100`.
-  - Axes: the first equation turns the axes numeric. `PS.cadangJulat` picks round maxima from the intercepts, so the curve ends inside 92% of each axis.
+  - Axes: the first equation turns the axes numeric. `PS.cadangJulat` picks round maxima from the intercepts (extent ÷ 0.7), and curves are drawn inside 75% of each axis, which leaves 20–30% of each axis free for shifting right or up.
   - Parameter sliders re-sample the curve, but the axes stay fixed so the change is visible.
-  - A shift is still only `anjak`, rounded to a tidy unit on numeric axes. The equivalent equation (for example `Qd = 110 − 2P`) is shown for straight lines but never stored.
+  - A shift is still only `anjak`, rounded to a tidy unit on numeric axes (also at the limit: +42, not +42.45). The equivalent equation (for example `Qd = 110 − 2P`) is shown for straight lines but never stored.
   - Readings on an equation curve round the free variable to one tidy unit and compute the other variable from the equation.
 - **Drawing (`B.dariLukisan`).** *Lukis keluk* turns a finger or mouse stroke into an ordinary `Keluk` (`sumber: "lukis"`):
   1. The points are clamped to 95% of the axes.

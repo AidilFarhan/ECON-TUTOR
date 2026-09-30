@@ -16,7 +16,7 @@
   var B = E.bina;
   var PS = (E.persamaan = {});
 
-  var KOTAK = 0.92; // keluk persamaan berakhir dalam 92% paksi supaya label kelihatan
+  var KOTAK = 0.75; // keluk persamaan berakhir dalam 75% paksi: label kelihatan dan ada ruang untuk beralih ke kanan/atas
   var MAKS_PARAM = 4;
   var FUNGSI = /(sqrt|ln|log|exp|sin|cos|tan|abs)\s*\(/i;
 
@@ -395,7 +395,7 @@
     if (!guna) {
       // garis mendatar/tegak: bersandar malar
       if (!(g0 > 0)) return null;
-      out[eq.dep] = PS.bulatElok(g0 * 1.25);
+      out[eq.dep] = PS.bulatElok(g0 / 0.6);
       out[bebas] = null;
       return out;
     }
@@ -436,8 +436,8 @@
       if (isFinite(v)) maks = Math.max(maks, v);
     }
     if (!(maks > 0)) return null;
-    out[bebas] = PS.bulatElok(T * 1.1);
-    out[eq.dep] = PS.bulatElok(maks * 1.15);
+    out[bebas] = PS.bulatElok(T / 0.7);
+    out[eq.dep] = PS.bulatElok(maks / 0.7);
     return out;
   };
 
@@ -465,7 +465,7 @@
       semasa.push(dep === "x" ? [nd / KOTAK, nb / KOTAK] : [nb / KOTAK, nd / KOTAK]);
     }
     if (semasa.length > 1) kepingan.push(semasa);
-    // potong pada kotak 92% dan ambil kepingan terpanjang
+    // potong pada kotak 75% dan ambil kepingan terpanjang
     var terbaik = null,
       panjang = 0;
     kepingan.forEach(function (k) {

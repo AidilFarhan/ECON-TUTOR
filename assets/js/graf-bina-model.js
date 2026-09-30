@@ -30,7 +30,7 @@
   var MAKS_KELUK = 6;
   var BAHAGIAN = 16; // segmen licin antara dua titik kawalan
   var TEPI = 0.95; // hujung keluk tidak boleh melepasi 95% paksi (label mesti kelihatan)
-  var NAMPAK_MIN = 0.3; // sekurang-kurangnya 30% paksi kekal di hadapan asalan
+  var NAMPAK_MIN = 0.1; // hujung jauh keluk kekal sekurang-kurangnya 10% dari paksi (boleh dialih hampir ke paksi)
   var S_MIN = 0.04;
   var S_MAKS = 0.96;
 

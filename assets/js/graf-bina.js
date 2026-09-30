@@ -312,7 +312,16 @@
         my = st.graf.paksi.y.maks;
       var ux = unit(mx) / mx,
         uy = unit(my) / my;
-      return [Math.round(ax / ux) * ux, Math.round(ay / uy) * uy];
+      // kepil pada had dahulu, kemudian bundar ke arah dalam supaya nilai di had pun kemas (+42, bukan +42.45)
+      var h = B.hadAnjak(k);
+      function kemas(v, u, julat) {
+        v = E.clamp(v, julat[0], julat[1]);
+        var r = Math.round(v / u) * u;
+        if (r > julat[1] + 1e-9) r -= u;
+        if (r < julat[0] - 1e-9) r += u;
+        return r;
+      }
+      return [kemas(ax, ux, h.x), kemas(ay, uy, h.y)];
     }
 
     function lukis() {
