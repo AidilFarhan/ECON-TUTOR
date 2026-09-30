@@ -130,6 +130,11 @@
         return k.label === l;
       });
     };
+    // keluk generik (K) guna huruf seterusnya; elak huruf yang sudah bermakna (D, S, P, Q, E, A, B)
+    if (label === "K") {
+      var huruf = ["K", "L", "M", "N", "R", "T", "U", "V"];
+      for (var i = 0; i < huruf.length; i++) if (!ada(huruf[i])) return huruf[i];
+    }
     var l = label;
     while (ada(l) && l.length < 8) l += "′";
     return l;
@@ -483,6 +488,125 @@
     if (a.y > 0.004) out.push("atas");
     else if (a.y < -0.004) out.push("bawah");
     return out;
+  };
+
+  /* ---------- lukisan tangan → keluk ---------- */
+  var LUKIS_MIN_PX = 30; // lukisan lebih pendek daripada ini diabaikan
+  var LUKIS_TOL_PX = 2.5; // toleransi awal Ramer–Douglas–Peucker (piksel)
+  var LUKIS_MAKS_TITIK = 12;
+  var LURUS_SUDUT = 6; // darjah: garis hampir mendatar/tegak diluruskan
+
+  // Purata bergerak (hujung dikekalkan) untuk mengurangkan getaran jari
+  B.purata = function (pts, w) {
+    var h = Math.floor((w || 5) / 2);
+    if (pts.length <= 2 || h < 1) return pts.map(function (p) {
+      return [p[0], p[1]];
+    });
+    return pts.map(function (p, i) {
+      if (i === 0 || i === pts.length - 1) return [p[0], p[1]];
+      var a = Math.max(0, i - h),
+        b = Math.min(pts.length - 1, i + h);
+      var sx = 0,
+        sy = 0;
+      for (var j = a; j <= b; j++) {
+        sx += pts[j][0];
+        sy += pts[j][1];
+      }
+      return [sx / (b - a + 1), sy / (b - a + 1)];
+    });
+  };
+
+  // Ramer–Douglas–Peucker; jarak diukur dalam piksel (sx, sy = piksel per unit)
+  B.permudah = function (pts, tol, sx, sy) {
+    sx = sx || 1;
+    sy = sy || 1;
+    if (pts.length < 3) return pts.slice();
+    var simpan = [];
+    for (var i = 0; i < pts.length; i++) simpan.push(false);
+    simpan[0] = simpan[pts.length - 1] = true;
+    var tindan = [[0, pts.length - 1]];
+    while (tindan.length) {
+      var j = tindan.pop();
+      var a = pts[j[0]],
+        b = pts[j[1]];
+      var ax = a[0] * sx,
+        ay = a[1] * sy,
+        bx = b[0] * sx,
+        by = b[1] * sy;
+      var vx = bx - ax,
+        vy = by - ay;
+      var len = Math.sqrt(vx * vx + vy * vy);
+      var jauh = -1,
+        idx = -1;
+      for (var k = j[0] + 1; k < j[1]; k++) {
+        var px = pts[k][0] * sx - ax,
+          py = pts[k][1] * sy - ay;
+        var d = len ? Math.abs(px * vy - py * vx) / len : Math.sqrt(px * px + py * py);
+        if (d > jauh) {
+          jauh = d;
+          idx = k;
+        }
+      }
+      if (jauh > tol) {
+        simpan[idx] = true;
+        tindan.push([j[0], idx], [idx, j[1]]);
+      }
+    }
+    return pts.filter(function (p, i) {
+      return simpan[i];
+    });
+  };
+
+  // Lukisan (titik ternormal mentah) → { titik } atau { ralat }. o.sx, o.sy = piksel per unit.
+  B.dariLukisan = function (mentah, o) {
+    o = o || {};
+    var sx = o.sx || 500,
+      sy = o.sy || 340;
+    // dalam kotak; hujung tidak melepasi 95% supaya label kelihatan
+    var pts = [];
+    (mentah || []).forEach(function (p) {
+      if (!isFinite(p[0]) || !isFinite(p[1])) return;
+      var q = [E.clamp(p[0], 0, TEPI), E.clamp(p[1], 0, TEPI)];
+      var z = pts[pts.length - 1];
+      if (!z || Math.abs(z[0] - q[0]) * sx + Math.abs(z[1] - q[1]) * sy > 0.5) pts.push(q);
+    });
+    // saiz lukisan = pepenjuru kotak sempadan (getaran jari tidak menambah saiz)
+    var h = had(pts.length ? pts : [[0, 0]]);
+    var pepenjuru = Math.sqrt(Math.pow((h.x1 - h.x0) * sx, 2) + Math.pow((h.y1 - h.y0) * sy, 2));
+    if (pts.length < 2 || pepenjuru < LUKIS_MIN_PX) return { ralat: "Lukisan terlalu pendek. Lukis keluk yang lebih panjang di dalam graf." };
+    var licin = B.purata(pts, 5);
+    var tol = LUKIS_TOL_PX;
+    var kawalan = B.permudah(licin, tol, sx, sy);
+    while (kawalan.length > LUKIS_MAKS_TITIK) {
+      tol *= 1.5;
+      kawalan = B.permudah(licin, tol, sx, sy);
+    }
+    // arah tetap: kiri → kanan (bawah → atas bagi keluk hampir tegak)
+    var a = kawalan[0],
+      z = kawalan[kawalan.length - 1];
+    var dxPx = (z[0] - a[0]) * sx,
+      dyPx = (z[1] - a[1]) * sy;
+    if (Math.abs(dxPx) >= Math.abs(dyPx) ? dxPx < 0 : dyPx < 0) kawalan.reverse();
+    // garis hampir mendatar/tegak diluruskan
+    var lurus = false;
+    if (kawalan.length === 2) {
+      var sudut = (Math.atan2(Math.abs(dyPx), Math.abs(dxPx)) * 180) / Math.PI;
+      if (sudut < LURUS_SUDUT) {
+        var ym = (kawalan[0][1] + kawalan[1][1]) / 2;
+        kawalan = [[kawalan[0][0], ym], [kawalan[1][0], ym]];
+        lurus = "mendatar";
+      } else if (sudut > 90 - LURUS_SUDUT) {
+        var xm = (kawalan[0][0] + kawalan[1][0]) / 2;
+        kawalan = [[xm, kawalan[0][1]], [xm, kawalan[1][1]]];
+        lurus = "tegak";
+      }
+    }
+    return {
+      titik: kawalan.map(function (p) {
+        return [bundar(p[0]), bundar(p[1])];
+      }),
+      diluruskan: lurus
+    };
   };
 
   /* ---------- graf contoh ---------- */

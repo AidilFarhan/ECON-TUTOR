@@ -173,7 +173,7 @@ flowchart TB
 
 ### 3.4a Bina graf (`EKO.bina`)
 
-`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine) and 2 (equation input) of the owner's plan are done (PRD §10). Drawing, scanning, explanations, equilibrium and exercises come later, and they must all produce this same model.
+`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input) and 3 (drawing) of the owner's plan are done (PRD §10). Explanations, equilibrium, exercises and scanning come later, and they must all use this same model.
 
 ```js
 GrafBina {
@@ -206,6 +206,15 @@ GrafBina {
   - Parameter sliders re-sample the curve, but the axes stay fixed so the change is visible.
   - A shift is still only `anjak`, rounded to a tidy unit on numeric axes. The equivalent equation (for example `Qd = 110 − 2P`) is shown for straight lines but never stored.
   - Readings on an equation curve round the free variable to one tidy unit and compute the other variable from the equation.
+- **Drawing (`B.dariLukisan`).** *Lukis keluk* turns a finger or mouse stroke into an ordinary `Keluk` (`sumber: "lukis"`):
+  1. The points are clamped to 95% of the axes.
+  2. A stroke whose bounding box is under 30 px is rejected.
+  3. A moving average removes finger jitter.
+  4. Ramer–Douglas–Peucker simplifies the stroke (2.5 px tolerance in pixels, at most 12 control points).
+  5. The points are ordered left → right (bottom → top when near-vertical), and near-horizontal or near-vertical lines (< 6°) are straightened.
+  6. The usual Catmull-Rom smoothing is applied.
+  - While drawing, handles are hidden and the SVG gets `touch-action: none` so the finger does not scroll the page. Drawing ends after each curve.
+  - Generic curves are labelled K, L, M… and no economic meaning is assumed.
 - **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
@@ -382,7 +391,7 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | --- | --- | --- |
 | No framework, no build | A teacher can open `index.html` offline, edit data files on GitHub, and deploy anywhere | Views are string templates; no component reuse beyond helpers |
 | Hash routing | Works on `file://`, any static host, and behind the middleware without rewrites | URLs contain `#`; the hash is lost across the login redirect |
-| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 9 600 lines across eight `graf*.js` files) |
+| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 9 800 lines across eight `graf*.js` files) |
 | Content as JS files | No fetch, works offline, one file per chapter is easy to review | Content editors must keep valid JS syntax |
 | Progress in `localStorage` | No accounts or database needed for learning features | Progress does not follow a student across devices |
 | Firebase Auth instead of Supabase | Free tier does not pause after inactivity; Google sign-in is a toggle; the owner's Supabase free slots were full | Adds a third-party identity provider |

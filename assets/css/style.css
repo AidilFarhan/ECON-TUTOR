@@ -4264,3 +4264,22 @@ ol.roman > li::before {
 .bina-param-tajuk b {
   color: var(--ink);
 }
+
+/* bina graf: mod lukis keluk */
+.bina-coretan {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.bina-graf[data-lukis] .graf-kanvas {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.bina-graf[data-lukis] .graf-kanvas svg {
+  cursor: crosshair;
+}

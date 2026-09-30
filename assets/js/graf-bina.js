@@ -33,7 +33,10 @@
       mod: opt.mod === "alih" ? "alih" : "gerak",
       pilih: null,
       hover: null,
-      seret: null
+      seret: null,
+      lukis: false, // mod input lukis keluk (bukan mod pembelajaran)
+      coretan: null, // titik mentah semasa melukis
+      baruDilukis: null // id keluk yang baru dilukis (untuk nota dalam panel bacaan)
     };
     st.pilih = st.graf.keluk.length ? st.graf.keluk[0].id : null;
 
@@ -82,6 +85,46 @@
       if (buka) inpPers.focus();
     });
     btnPers.setAttribute("aria-expanded", "false");
+
+    /* ---------- lukis keluk ---------- */
+    var btnLukis = G.butang(K.kawalan, E.ikon("pensel") + " Lukis keluk", function () {
+      setLukis(!st.lukis);
+    }, { tekan: false });
+
+    function setLukis(on, pesan) {
+      st.lukis = !!on && st.graf.keluk.length < B.MAKS_KELUK;
+      st.coretan = null;
+      st.hover = null;
+      st.pesanLukis = pesan || null;
+      btnLukis.setAttribute("aria-pressed", st.lukis ? "true" : "false");
+      btnLukis.innerHTML = st.lukis ? E.ikon("salah") + " Batal lukisan" : E.ikon("pensel") + " Lukis keluk";
+      // semasa melukis, jari tidak menatal halaman
+      plot.svg.style.touchAction = st.lukis ? "none" : "";
+      if (st.lukis) host.setAttribute("data-lukis", "1");
+      else host.removeAttribute("data-lukis");
+      petunjuk.textContent = st.lukis ? "Lukis keluk dengan jari atau tetikus" : PETUNJUK[st.mod];
+      lukis();
+    }
+
+    function selesaiLukis() {
+      var coretan = st.coretan;
+      st.coretan = null;
+      if (!coretan) return;
+      var sk = skala();
+      var h = B.dariLukisan(coretan, { sx: sk[0], sy: sk[1] });
+      if (h.ralat) {
+        st.pesanLukis = h.ralat;
+        lukis();
+        return;
+      }
+      st.graf = B.tambahKeluk(st.graf, { label: "K", titik: h.titik, sumber: "lukis" });
+      st.pilih = st.graf.keluk[st.graf.keluk.length - 1].id;
+      st.baruDilukis = { id: st.pilih, diluruskan: h.diluruskan };
+      setLukis(false);
+      binaPanel();
+      binaParam();
+      lukis();
+    }
     var kotakPers = G.div("bina-pers");
     kotakPers.hidden = true;
     kotakPers.innerHTML =
@@ -213,6 +256,7 @@
     }
 
     function tukarMod(v) {
+      if (st.lukis) setLukis(false);
       st.mod = v;
       st.hover = null;
       segMod.set(v);
@@ -301,7 +345,8 @@
       });
       // keluk dipilih dilukis terakhir supaya kawasan sentuhnya di atas
       if (dipilih) lukisKeluk(dipilih);
-      if (st.mod === "gerak" && dipilih) lukisTitik(dipilih);
+      if (st.mod === "gerak" && dipilih && !st.lukis) lukisTitik(dipilih);
+      if (st.coretan && st.coretan.length > 1) plot.laluan(st.coretan, "bina-coretan", "atas");
       baca();
     }
 
@@ -329,7 +374,7 @@
       });
       labelHujung(keping, dianjak ? asas + "₁" : k.label, "g-teks " + kls + (dipilih ? " besar" : ""));
       // mod alih: keseluruhan keluk ialah pemegang
-      if (st.mod === "alih" && k.arahSeret !== "tiada") {
+      if (st.mod === "alih" && k.arahSeret !== "tiada" && !st.lukis) {
         keping.forEach(function (p) {
           var gk = G.svgEl("g", { "data-pegang": "keluk:" + k.id, class: "g-pemegang", style: "touch-action:none;cursor:grab" }, plot.lapis.pemegang);
           gk.appendChild(plot.laluan(p, "g-lengkung tebal-hit bina-hit", "pemegang"));
@@ -480,10 +525,30 @@
     }
 
     function baca() {
+      if (st.lukis) {
+        K.baca.innerHTML =
+          G.nilai([["Input", "Lukis keluk"]]) +
+          '<div class="ayat">' +
+          (st.pesanLukis ? '<span class="status buruk">' + esc(st.pesanLukis) + "</span> " : "") +
+          "Lukis satu keluk di dalam graf dengan jari atau tetikus, kemudian lepaskan. Lukisan akan dilicinkan; garisan yang hampir mendatar atau tegak akan diluruskan. Tekan <b>Batal lukisan</b> untuk berhenti.</div>";
+        return;
+      }
       var k = cari(st.pilih);
       var chipMod = ["Mod", MOD[st.mod]];
+      var notaBaru = "";
+      if (k && st.baruDilukis && st.baruDilukis.id === k.id) {
+        notaBaru =
+          '<div class="ayat"><span class="status baik">Keluk dilukis</span> Keluk <b>' + esc(k.label) + "</b> sudah dilicinkan" +
+          (st.baruDilukis.diluruskan ? " dan diluruskan (" + st.baruDilukis.diluruskan + ")" : "") +
+          ". Namakan keluk dalam senarai di bawah graf, contohnya D atau S. Keluk ini boleh dialih atau dijejak seperti keluk lain.</div>";
+      }
+      bacaKeluk(k, chipMod);
+      if (notaBaru) K.baca.innerHTML += notaBaru;
+    }
+
+    function bacaKeluk(k, chipMod) {
       if (!k) {
-        K.baca.innerHTML = G.nilai([chipMod]) + '<div class="ayat">Tiada keluk dalam graf. Pilih satu bentuk dalam <b>Tambah keluk</b> atau tekan <b>ƒ Persamaan</b>.</div>';
+        K.baca.innerHTML = G.nilai([chipMod]) + '<div class="ayat">Tiada keluk dalam graf. Pilih satu bentuk dalam <b>Tambah keluk</b>, tekan <b>ƒ Persamaan</b> atau <b>Lukis keluk</b>.</div>';
         return;
       }
       var nama = esc(k.label);
@@ -596,11 +661,13 @@
         '<button type="button" class="cip" data-kosong>' + E.ikon("salah") + " Kosongkan graf</button></div>";
       panel.innerHTML = html;
       pilihTambah.select.disabled = n >= B.MAKS_KELUK;
+      btnLukis.disabled = n >= B.MAKS_KELUK;
     }
 
     function pilihKeluk(id) {
       if (st.pilih === id) return;
       st.pilih = id;
+      st.baruDilukis = null;
       Array.prototype.forEach.call(panel.querySelectorAll("[data-pilih]"), function (b) {
         b.setAttribute("aria-pressed", b.getAttribute("data-pilih") === id ? "true" : "false");
       });
@@ -699,6 +766,7 @@
 
     G.interaksi(plot, {
       seret: function (nama, pt, fasa) {
+        if (fasa === "mula") st.baruDilukis = null;
         if (nama === "titik") {
           if (fasa === "mula") mulaGerak();
           gerakKe(pt);
@@ -719,8 +787,22 @@
       },
       // Ketukan di luar pemegang: pilih keluk terdekat; dalam mod gerak, ketuk/seret pada keluk dipilih menggerakkan titik
       tekan: function (pt, e) {
+        // mod lukis: kumpul titik lukisan (setiap ≥ 2 px)
+        if (st.lukis) {
+          if (e && e.type === "pointerdown") {
+            st.coretan = [[pt.x, pt.y]];
+            st.pesanLukis = null;
+          } else if (st.coretan) {
+            var z = st.coretan[st.coretan.length - 1];
+            if (Math.abs(plot.X(z[0]) - pt.px) + Math.abs(plot.Y(z[1]) - pt.py) < 2) return;
+            st.coretan.push([pt.x, pt.y]);
+          }
+          lukis();
+          return;
+        }
         if (e && e.type === "pointerdown") {
           st.seret = null;
+          st.baruDilukis = null;
           var d = dekat(pt);
           if (!d || d.jarak > JARAK) return;
           if (d.id !== st.pilih) {
@@ -739,9 +821,12 @@
       },
       tekanSeret: true,
       lepas: function (nama) {
-        if (nama === "__tekan") selesaiSeret();
+        if (nama !== "__tekan") return;
+        if (st.lukis) selesaiLukis();
+        else selesaiSeret();
       },
       hover: function (pt) {
+        if (st.lukis) return;
         var d = dekat(pt);
         var h = d && d.jarak < JARAK ? d.id : null;
         if (h !== st.hover) {
@@ -757,7 +842,8 @@
       },
       kekunci: function (kk) {
         var k = cari(st.pilih);
-        if (!k) return false;
+        if (!k || st.lukis) return false;
+        st.baruDilukis = null;
         var langkah = 0.01;
         if (st.mod === "alih") {
           // keluk persamaan: satu langkah = satu unit kemas pada paksi
