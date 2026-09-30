@@ -187,8 +187,9 @@ GrafBina {
   paksi: { x: { label, maks? }, y: { label, maks? } },   // maks set = numeric axes (from 0); none = conceptual
   keluk: [{ id, label, jenis: null, warna: "d" | "s" | "c3" | "c4" | "c5",
             titik: [[x, y], …],          // normalised 0..1 inside the axes box, ordered along the path
-            anjak: { x, y },             // SHIFT = translation only; titik[] is never rewritten
-            arahSeret: "x" | "y" | "xy" | "tiada",
+            anjak: { x, y },             // SHIFT = translation; titik[] is never rewritten
+            skala: 1,                    // KKP shift = growth/shrink from the origin (arahSeret "skala")
+            arahSeret: "x" | "y" | "xy" | "tiada" | "skala",
             meta: { arah: "menurun" | "menaik" | "mendatar" | "tegak" | "lain", sumber },
             persamaan: null | { teks, kiri, kanan /* AST */, dep: "x" | "y", nama: { x, y }, sistem: "PQ" | "xy",
                                 param: { a: 100 }, julatParam: { a: [min, maks, langkah] }, linear } }],
@@ -223,7 +224,9 @@ GrafBina {
   - Generic curves are labelled K, L, M… and no economic meaning is assumed.
 - **Curve types and explanations (`graf-terang.js`).**
   - `EKO.jenisKeluk` is a registry of curve types stored as data, written in textbook terms: definition, relationship, law, movement terms (*pengembangan*/*penguncupan*), shift terms (*pertambahan*/*pengurangan*), non-price factors, and special shapes (horizontal = *anjal sempurna*, vertical = *tidak anjal sempurna*).
-  - Registered now: `permintaan` and `penawaran`. Their factor lists reuse `G.FAKTOR_D`/`G.FAKTOR_S` from `graf.js`.
+  - Registered now: `permintaan` and `penawaran` (factor lists reuse `G.FAKTOR_D`/`G.FAKTOR_S` from `graf.js`), and `kkp` (T4 Bab 1 definition, increasing opportunity cost, points inside/outside the curve, causes from the STPM KKP widget).
+  - A KKP shifts by scaling from the origin (`cara: "skala"`, `B.skalaKeluk`), so both intercepts change in the same ratio and the curve still meets both axes. Its outward shift is called *KKP beralih ke kanan* (pertumbuhan ekonomi), as in the textbook. Pivoting on one axis is left to the note widget.
+  - Registry fields such as `gerak.ringkas`, `alih.ringkas`, `alih.bentuk` and `alih.faktorTajuk` give the reading panel type-specific sentences, so KKP never mentions "faktor bukan harga". `paksiPadan` scores axis labels per type in suggestions, and `paksiLalai` switches the default axes to Barang X / Barang Y when a KKP is the only typed curve.
   - A new type (KKP, AD/AS, Lorenz…) is one `JK.daftar({...})` call, with no change to the engine.
   - `EKO.terang.keluk(graf, id, mod)` builds template explanation blocks from the registry plus the graph state (A → B direction, shift direction). No AI is involved. With `mod` it returns only the current concept (owner request): shift mode gives the curve type with its definition plus the shift block; movement mode gives the curve type with its definition and law plus the movement block.
   - The *Terangkan graf* panel shows these blocks as the usual `.kotak` callouts, and the reading panel uses the same terms (for example "Pengembangan permintaan").

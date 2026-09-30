@@ -44,7 +44,17 @@
     menaik: { nama: "Menaik (garis lurus)", label: "S", warna: "s", titik: [[0.1, 0.14], [0.68, 0.84]] },
     "menaik-cembung": { nama: "Menaik (melengkung)", label: "S", warna: "s", titik: [[0.08, 0.18], [0.4, 0.28], [0.6, 0.48], [0.7, 0.84]] },
     mendatar: { nama: "Mendatar", label: "D", warna: "d", titik: [[0.03, 0.5], [0.8, 0.5]] },
-    tegak: { nama: "Tegak", label: "S", warna: "s", titik: [[0.5, 0.03], [0.5, 0.82]] }
+    tegak: { nama: "Tegak", label: "S", warna: "s", titik: [[0.5, 0.03], [0.5, 0.82]] },
+    // KKP cembung ke titik asalan (suku elips) dari paksi Y ke paksi X; jenis diketahui kerana dipilih sebagai KKP
+    kkp: {
+      nama: "KKP (keluk kemungkinan pengeluaran)",
+      label: "KKP",
+      warna: "c3",
+      titik: [[0, 0.78], [0.276, 0.721], [0.509, 0.552], [0.665, 0.298], [0.72, 0]],
+      jenis: "kkp",
+      arahSeret: "skala",
+      s: 0.45
+    }
   };
 
   function klon(o) {
@@ -108,6 +118,7 @@
       warna: WARNA.indexOf(o.warna) !== -1 ? o.warna : "d",
       titik: pts,
       anjak: { x: 0, y: 0 },
+      skala: 1, // peralihan KKP: kembang/kecut dari asalan (arahSeret "skala"); keluk lain kekal 1
       arahSeret: o.arahSeret || B.arahSeretLalai(arah),
       meta: { arah: arah, sumber: o.sumber || "contoh" },
       // hanya bagi keluk daripada persamaan (EKO.persamaan); keluk lain tidak perlu persamaan
@@ -276,7 +287,12 @@
     var poli = k.persamaan ? k.titik.map(function (p) {
       return [p[0], p[1]];
     }) : B.licin(k.titik);
-    return denganAnjak === false ? poli : tambahAnjak(poli, k.anjak);
+    if (denganAnjak === false) return poli;
+    var sk = k.skala || 1;
+    if (sk !== 1) poli = poli.map(function (p) {
+      return [p[0] * sk, p[1] * sk];
+    });
+    return tambahAnjak(poli, k.anjak);
   };
 
   // Panjang lengkok kumulatif
@@ -433,12 +449,29 @@
     };
   };
 
+  // Julat skala KKP: hujung kekal dalam 95% paksi, dan sekurang-kurangnya 20% paksi
+  B.hadSkala = function (k) {
+    var h = had(B.laluan(k, false));
+    var m = Math.max(h.x1, h.y1, 1e-6);
+    return [Math.min(1, 0.2 / m), Math.max(1, TEPI / m)];
+  };
+
   /* ---------- tindakan (pulang graf baharu) ---------- */
+  // PERALIHAN KKP: kembang (> 1, beralih ke kanan) atau kecut (< 1, ke kiri) dari asalan
+  B.skalaKeluk = function (graf, id, s) {
+    var g = klon(graf);
+    var k = B.cari(g, id);
+    if (!k || k.arahSeret !== "skala" || !isFinite(s)) return g;
+    var h = B.hadSkala(k);
+    k.skala = Math.round(E.clamp(s, h[0], h[1]) * 1e6) / 1e6;
+    return g;
+  };
+
   // PERALIHAN: set anjakan mutlak keluk, ikut arahSeret dan had. Bentuk tidak berubah.
   B.anjakKeluk = function (graf, id, ax, ay) {
     var g = klon(graf);
     var k = B.cari(g, id);
-    if (!k || k.arahSeret === "tiada") return g;
+    if (!k || k.arahSeret === "tiada" || k.arahSeret === "skala") return g;
     var h = B.hadAnjak(k);
     var x = k.arahSeret === "y" ? 0 : E.clamp(ax, h.x[0], h.x[1]);
     var y = k.arahSeret === "x" ? 0 : E.clamp(ay, h.y[0], h.y[1]);
@@ -472,6 +505,7 @@
     var g = klon(graf);
     g.keluk.forEach(function (k) {
       k.anjak = { x: 0, y: 0 };
+      k.skala = 1;
     });
     g.titik.forEach(function (t) {
       t.s = t.sAwal;
@@ -481,7 +515,16 @@
   };
 
   B.dianjak = function (k) {
-    return Math.abs(k.anjak.x) > 0.004 || Math.abs(k.anjak.y) > 0.004;
+    return Math.abs(k.anjak.x) > 0.004 || Math.abs(k.anjak.y) > 0.004 || Math.abs((k.skala || 1) - 1) > 0.004;
+  };
+
+  // Arah peralihan keluk dalam perkataan. KKP yang mengembang = "kanan" (istilah buku teks: KKP beralih ke kanan).
+  B.arahAlih = function (k) {
+    if (k.arahSeret === "skala") {
+      var s = k.skala || 1;
+      return s > 1.004 ? ["kanan"] : s < 0.996 ? ["kiri"] : [];
+    }
+    return B.arahAnjak(k.anjak);
   };
 
   // Arah anjakan dalam perkataan: ["kanan"], ["kiri", "atas"] …

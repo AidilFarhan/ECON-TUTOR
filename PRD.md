@@ -132,7 +132,8 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - in *Pergerakan di sepanjang keluk* mode: the curve type (definition, relationship, law) and movement along the curve (*pengembangan*/*penguncupan*), with what happened in the student's graph;
     - in *Peralihan keluk* mode: the curve type (definition) and the shift (*pertambahan*/*pengurangan*), with the non-price factors for that direction.
     - The reading panel uses the same terms.
-    - The curve type (Permintaan, Penawaran) is chosen by the student. Suggestions show a confidence score and reasons, and are never applied automatically. Equations with Qd/Qs set the type.
+    - Curve types: Permintaan, Penawaran and KKP. A KKP (template *KKP*, or a drawn/traced curve set to KKP) moves along the curve to show opportunity cost, and shifts outward/inward from the origin (economic growth), with textbook causes.
+    - The curve type is chosen by the student. Suggestions show a confidence score and reasons, and are never applied automatically. Equations with Qd/Qs set the type.
   - **Market equilibrium** (phase 6):
     - when the graph has a Permintaan and a Penawaran curve, their intersection E is shown;
     - after a shift, E₀ → E₁ with P₀ → P₁ and Q₀ → Q₁ (exact values for equations, for example 16 → 20);
@@ -289,6 +290,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | *Bina graf* phase 6: market equilibrium E₀ → E₁ with P and Q changes (`EKO.keseimbangan`) |
 | 2026-10-01 | *Bina graf* phase 7: *Latihan graf* with *Semak Jawapan* (`EKO.senario`, 8 T4 Bab 2 questions) |
 | 2026-10-01 | *Bina graf* phase 4: *Tekap gambar*, which traces a graph from a photo on the device without AI (`EKO.imbas`) |
+| 2026-10-01 | *Bina graf*: curve type KKP (opportunity cost along the curve, economic growth as an outward shift from the origin) |
 
 ## 10. Roadmap and open questions
 

@@ -19,6 +19,7 @@
 
   var daftar = {};
   var tertib = [];
+  var RE_BARANG = /barang|modal|pengguna/i; // paksi KKP (dua barang)
 
   JK.daftar = function (j) {
     if (!daftar[j.id]) tertib.push(j.id);
@@ -43,17 +44,22 @@
     warna: "d",
     arahBiasa: "menurun",
     labelPadan: /^(D|DD|Dd|Qd)$/,
+    paksiPadan: function (p) {
+      return RE_HARGA.test(p.y.label || "") && RE_KUANTITI.test(p.x.label || "");
+    },
     definisi:
       "<b>Permintaan</b> merujuk kepada keinginan dan kemampuan seseorang individu untuk membeli sesuatu barang atau perkhidmatan pada suatu tingkat harga tertentu dan dalam jangka masa tertentu.",
     hubungan: "Keluk ini menunjukkan hubungan <b>songsang (negatif)</b> antara harga dan kuantiti diminta, <i>ceteris paribus</i>.",
     hukum: ["Harga meningkat → kuantiti diminta menurun.", "Harga menurun → kuantiti diminta meningkat."],
     gerak: {
       sebab: "Berlaku apabila <b>harga barang itu sendiri</b> berubah. Ini ialah perubahan dalam <b>kuantiti diminta</b>.",
+      ringkas: "ini perubahan dalam <b>kuantiti diminta</b>, yang berlaku apabila <b>harga barang itu sendiri</b> berubah.",
       atas: { istilah: "Penguncupan permintaan", ayat: "Harga naik, maka kuantiti diminta berkurang. Titik bergerak ke atas di sepanjang keluk permintaan yang sama." },
       bawah: { istilah: "Pengembangan permintaan", ayat: "Harga turun, maka kuantiti diminta bertambah. Titik bergerak ke bawah di sepanjang keluk permintaan yang sama." }
     },
     alih: {
       sebab: "Berlaku apabila <b>faktor bukan harga</b> berubah. Ini ialah perubahan dalam <b>permintaan</b>; keseluruhan keluk beralih.",
+      ringkas: "Peralihan keluk permintaan berlaku apabila <b>faktor bukan harga</b> berubah.",
       kanan: { istilah: "Pertambahan permintaan", ayat: "Keluk permintaan beralih ke kanan: pada setiap tingkat harga, kuantiti diminta lebih banyak." },
       kiri: { istilah: "Pengurangan permintaan", ayat: "Keluk permintaan beralih ke kiri: pada setiap tingkat harga, kuantiti diminta lebih sedikit." },
       faktor: function () {
@@ -75,17 +81,22 @@
     warna: "s",
     arahBiasa: "menaik",
     labelPadan: /^(S|SS|Ss|Qs)$/,
+    paksiPadan: function (p) {
+      return RE_HARGA.test(p.y.label || "") && RE_KUANTITI.test(p.x.label || "");
+    },
     definisi:
       "<b>Penawaran</b> merujuk kepada kuantiti sesuatu barang atau perkhidmatan yang sanggup dan mampu dikeluarkan oleh pengeluar atau firma pada suatu tingkat harga tertentu dalam tempoh masa tertentu.",
     hubungan: "Keluk ini menunjukkan hubungan <b>positif</b> antara harga dan kuantiti ditawarkan, <i>ceteris paribus</i>.",
     hukum: ["Harga meningkat → kuantiti ditawarkan meningkat.", "Harga menurun → kuantiti ditawarkan menurun."],
     gerak: {
       sebab: "Berlaku apabila <b>harga barang itu sendiri</b> berubah. Ini ialah perubahan dalam <b>kuantiti ditawarkan</b>.",
+      ringkas: "ini perubahan dalam <b>kuantiti ditawarkan</b>, yang berlaku apabila <b>harga barang itu sendiri</b> berubah.",
       atas: { istilah: "Pengembangan penawaran", ayat: "Harga naik, maka kuantiti ditawarkan bertambah. Titik bergerak ke atas di sepanjang keluk penawaran yang sama." },
       bawah: { istilah: "Penguncupan penawaran", ayat: "Harga turun, maka kuantiti ditawarkan berkurang. Titik bergerak ke bawah di sepanjang keluk penawaran yang sama." }
     },
     alih: {
       sebab: "Berlaku apabila <b>faktor bukan harga</b> berubah. Ini ialah perubahan dalam <b>penawaran</b>; keseluruhan keluk beralih.",
+      ringkas: "Peralihan keluk penawaran berlaku apabila <b>faktor bukan harga</b> berubah.",
       kanan: { istilah: "Pertambahan penawaran", ayat: "Keluk penawaran beralih ke kanan: pada setiap tingkat harga, kuantiti ditawarkan lebih banyak." },
       kiri: { istilah: "Pengurangan penawaran", ayat: "Keluk penawaran beralih ke kiri: pada setiap tingkat harga, kuantiti ditawarkan lebih sedikit." },
       faktor: function () {
@@ -96,6 +107,74 @@
       mendatar: "Keluk penawaran yang mendatar menunjukkan penawaran <b>anjal sempurna</b>: pada harga itu, kuantiti ditawarkan boleh berubah tanpa had.",
       tegak: "Keluk penawaran yang tegak menunjukkan penawaran <b>tidak anjal sempurna</b>: perubahan harga tidak mengubah kuantiti ditawarkan."
     }
+  });
+
+  /* ---------- jenis: keluk kemungkinan pengeluaran (Tingkatan 4 Bab 1; STPM P1 Bab 1) ---------- */
+  // Punca peralihan selari (kedua-dua barang), mengikut nota KKP STPM (PUNCA dalam graf-stpm.js)
+  var FAKTOR_KKP = [
+    {
+      label: "KKP beralih ke kanan (pertumbuhan ekonomi)",
+      pilihan: [
+        ["sumber+", "Pertambahan anugerah sumber: pertambahan penduduk atau kemasukan buruh asing, penemuan sumber alam baharu, pertambahan pelaburan"],
+        ["teknologi+", "Kemajuan teknologi dalam pengeluaran kedua-dua barang"]
+      ]
+    },
+    {
+      label: "KKP beralih ke kiri",
+      pilihan: [
+        ["sumber-", "Pengurangan anugerah sumber: kepupusan bahan galian, pengurangan tenaga kerja asing, kemerosotan pelaburan"],
+        ["teknologi-", "Kemunduran teknologi dalam pengeluaran kedua-dua barang"]
+      ]
+    }
+  ];
+
+  JK.daftar({
+    id: "kkp",
+    nama: "Keluk Kemungkinan Pengeluaran (KKP)",
+    pendek: "KKP",
+    label: "KKP",
+    warna: "c3",
+    arahBiasa: "menurun",
+    cara: "skala", // KKP beralih dengan mengembang/mengecut dari asalan, bukan digeser
+    labelPadan: /^(KKP|PPC|AB)$/i,
+    paksiLalai: { x: "Barang X", y: "Barang Y" },
+    paksiPadan: function (p) {
+      return RE_BARANG.test(p.x.label || "") || RE_BARANG.test(p.y.label || "");
+    },
+    definisi:
+      "<b>Keluk kemungkinan pengeluaran (KKP)</b> ialah keluk yang menunjukkan had maksimum tingkat pengeluaran yang dapat dicapai oleh sebuah ekonomi dengan menggunakan faktor pengeluaran yang ada dan tingkat teknologi tertentu.",
+    hubungan:
+      "KKP yang cembung ke titik asalan menunjukkan <b>kos lepas yang semakin meningkat</b>: semakin banyak barang lain perlu dikorbankan untuk setiap unit tambahan kerana faktor pengeluaran tidak sama cekap.",
+    hukum: [
+      "Titik pada KKP: pengeluaran maksimum; faktor pengeluaran digunakan sepenuhnya dan cekap.",
+      "Titik di dalam KKP: tidak cekap; berlaku pengangguran atau pembaziran.",
+      "Titik di luar KKP: tidak dapat dicapai dengan sumber sedia ada; menggambarkan masalah kekurangan."
+    ],
+    gerak: {
+      sebab: "Pergerakan di sepanjang KKP menunjukkan <b>pilihan</b> dan <b>kos lepas</b>: kerana sumber terhad, menambah pengeluaran satu barang bermakna mengurangkan pengeluaran barang yang lain.",
+      ringkas: "ini menunjukkan <b>kos lepas</b>: menambah pengeluaran satu barang bermakna mengorbankan barang yang lain.",
+      atas: {
+        istilah: "Tambah barang Y (paksi tegak)",
+        ayat: "Titik bergerak ke atas di sepanjang KKP: pengeluaran barang Y bertambah dan pengeluaran barang X berkurang. Kos lepasnya ialah barang X yang dikorbankan."
+      },
+      bawah: {
+        istilah: "Tambah barang X (paksi datar)",
+        ayat: "Titik bergerak ke bawah di sepanjang KKP: pengeluaran barang X bertambah dan pengeluaran barang Y berkurang. Kos lepasnya ialah barang Y yang dikorbankan."
+      }
+    },
+    alih: {
+      sebab: "KKP beralih apabila <b>jumlah faktor pengeluaran</b> atau <b>tingkat teknologi</b> berubah. Pertumbuhan ekonomi ditunjukkan oleh KKP yang beralih ke kanan.",
+      ringkas: "Peralihan KKP berlaku apabila jumlah faktor pengeluaran atau tingkat teknologi berubah.",
+      bentuk: "Kedua-dua pintasan KKP berubah dengan nisbah yang sama (peralihan selari).",
+      kanan: { istilah: "Pertumbuhan ekonomi", ayat: "KKP beralih ke kanan: ekonomi dapat mengeluarkan lebih banyak kedua-dua barang." },
+      kiri: { istilah: "Pengurangan keupayaan pengeluaran", ayat: "KKP beralih ke kiri: ekonomi hanya dapat mengeluarkan lebih sedikit kedua-dua barang." },
+      faktorTajuk: "Antara punca yang boleh menyebabkannya:",
+      nota: "Jika hanya satu barang terlibat (contohnya kemajuan teknologi dalam pengeluaran barang X sahaja), KKP berpusing pada satu paksi sahaja. Bina graf menunjukkan peralihan selari; lihat graf KKP dalam nota bab untuk kes berpusing.",
+      faktor: function () {
+        return FAKTOR_KKP;
+      }
+    },
+    khas: {}
   });
 
   /* ---------- istilah bagi keadaan semasa ---------- */
@@ -121,7 +200,7 @@
   T.istilahAlih = function (k) {
     var j = JK.dapat(k.jenis);
     if (!j) return null;
-    var arah = B.arahAnjak(k.anjak);
+    var arah = B.arahAlih(k);
     if (arah.indexOf("kanan") !== -1) return j.alih.kanan;
     if (arah.indexOf("kiri") !== -1) return j.alih.kiri;
     return null;
@@ -135,7 +214,6 @@
     var k = B.cari(graf, id);
     if (!k) return [];
     var asas = B.asasLabel(k.label).replace(/′+$/, "");
-    var paksiPasaran = RE_HARGA.test(graf.paksi.y.label || "") && RE_KUANTITI.test(graf.paksi.x.label || "");
     return JK.senarai()
       .map(function (j) {
         var skor = 0,
@@ -152,9 +230,9 @@
           skor += 0.3;
           sebab.push("keluk " + k.meta.arah);
         } else if (k.meta.arah === "menurun" || k.meta.arah === "menaik") skor -= 0.4;
-        if (paksiPasaran) {
+        if (j.paksiPadan && j.paksiPadan(graf.paksi)) {
           skor += 0.1;
-          sebab.push("paksi harga dan kuantiti");
+          sebab.push(j.id === "kkp" ? "paksi dua barang" : "paksi harga dan kuantiti");
         }
         return { jenis: j.id, nama: j.nama, skor: Math.max(0, Math.min(1, Math.round(skor * 100) / 100)), sebab: sebab };
       })
@@ -173,6 +251,22 @@
     if (!k) return g;
     var j = JK.dapat(jenisId);
     k.jenis = j ? j.id : null;
+    // cara peralihan ikut jenis: KKP mengembang dari asalan (skala), keluk lain digeser (translasi)
+    var cara = j && j.cara === "skala" ? "skala" : B.arahSeretLalai(k.meta.arah);
+    if (cara !== k.arahSeret && (cara === "skala" || k.arahSeret === "skala")) {
+      k.anjak = { x: 0, y: 0 };
+      k.skala = 1;
+    }
+    k.arahSeret = cara;
+    // label paksi lalai jenis (contoh KKP: Barang X / Barang Y) jika paksi masih label pasaran lalai
+    // dan tiada keluk berjenis lain (contohnya D/S) yang memerlukan paksi harga dan kuantiti
+    var jenisLain = g.keluk.some(function (x) {
+      return x.id !== k.id && x.jenis && x.jenis !== k.jenis;
+    });
+    if (j && j.paksiLalai && !jenisLain && g.paksi.x.label === "Kuantiti (unit)" && g.paksi.y.label === "Harga (RM)") {
+      g.paksi.x.label = j.paksiLalai.x;
+      g.paksi.y.label = j.paksiLalai.y;
+    }
     if (j) {
       if (/^[KLMNRTUV]′*$/.test(k.label)) {
         k.label = "";
@@ -237,6 +331,11 @@
     return "<ul>" + items.map(function (s) {
       return "<li>" + s + "</li>";
     }).join("") + "</ul>";
+  }
+
+  // huruf pertama sahaja dikecilkan ("Tambah barang Y" → "tambah barang Y")
+  function kecil(t) {
+    return t.charAt(0).toLowerCase() + t.slice(1);
   }
 
   function esc(s) {
@@ -316,7 +415,7 @@
     // pergerakan di sepanjang keluk
     var arahG = t ? T.arahGerak(k, t) : null;
     var dalamGraf = arahG
-      ? "<p><b>Dalam graf ini:</b> titik bergerak dari A ke B ke " + arahG + " di sepanjang keluk " + nama + ", iaitu <b>" + j.gerak[arahG].istilah.toLowerCase() + "</b>.</p>"
+      ? "<p><b>Dalam graf ini:</b> titik bergerak dari A ke B ke " + arahG + " di sepanjang keluk " + nama + ", iaitu <b>" + kecil(j.gerak[arahG].istilah) + "</b>.</p>"
       : "<p><b>Dalam graf ini:</b> titik belum digerakkan. Seret titik A di sepanjang keluk.</p>";
     blok.push({
       jenis: "tip",
@@ -335,14 +434,15 @@
     if (alih) {
       var kumpulan = faktor[alih === j.alih.kanan ? 0 : 1];
       htmlAlih +=
-        "<p><b>Dalam graf ini:</b> " + asas + "₀ → " + asas + "₁ ialah <b>" + alih.istilah.toLowerCase() + "</b>.</p>" +
-        (kumpulan ? "<p>Antara faktor bukan harga yang boleh menyebabkannya:</p>" + senaraiFaktor(kumpulan) : "");
+        "<p><b>Dalam graf ini:</b> " + asas + "₀ → " + asas + "₁ ialah <b>" + kecil(alih.istilah) + "</b>.</p>" +
+        (kumpulan ? "<p>" + (j.alih.faktorTajuk || "Antara faktor bukan harga yang boleh menyebabkannya:") + "</p>" + senaraiFaktor(kumpulan) : "");
     } else {
       htmlAlih += "<p><b>Dalam graf ini:</b> keluk belum beralih. Seret keseluruhan keluk ke kiri atau ke kanan.</p>";
       faktor.forEach(function (kum) {
         htmlAlih += "<details class=\"bina-faktor\"><summary>" + esc(kum.label) + "</summary>" + senaraiFaktor(kum) + "</details>";
       });
     }
+    if (j.alih.nota) htmlAlih += "<p class=\"teks-lemah\">" + j.alih.nota + "</p>";
     blok.push({ jenis: "fokus", konsep: "alih", tajuk: "Peralihan keluk", html: htmlAlih });
 
     // kesan terhadap keseimbangan pasaran (hanya jika keluk ini sebahagian pasangan D/S)

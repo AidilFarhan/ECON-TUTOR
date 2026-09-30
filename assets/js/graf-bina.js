@@ -80,7 +80,11 @@
         if (!v) return;
         var n = st.graf.keluk.length;
         st.graf = B.tambahKeluk(st.graf, v);
-        if (st.graf.keluk.length > n) st.pilih = st.graf.keluk[st.graf.keluk.length - 1].id;
+        if (st.graf.keluk.length > n) {
+          st.pilih = st.graf.keluk[st.graf.keluk.length - 1].id;
+          // templat berjenis (KKP): cara peralihan dan label paksi lalai diselaraskan
+          if (B.TEMPLAT[v] && B.TEMPLAT[v].jenis) st.graf = T.tetapkan(st.graf, st.pilih, B.TEMPLAT[v].jenis);
+        }
         pilihTambah.set("");
         binaPanel();
         binaParam();
@@ -763,16 +767,17 @@
     function panahAnjak(k) {
       // kedudukan anak panah (25% atau 75% panjang keluk) yang lebih jauh daripada titik keseimbangan E₀
       var asal = B.laluan(k, false);
-      var a = B.titikPadaS(asal, 0.3);
+      var sA = 0.3;
       var e0 = imbangSemasa && imbangSemasa.E0 ? imbangSemasa.E0.n : null;
       if (e0) {
         var c1 = B.titikPadaS(asal, 0.25),
           c2 = B.titikPadaS(asal, 0.75);
         var d1 = Math.abs(plot.X(c1[0]) - plot.X(e0[0])) + Math.abs(plot.Y(c1[1]) - plot.Y(e0[1])),
           d2 = Math.abs(plot.X(c2[0]) - plot.X(e0[0])) + Math.abs(plot.Y(c2[1]) - plot.Y(e0[1]));
-        a = d1 >= d2 ? c1 : c2;
+        sA = d1 >= d2 ? 0.25 : 0.75;
       }
-      var b = [a[0] + k.anjak.x, a[1] + k.anjak.y];
+      var a = B.titikPadaS(asal, sA),
+        b = B.titikPadaS(B.laluan(k), sA);
       if (!dalamKotak(a) || !dalamKotak(b)) return;
       var ax = plot.X(a[0]),
         ay = plot.Y(a[1]),
@@ -953,7 +958,7 @@
       if (semasa) chipPers = ["Persamaan", esc(eq.teks) + " · " + esc(semasa)];
       var ayat;
       if (st.mod === "alih") {
-        var arah = B.arahAnjak(k.anjak);
+        var arah = B.arahAlih(k);
         if (!arah.length) {
           K.baca.innerHTML =
             G.nilai([chipMod, ["Keluk", nama, k.warna], chipPers]) +
@@ -966,7 +971,7 @@
         var istilahA = T.istilahAlih(k);
         ayat =
           '<span class="status neutral">' + (istilahA ? istilahA.istilah : "Keluk beralih ke " + arahTeks) + "</span> Keseluruhan keluk <b>" + asas + "</b> beralih ke " + arahTeks + " dari <b>" + asas + "₀</b> ke <b>" + asas +
-          "₁</b>. " + (istilahA ? istilahA.ayat + " " : "") + "Setiap titik pada keluk beralih sejauh yang sama, jadi bentuk keluk tidak berubah.";
+          "₁</b>. " + (istilahA ? istilahA.ayat + " " : "") + ((jenis && jenis.alih.bentuk) || "Setiap titik pada keluk beralih sejauh yang sama, jadi bentuk keluk tidak berubah.");
         var chipBaharu = null;
         if (bernilai) {
           var dx = k.anjak.x * st.graf.paksi.x.maks,
@@ -980,7 +985,7 @@
           }
         }
         ayat += jenis
-          ? " Peralihan keluk " + jenis.pendek + " berlaku apabila <b>faktor bukan harga</b> berubah."
+          ? " " + jenis.alih.ringkas
           : " Peralihan keluk berlaku apabila faktor selain pemboleh ubah pada paksi berubah (bagi keluk permintaan dan penawaran: faktor bukan harga).";
         // kesan terhadap keseimbangan pasaran (jika keluk ini sebahagian pasangan D/S)
         var ri = KS.kira(st.graf, k.id);
@@ -1027,7 +1032,7 @@
       ayat =
         '<span class="status neutral">' + (istilahG ? istilahG.istilah : "Pergerakan di sepanjang keluk") + "</span> Titik bergerak dari <b>A</b> ke <b>B</b> di sepanjang keluk <b>" + nama + "</b> yang sama. " + perubahan +
         (jenis
-          ? " Keluk tidak beralih: ini perubahan dalam <b>" + jenis.kuantiti + "</b>, yang berlaku apabila <b>harga barang itu sendiri</b> berubah."
+          ? " Keluk tidak beralih: " + jenis.gerak.ringkas
           : " Keluk tidak beralih: pergerakan di sepanjang keluk berlaku apabila pemboleh ubah pada paksi itu sendiri berubah (bagi keluk permintaan: harga barang itu sendiri).");
       K.baca.innerHTML =
         G.nilai([
@@ -1053,7 +1058,7 @@
               '<li class="bina-baris">' +
               '<button type="button" class="cip bina-pilih" data-pilih="' + id + '" aria-pressed="' + (k.id === st.pilih) + '">' +
               '<span class="titik" style="color:' + TOKEN[k.warna] + '"></span><span class="bina-nama-cip">' + esc(k.label) + "</span>" +
-              '<span class="bina-arah">' + esc([JK.dapat(k.jenis) ? JK.dapat(k.jenis).pendek : "", k.persamaan ? k.persamaan.teks : ARAH[k.meta.arah]].filter(Boolean).join(" · ")) + "</span></button>" +
+              '<span class="bina-arah">' + esc([JK.dapat(k.jenis) && JK.dapat(k.jenis).pendek !== k.label ? JK.dapat(k.jenis).pendek : "", k.persamaan ? k.persamaan.teks : ARAH[k.meta.arah]].filter(Boolean).join(" · ")) + "</span></button>" +
               '<label class="medan bina-nama"><span class="sr-only">Nama keluk</span><input type="text" maxlength="8" autocomplete="off" spellcheck="false" data-nama="' + id + '" value="' + esc(k.label) + '"></label>' +
               '<button type="button" class="cip bina-padam" data-padam="' + id + '" aria-label="Padam keluk ' + esc(k.label) + '">' + E.ikon("salah") + "</button>" +
               "</li>"
@@ -1167,6 +1172,9 @@
         if (k && (k.anjak.x !== s.dari.x || k.anjak.y !== s.dari.y)) {
           st.graf = B.catat(st.graf, { jenis: "anjak", keluk: s.keluk, dari: s.dari, ke: B.klon(k.anjak) });
         }
+      } else if (s.jenis === "skala") {
+        var ks = cari(s.keluk);
+        if (ks && ks.skala !== s.dari) st.graf = B.catat(st.graf, { jenis: "anjak", keluk: s.keluk, dari: { skala: s.dari }, ke: { skala: ks.skala } });
       } else if (s.jenis === "gerak") {
         var t = B.titikKeluk(st.graf, s.keluk);
         if (t && t.s !== s.dari) st.graf = B.catat(st.graf, { jenis: "gerak", keluk: s.keluk, titik: t.id, dari: s.dari, ke: t.s });
@@ -1189,7 +1197,12 @@
           if (fasa === "mula") {
             pilihKeluk(id);
             var k = cari(id);
-            st.seret = k && pt.x != null ? { jenis: "anjak", keluk: id, mula: [pt.x, pt.y], dari: B.klon(k.anjak) } : null;
+            if (k && pt.x != null && k.arahSeret === "skala") {
+              st.seret = { jenis: "skala", keluk: id, r0: Math.max(Math.sqrt(pt.x * pt.x + pt.y * pt.y), 0.05), dari: k.skala || 1 };
+            } else st.seret = k && pt.x != null ? { jenis: "anjak", keluk: id, mula: [pt.x, pt.y], dari: B.klon(k.anjak) } : null;
+          }
+          if (st.seret && st.seret.jenis === "skala" && pt.x != null) {
+            st.graf = B.skalaKeluk(st.graf, id, (st.seret.dari * Math.sqrt(pt.x * pt.x + pt.y * pt.y)) / st.seret.r0);
           }
           if (st.seret && st.seret.jenis === "anjak" && pt.x != null) {
             var a = anjakKemas(cari(id), st.seret.dari.x + pt.x - st.seret.mula[0], st.seret.dari.y + pt.y - st.seret.mula[1]);
@@ -1260,7 +1273,12 @@
         if (!k || st.lukis || laras()) return false;
         st.baruDilukis = null;
         var langkah = 0.01;
-        if (st.mod === "alih") {
+        if (st.mod === "alih" && k.arahSeret === "skala") {
+          var ds = (kk.dx + kk.dy) * langkah;
+          if (!ds) return false;
+          st.seret = { jenis: "skala", keluk: k.id, dari: k.skala || 1 };
+          st.graf = B.skalaKeluk(st.graf, k.id, (k.skala || 1) + ds);
+        } else if (st.mod === "alih") {
           // keluk persamaan: satu langkah = satu unit kemas pada paksi
           var nombor = k.persamaan && PS.paksiNombor(st.graf);
           var lx = nombor ? unit(st.graf.paksi.x.maks) / st.graf.paksi.x.maks : langkah,
