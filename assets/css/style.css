@@ -4283,3 +4283,60 @@ ol.roman > li::before {
 .bina-graf[data-lukis] .graf-kanvas svg {
   cursor: crosshair;
 }
+
+/* bina graf: panel penerangan (Terangkan graf) */
+.bina-terang {
+  display: grid;
+  gap: 10px;
+  padding: 12px 4px 2px;
+  border-top: 1px solid var(--line);
+}
+
+.bina-terang-kepala {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 8px 14px;
+}
+
+.bina-terang-kepala > b {
+  font-family: var(--font-d);
+  font-size: 17px;
+}
+
+.bina-jenis {
+  flex: 0 1 240px;
+}
+
+.bina-jenis select {
+  min-height: 44px;
+}
+
+.bina-cadang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 13px;
+}
+
+.bina-cadang .cip {
+  min-height: 40px;
+}
+
+.bina-sebab {
+  font-size: 12.5px;
+}
+
+.bina-terang .kotak {
+  margin: 0;
+}
+
+.bina-faktor summary {
+  cursor: pointer;
+  font-weight: 650;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}

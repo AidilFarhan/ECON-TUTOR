@@ -917,6 +917,10 @@
     }
   ];
 
+  // Didedahkan untuk daftar jenis keluk (graf-terang.js) supaya teks faktor tidak diulang
+  G.FAKTOR_D = FAKTOR_D;
+  G.FAKTOR_S = FAKTOR_S;
+
   function arahFaktor(kumpulan, kod) {
     // pulang +1 (kumpulan pertama: ke kanan) atau -1 (kumpulan kedua: ke kiri)
     var arah = 0;

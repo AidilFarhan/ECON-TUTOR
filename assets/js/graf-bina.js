@@ -12,6 +12,8 @@
   var G = E.graf;
   var B = E.bina;
   var PS = E.persamaan;
+  var JK = E.jenisKeluk;
+  var T = E.terang;
   var esc = E.esc;
   var CONTOH_PERSAMAAN = ["Qd = 100 − 2P", "Qs = 20 + 3P", "y = −2x + 10", "Qd = a − bP; a = 100; b = 2"];
 
@@ -90,6 +92,17 @@
     var btnLukis = G.butang(K.kawalan, E.ikon("pensel") + " Lukis keluk", function () {
       setLukis(!st.lukis);
     }, { tekan: false });
+
+    /* ---------- terangkan graf (EKO.terang) ---------- */
+    var btnTerang = G.butang(K.kawalan, E.ikon("buku") + " Terangkan graf", function () {
+      var buka = kotakTerang.hidden;
+      kotakTerang.hidden = !buka;
+      btnTerang.setAttribute("aria-pressed", buka ? "true" : "false");
+      btnTerang.setAttribute("aria-expanded", buka ? "true" : "false");
+      binaTerang();
+      if (buka && kotakTerang.scrollIntoView) kotakTerang.scrollIntoView({ block: "nearest", behavior: E.kurangGerak() ? "auto" : "smooth" });
+    }, { tekan: false });
+    btnTerang.setAttribute("aria-expanded", "false");
 
     function setLukis(on, pesan) {
       st.lukis = !!on && st.graf.keluk.length < B.MAKS_KELUK;
@@ -208,8 +221,81 @@
     var kotakParam = G.div("bina-param");
     host.insertBefore(kotakParam, K.baca);
 
+    // Panel penerangan di bawah panel bacaan (dibuka dengan "Terangkan graf")
+    var kotakTerang = G.div("bina-terang");
+    kotakTerang.hidden = true;
+    kotakTerang.setAttribute("aria-live", "polite");
+    host.appendChild(kotakTerang);
+
     var panel = G.div("bina-panel");
     host.appendChild(panel);
+
+    function binaTerang() {
+      if (kotakTerang.hidden) return;
+      // kekalkan <details> yang sedang dibuka apabila panel dilukis semula
+      var buka = [];
+      Array.prototype.forEach.call(kotakTerang.querySelectorAll("details"), function (d, i) {
+        if (d.open) buka.push(i);
+      });
+      var k = cari(st.pilih);
+      if (!k) {
+        kotakTerang.innerHTML = '<p class="teks-lemah">Pilih atau tambah satu keluk untuk melihat penerangannya.</p>';
+        return;
+      }
+      var r = T.keluk(st.graf, k.id);
+      var html =
+        '<div class="bina-terang-kepala"><b>' + r.tajuk + "</b>" +
+        '<label class="medan bina-jenis"><span>Jenis keluk ' + esc(k.label) + "</span><select data-jenis>" +
+        '<option value="">Belum ditetapkan</option>' +
+        JK.senarai()
+          .map(function (j) {
+            return '<option value="' + esc(j.id) + '"' + (k.jenis === j.id ? " selected" : "") + ">" + esc(j.nama) + "</option>";
+          })
+          .join("") +
+        "</select></label></div>";
+      var cadang = r.cadangan.filter(function (c) {
+        return c.skor >= 0.3;
+      });
+      if (!r.jenis) {
+        html +=
+          '<div class="bina-cadang"><span class="teks-lemah">' + (cadang.length ? "Cadangan (sahkan sendiri):" : "Tiada cadangan yang cukup yakin. Pilih jenis sendiri jika anda tahu maknanya.") + "</span>" +
+          cadang
+            .slice(0, 2)
+            .map(function (c) {
+              return (
+                '<button type="button" class="cip" data-cadang="' + esc(c.jenis) + '">' + E.ikon("betul") + " " + esc(c.nama) + " · " + Math.round(c.skor * 100) + "%</button>" +
+                '<span class="teks-lemah bina-sebab">' + esc(c.sebab.join(", ")) + "</span>"
+              );
+            })
+            .join("") +
+          "</div>";
+      }
+      html += r.blok
+        .map(function (b) {
+          return '<div class="kotak ' + b.jenis + '"><span class="kotak-label">' + esc(b.tajuk) + "</span>" + b.html + "</div>";
+        })
+        .join("");
+      kotakTerang.innerHTML = html;
+      var semua = kotakTerang.querySelectorAll("details");
+      buka.forEach(function (i) {
+        if (semua[i]) semua[i].open = true;
+      });
+    }
+
+    function tetapkanJenis(v) {
+      if (!st.pilih) return;
+      st.graf = T.tetapkan(st.graf, st.pilih, v || null);
+      binaPanel();
+      lukis();
+    }
+
+    kotakTerang.addEventListener("change", function (e) {
+      if (e.target.hasAttribute("data-jenis")) tetapkanJenis(e.target.value);
+    });
+    kotakTerang.addEventListener("click", function (e) {
+      var b = e.target.closest ? e.target.closest("[data-cadang]") : null;
+      if (b) tetapkanJenis(b.getAttribute("data-cadang"));
+    });
 
     function binaParam() {
       kotakParam.innerHTML = "";
@@ -357,6 +443,7 @@
       if (st.mod === "gerak" && dipilih && !st.lukis) lukisTitik(dipilih);
       if (st.coretan && st.coretan.length > 1) plot.laluan(st.coretan, "bina-coretan", "atas");
       baca();
+      if (!st.coretan) binaTerang();
     }
 
     function lukisKeluk(k) {
@@ -563,6 +650,7 @@
       var nama = esc(k.label);
       var asas = esc(B.asasLabel(k.label));
       var eq = k.persamaan;
+      var jenis = JK.dapat(k.jenis); // daftar jenis keluk (graf-terang.js), null jika belum ditetapkan
       var bernilai = !!eq && PS.paksiNombor(st.graf);
       // nama pemboleh ubah: daripada persamaan (P, Qd…) atau label paksi
       var X = bernilai ? esc(eq.nama.x) : esc(st.graf.paksi.x.label || "paksi datar"),
@@ -582,9 +670,11 @@
           return;
         }
         var arahTeks = arah.join(" dan ");
+        // istilah buku teks jika jenis keluk diketahui (contoh "Pertambahan permintaan")
+        var istilahA = T.istilahAlih(k);
         ayat =
-          '<span class="status neutral">Keluk beralih ke ' + arahTeks + "</span> Keseluruhan keluk <b>" + asas + "</b> beralih dari <b>" + asas + "₀</b> ke <b>" + asas +
-          "₁</b>. Setiap titik pada keluk beralih sejauh yang sama, jadi bentuk keluk tidak berubah.";
+          '<span class="status neutral">' + (istilahA ? istilahA.istilah : "Keluk beralih ke " + arahTeks) + "</span> Keseluruhan keluk <b>" + asas + "</b> beralih ke " + arahTeks + " dari <b>" + asas + "₀</b> ke <b>" + asas +
+          "₁</b>. " + (istilahA ? istilahA.ayat + " " : "") + "Setiap titik pada keluk beralih sejauh yang sama, jadi bentuk keluk tidak berubah.";
         var chipBaharu = null;
         if (bernilai) {
           var dx = k.anjak.x * st.graf.paksi.x.maks,
@@ -597,7 +687,9 @@
             ayat += " Persamaan setara bagi " + asas + "₁: <b>" + esc(baharu) + "</b> (persamaan asal tidak diubah).";
           }
         }
-        ayat += " Peralihan keluk berlaku apabila faktor selain pemboleh ubah pada paksi berubah (bagi keluk permintaan dan penawaran: faktor bukan harga).";
+        ayat += jenis
+          ? " Peralihan keluk " + jenis.pendek + " berlaku apabila <b>faktor bukan harga</b> berubah."
+          : " Peralihan keluk berlaku apabila faktor selain pemboleh ubah pada paksi berubah (bagi keluk permintaan dan penawaran: faktor bukan harga).";
         K.baca.innerHTML =
           G.nilai([chipMod, ["Keluk", asas + "₀ → " + asas + "₁", k.warna], ["Arah", "Ke " + arahTeks], chipPers, chipBaharu]) + '<div class="ayat">' + ayat + "</div>";
         return;
@@ -626,9 +718,12 @@
       } else {
         perubahan = "<b>" + Y + "</b> " + arahPaksi(pB[1] - pA[1], "meningkat", "menurun") + " dan <b>" + X + "</b> " + arahPaksi(pB[0] - pA[0], "meningkat", "menurun") + ".";
       }
+      var istilahG = T.istilahGerak(st.graf, k);
       ayat =
-        '<span class="status neutral">Pergerakan di sepanjang keluk</span> Titik bergerak dari <b>A</b> ke <b>B</b> di sepanjang keluk <b>' + nama + "</b> yang sama. " + perubahan +
-        " Keluk tidak beralih: pergerakan di sepanjang keluk berlaku apabila pemboleh ubah pada paksi itu sendiri berubah (bagi keluk permintaan: harga barang itu sendiri).";
+        '<span class="status neutral">' + (istilahG ? istilahG.istilah : "Pergerakan di sepanjang keluk") + "</span> Titik bergerak dari <b>A</b> ke <b>B</b> di sepanjang keluk <b>" + nama + "</b> yang sama. " + perubahan +
+        (jenis
+          ? " Keluk tidak beralih: ini perubahan dalam <b>" + jenis.kuantiti + "</b>, yang berlaku apabila <b>harga barang itu sendiri</b> berubah."
+          : " Keluk tidak beralih: pergerakan di sepanjang keluk berlaku apabila pemboleh ubah pada paksi itu sendiri berubah (bagi keluk permintaan: harga barang itu sendiri).");
       K.baca.innerHTML =
         G.nilai([
           chipMod,
@@ -653,7 +748,7 @@
               '<li class="bina-baris">' +
               '<button type="button" class="cip bina-pilih" data-pilih="' + id + '" aria-pressed="' + (k.id === st.pilih) + '">' +
               '<span class="titik" style="color:' + TOKEN[k.warna] + '"></span><span class="bina-nama-cip">' + esc(k.label) + "</span>" +
-              '<span class="bina-arah">' + (k.persamaan ? esc(k.persamaan.teks) : ARAH[k.meta.arah]) + "</span></button>" +
+              '<span class="bina-arah">' + esc([JK.dapat(k.jenis) ? JK.dapat(k.jenis).pendek : "", k.persamaan ? k.persamaan.teks : ARAH[k.meta.arah]].filter(Boolean).join(" · ")) + "</span></button>" +
               '<label class="medan bina-nama"><span class="sr-only">Nama keluk</span><input type="text" maxlength="8" autocomplete="off" spellcheck="false" data-nama="' + id + '" value="' + esc(k.label) + '"></label>' +
               '<button type="button" class="cip bina-padam" data-padam="' + id + '" aria-label="Padam keluk ' + esc(k.label) + '">' + E.ikon("salah") + "</button>" +
               "</li>"

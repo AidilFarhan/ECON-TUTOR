@@ -140,6 +140,10 @@
     return l;
   }
 
+  B.labelBebas = function (graf, label) {
+    return labelBebas(graf, label);
+  };
+
   function warnaBebas(graf, cadangan) {
     var dipakai = graf.keluk.map(function (k) {
       return k.warna;
@@ -613,8 +617,9 @@
   // Graf konsep permintaan dan penawaran (tiada nombor pada paksi)
   B.grafContoh = function () {
     var g = B.buatGraf({ paksi: { x: { label: "Kuantiti (unit)" }, y: { label: "Harga (RM)" } } });
-    g = B.tambahKeluk(g, { label: "D", warna: "d", titik: B.TEMPLAT["menurun-cembung"].titik, s: 0.42 });
-    g = B.tambahKeluk(g, { label: "S", warna: "s", titik: B.TEMPLAT.menaik.titik, s: 0.45 });
+    // graf contoh ditulis oleh kita, jadi jenisnya diketahui (keluk lain tidak diandaikan)
+    g = B.tambahKeluk(g, { label: "D", warna: "d", titik: B.TEMPLAT["menurun-cembung"].titik, s: 0.42, jenis: "permintaan" });
+    g = B.tambahKeluk(g, { label: "S", warna: "s", titik: B.TEMPLAT.menaik.titik, s: 0.45, jenis: "penawaran" });
     return g;
   };
 })();
