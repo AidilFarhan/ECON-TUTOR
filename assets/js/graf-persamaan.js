@@ -211,6 +211,11 @@
     return out;
   }
 
+  // Baki persamaan F(x, y) = kiri − kanan (0 tepat pada keluk); digunakan oleh EKO.keseimbangan
+  PS.sisa = function (eq, x, y, param) {
+    return F(eq, x, y, param);
+  };
+
   // F(x, y) = kiri − kanan
   function F(eq, x, y, param) {
     var env = { x: x, y: y, param: param || eq.param };

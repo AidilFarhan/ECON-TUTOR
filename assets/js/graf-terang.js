@@ -186,6 +186,52 @@
     return g;
   };
 
+  /* ---------- keseimbangan pasaran (Tingkatan 4 Bab 2) ---------- */
+  // Mekanisme buku teks bagi setiap kes asas: lebihan pada harga asal → harga berubah → E₁
+  var MEKANISME = {
+    "D+": "Pertambahan permintaan: pada harga asal P₀ berlaku <b>lebihan permintaan</b> (DD &gt; SS), maka harga naik. Keseimbangan baharu E₁ tercapai pada harga dan kuantiti keseimbangan yang <b>lebih tinggi</b>.",
+    "D-": "Pengurangan permintaan: pada harga asal P₀ berlaku <b>lebihan penawaran</b> (SS &gt; DD), maka harga turun. Keseimbangan baharu E₁ tercapai pada harga dan kuantiti keseimbangan yang <b>lebih rendah</b>.",
+    "S+": "Pertambahan penawaran: pada harga asal P₀ berlaku <b>lebihan penawaran</b> (SS &gt; DD), maka harga turun. Keseimbangan baharu E₁ tercapai pada harga keseimbangan yang <b>lebih rendah</b> dan kuantiti keseimbangan yang <b>lebih tinggi</b>.",
+    "S-": "Pengurangan penawaran: pada harga asal P₀ berlaku <b>lebihan permintaan</b> (DD &gt; SS), maka harga naik. Keseimbangan baharu E₁ tercapai pada harga keseimbangan yang <b>lebih tinggi</b> dan kuantiti keseimbangan yang <b>lebih rendah</b>.",
+    DS: "Kedua-dua keluk permintaan dan penawaran beralih. Kesan bersih terhadap harga dan kuantiti keseimbangan bergantung pada <b>magnitud</b> peralihan setiap keluk."
+  };
+
+  function fmtW(v) {
+    return E.fmt(v, 2);
+  }
+
+  function ubahTeks(arah, naik, turun) {
+    return arah > 0 ? naik : arah < 0 ? turun : "tidak berubah";
+  }
+
+  // Blok penerangan keseimbangan untuk keluk `id` (null jika tiada pasangan D/S atau keluk ini bukan sebahagiannya)
+  T.keseimbangan = function (graf, id) {
+    var KS = E.keseimbangan;
+    var r = KS && KS.kira(graf, id);
+    if (!r || (r.d !== id && r.s !== id)) return null;
+    var def =
+      "<p><b>Keseimbangan pasaran</b> tercapai apabila kuantiti diminta sama dengan kuantiti ditawarkan, iaitu keluk DD bersilang dengan SS.</p>";
+    if (r.ralat || !r.E1) {
+      return { jenis: "contoh", konsep: "alih", tajuk: "Keseimbangan pasaran", html: def + "<p>Dalam graf ini, keluk permintaan dan penawaran tidak bersilang, jadi tiada keseimbangan yang kelihatan.</p>" };
+    }
+    if (!r.berubah) {
+      var nilai0 = r.bernilai ? " Harga keseimbangan = <b>" + fmtW(r.E1.w[1]) + "</b>, kuantiti keseimbangan = <b>" + fmtW(r.E1.w[0]) + "</b>." : "";
+      return { jenis: "contoh", konsep: "alih", tajuk: "Keseimbangan pasaran", html: def + "<p><b>Dalam graf ini:</b> keseimbangan di E." + nilai0 + " Alihkan keluk permintaan atau penawaran untuk melihat kesannya.</p>" };
+    }
+    var jangka = KS.JANGKA[r.kes];
+    var sepadan = !jangka || (jangka.p === r.arahP && jangka.q === r.arahQ);
+    var html = def + (sepadan ? "<p>" + MEKANISME[r.kes] + "</p>" : "");
+    var p = ubahTeks(r.arahP, "naik", "turun"),
+      q = ubahTeks(r.arahQ, "bertambah", "berkurang");
+    html +=
+      "<p><b>Dalam graf ini:</b> keseimbangan beralih dari E₀ ke E₁. Harga keseimbangan <b>" + p + "</b>" +
+      (r.bernilai && r.arahP ? " (P₀ = " + fmtW(r.E0.w[1]) + " → P₁ = " + fmtW(r.E1.w[1]) + ")" : "") +
+      " dan kuantiti keseimbangan <b>" + q + "</b>" +
+      (r.bernilai && r.arahQ ? " (Q₀ = " + fmtW(r.E0.w[0]) + " → Q₁ = " + fmtW(r.E1.w[0]) + ")" : "") + ".</p>";
+    if (!r.E1.nampak) html += "<p>E₁ berada di luar kawasan graf.</p>";
+    return { jenis: "contoh", konsep: "alih", tajuk: "Kesan terhadap keseimbangan pasaran", html: html };
+  };
+
   /* ---------- penerangan ---------- */
   function senarai(items) {
     return "<ul>" + items.map(function (s) {
@@ -298,6 +344,10 @@
       });
     }
     blok.push({ jenis: "fokus", konsep: "alih", tajuk: "Peralihan keluk", html: htmlAlih });
+
+    // kesan terhadap keseimbangan pasaran (hanya jika keluk ini sebahagian pasangan D/S)
+    var imbang = T.keseimbangan(graf, k.id);
+    if (imbang) blok.push(imbang);
 
     return { tajuk: j.nama + " (" + nama + ")", jenis: j.id, blok: tapis(blok, mod), cadangan: [] };
   };

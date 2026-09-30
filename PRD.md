@@ -133,6 +133,10 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - in *Peralihan keluk* mode: the curve type (definition) and the shift (*pertambahan*/*pengurangan*), with the non-price factors for that direction.
     - The reading panel uses the same terms.
     - The curve type (Permintaan, Penawaran) is chosen by the student. Suggestions show a confidence score and reasons, and are never applied automatically. Equations with Qd/Qs set the type.
+  - **Market equilibrium** (phase 6):
+    - when the graph has a Permintaan and a Penawaran curve, their intersection E is shown;
+    - after a shift, E₀ → E₁ with P₀ → P₁ and Q₀ → Q₁ (exact values for equations, for example 16 → 20);
+    - in shift mode, the reading panel and *Terangkan graf* explain the effect with the textbook mechanism (excess demand or supply at P₀), including when both curves shift.
   - Scanning comes in a later phase.
 
 **Acceptance.**
@@ -272,13 +276,14 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | *Bina graf* phase 2: equation input (`EKO.persamaan`) with numeric axes, parameter sliders and the equivalent equation after a shift |
 | 2026-10-01 | *Bina graf* phase 3: draw a curve by finger or mouse (smoothed, simplified, straightened) |
 | 2026-10-01 | *Bina graf* phase 5a: curve-type registry (Permintaan, Penawaran) and *Terangkan graf* explanations in textbook terms |
+| 2026-10-01 | *Bina graf* phase 6: market equilibrium E₀ → E₁ with P and Q changes (`EKO.keseimbangan`) |
 
 ## 10. Roadmap and open questions
 
 | Priority | Item | Notes |
 | --- | --- | --- |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
-| High | *Bina graf*, next phases | Order agreed with the owner (1–3 and 5a done): 6 D/S equilibrium → 7 scenario / *Semak Jawapan* exercises (rule-based, no AI) → 4 photo/upload scanner → 5b interpretation of scanned graphs. The scanner needs an owner decision first: AI is a non-goal (§2), and it has a cost and needs a privacy note for students |
+| High | *Bina graf*, next phases | Order agreed with the owner (1–3, 5a and 6 done): 7 scenario / *Semak Jawapan* exercises (rule-based, no AI) → 4 photo/upload scanner → 5b interpretation of scanned graphs. The scanner needs an owner decision first: AI is a non-goal (§2), and it has a cost and needs a privacy note for students |
 | Medium | STPM quizzes | Deferred by the owner; module practice questions are available as a source |
 | Medium | Matrikulasi: replace *cadangan* sections (AE015 2.2–2.4, 6.5 Oligopoli) | Waiting for the owner to find the slides |
 | Medium | Matrikulasi quizzes | Kept empty for now by the owner's decision |

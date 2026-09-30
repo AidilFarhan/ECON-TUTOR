@@ -14,6 +14,7 @@
   var PS = E.persamaan;
   var JK = E.jenisKeluk;
   var T = E.terang;
+  var KS = E.keseimbangan;
   var esc = E.esc;
   var CONTOH_PERSAMAAN = ["Qd = 100 − 2P", "Qs = 20 + 3P", "y = −2x + 10", "Qd = a − bP; a = 100; b = 2"];
 
@@ -433,6 +434,8 @@
       plot.kosong();
       plot.paksi();
       labelDiletak = [];
+      // dikira sekali setiap lukisan; digunakan oleh lukisImbang dan anak panah peralihan
+      imbangSemasa = st.lukis ? null : KS.kira(st.graf, st.pilih);
       var dipilih = null;
       st.graf.keluk.forEach(function (k) {
         if (k.id === st.pilih) dipilih = k;
@@ -440,10 +443,59 @@
       });
       // keluk dipilih dilukis terakhir supaya kawasan sentuhnya di atas
       if (dipilih) lukisKeluk(dipilih);
+      lukisImbang();
       if (st.mod === "gerak" && dipilih && !st.lukis) lukisTitik(dipilih);
       if (st.coretan && st.coretan.length > 1) plot.laluan(st.coretan, "bina-coretan", "atas");
       baca();
       if (!st.coretan) binaTerang();
+    }
+
+    // Keseimbangan pasaran (EKO.keseimbangan): E, atau E₀ (pudar) → E₁ selepas peralihan.
+    // Garis panduan dan cip paksi hanya dalam mod peralihan supaya mod pergerakan tidak sesak.
+    function lukisImbang() {
+      var r = imbangSemasa;
+      if (!r || !r.E1) return;
+      var alih = st.mod === "alih";
+      var e0 = r.E0,
+        e1 = r.E1;
+      function cip(e, sub) {
+        if (!alih) return null;
+        if (r.bernilai) return { labelX: E.fmt(e.w[0], 2), labelY: E.fmt(e.w[1], 2) };
+        return { labelX: "Q" + sub, labelY: "P" + sub };
+      }
+      if (r.berubah && e0 && e0.nampak) {
+        var c0 = cip(e0, "₀");
+        if (c0 && e1.nampak) {
+          // cip E₀ disorok jika bertindih dengan cip E₁
+          if (Math.abs(plot.X(e0.n[0]) - plot.X(e1.n[0])) < 46) delete c0.labelX;
+          if (Math.abs(plot.Y(e0.n[1]) - plot.Y(e1.n[1])) < 22) delete c0.labelY;
+        }
+        if (c0) plot.panduanKePaksi(e0.n[0], e0.n[1], c0);
+        plot.nod(e0.n[0], e0.n[1], { r: 5 });
+      }
+      if (e1.nampak) {
+        var c1 = cip(e1, r.berubah ? "₁" : "₀");
+        if (c1) plot.panduanKePaksi(e1.n[0], e1.n[1], c1);
+        plot.nod(e1.n[0], e1.n[1], { kelas: "isi", r: 6 });
+        labelNod(e1.n, r.berubah ? "E₁" : "E", "g-teks", [[10, -10], [10, 18], [-26, -8], [-26, 18]]);
+      }
+      if (r.berubah && e0 && e0.nampak) labelNod(e0.n, "E₀", "g-teks lemah", [[-26, -8], [-26, 18], [10, 18], [10, -10]]);
+    }
+
+    // Label nod di kedudukan calon pertama yang tidak bertindih dengan label lain
+    function labelNod(n, teks, kelas, calon) {
+      var px = plot.X(n[0]),
+        py = plot.Y(n[1]);
+      var lebar = teks.length * 8 + 4;
+      var pilih = calon[0];
+      for (var i = 0; i < calon.length; i++) {
+        if (!labelDiletak.some(bertindih(px + calon[i][0], py + calon[i][1], lebar))) {
+          pilih = calon[i];
+          break;
+        }
+      }
+      labelDiletak.push([px + pilih[0], py + pilih[1], lebar]);
+      plot.teksPx(px + pilih[0], E.clamp(py + pilih[1], 14, plot.H - 6), teks, kelas, "start", "label");
     }
 
     function lukisKeluk(k) {
@@ -478,9 +530,19 @@
       }
     }
 
-    // Anak panah dari keluk asal ke keluk semasa (di tengah keluk)
+    // Anak panah dari keluk asal ke keluk semasa
     function panahAnjak(k) {
-      var a = B.titikPadaS(B.laluan(k, false), 0.5);
+      // kedudukan anak panah (25% atau 75% panjang keluk) yang lebih jauh daripada titik keseimbangan E₀
+      var asal = B.laluan(k, false);
+      var a = B.titikPadaS(asal, 0.3);
+      var e0 = imbangSemasa && imbangSemasa.E0 ? imbangSemasa.E0.n : null;
+      if (e0) {
+        var c1 = B.titikPadaS(asal, 0.25),
+          c2 = B.titikPadaS(asal, 0.75);
+        var d1 = Math.abs(plot.X(c1[0]) - plot.X(e0[0])) + Math.abs(plot.Y(c1[1]) - plot.Y(e0[1])),
+          d2 = Math.abs(plot.X(c2[0]) - plot.X(e0[0])) + Math.abs(plot.Y(c2[1]) - plot.Y(e0[1]));
+        a = d1 >= d2 ? c1 : c2;
+      }
       var b = [a[0] + k.anjak.x, a[1] + k.anjak.y];
       if (!dalamKotak(a) || !dalamKotak(b)) return;
       var ax = plot.X(a[0]),
@@ -494,6 +556,7 @@
     }
 
     var labelDiletak = []; // [kiri, garis dasar, lebar] label yang sudah dilukis dalam lukisan semasa
+    var imbangSemasa = null; // hasil EKO.keseimbangan.kira bagi lukisan semasa
     function bertindih(kiri, y, lebar) {
       return function (l) {
         return kiri < l[0] + l[2] && l[0] < kiri + lebar && Math.abs(y - l[1]) < 14;
@@ -690,8 +753,21 @@
         ayat += jenis
           ? " Peralihan keluk " + jenis.pendek + " berlaku apabila <b>faktor bukan harga</b> berubah."
           : " Peralihan keluk berlaku apabila faktor selain pemboleh ubah pada paksi berubah (bagi keluk permintaan dan penawaran: faktor bukan harga).";
+        // kesan terhadap keseimbangan pasaran (jika keluk ini sebahagian pasangan D/S)
+        var ri = KS.kira(st.graf, k.id);
+        var chipImbang = [];
+        if (ri && ri.E1 && ri.E0 && ri.berubah && (ri.d === k.id || ri.s === k.id)) {
+          var pTeks = ri.arahP > 0 ? "naik" : ri.arahP < 0 ? "turun" : "tidak berubah",
+            qTeks = ri.arahQ > 0 ? "bertambah" : ri.arahQ < 0 ? "berkurang" : "tidak berubah";
+          chipImbang = [
+            ["Keseimbangan", "E₀ → E₁"],
+            ["Harga keseimbangan", ri.bernilai ? E.fmt(ri.E0.w[1], 2) + " → " + E.fmt(ri.E1.w[1], 2) : pTeks],
+            ["Kuantiti keseimbangan", ri.bernilai ? E.fmt(ri.E0.w[0], 2) + " → " + E.fmt(ri.E1.w[0], 2) : qTeks]
+          ];
+          ayat += " Keseimbangan beralih dari <b>E₀</b> ke <b>E₁</b>: harga keseimbangan <b>" + pTeks + "</b> dan kuantiti keseimbangan <b>" + qTeks + "</b>.";
+        }
         K.baca.innerHTML =
-          G.nilai([chipMod, ["Keluk", asas + "₀ → " + asas + "₁", k.warna], ["Arah", "Ke " + arahTeks], chipPers, chipBaharu]) + '<div class="ayat">' + ayat + "</div>";
+          G.nilai([chipMod, ["Keluk", asas + "₀ → " + asas + "₁", k.warna], ["Arah", "Ke " + arahTeks], chipPers, chipBaharu].concat(chipImbang)) + '<div class="ayat">' + ayat + "</div>";
         return;
       }
       var t = B.titikKeluk(st.graf, k.id);

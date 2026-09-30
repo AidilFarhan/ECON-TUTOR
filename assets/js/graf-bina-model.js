@@ -442,8 +442,8 @@
     var h = B.hadAnjak(k);
     var x = k.arahSeret === "y" ? 0 : E.clamp(ax, h.x[0], h.x[1]);
     var y = k.arahSeret === "x" ? 0 : E.clamp(ay, h.y[0], h.y[1]);
-    // 6 tempat perpuluhan: anjakan unit kemas (contoh 10/120) kekal tepat dalam unit dunia
-    k.anjak = { x: Math.round(x * 1e6) / 1e6, y: Math.round(y * 1e6) / 1e6 };
+    // 9 tempat perpuluhan: anjakan unit kemas (contoh 20/150) kekal tepat dalam unit dunia
+    k.anjak = { x: Math.round(x * 1e9) / 1e9, y: Math.round(y * 1e9) / 1e9 };
     return g;
   };
 
