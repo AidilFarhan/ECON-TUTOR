@@ -15,6 +15,7 @@
   var JK = E.jenisKeluk;
   var T = E.terang;
   var KS = E.keseimbangan;
+  var SN = E.senario;
   var esc = E.esc;
   var CONTOH_PERSAMAAN = ["Qd = 100 − 2P", "Qs = 20 + 3P", "y = −2x + 10", "Qd = a − bP; a = 100; b = 2"];
 
@@ -41,6 +42,13 @@
       coretan: null, // titik mentah semasa melukis
       baruDilukis: null // id keluk yang baru dilukis (untuk nota dalam panel bacaan)
     };
+    // Mod latihan (Semak Jawapan): opt.latihan = true atau id senario (EKO.senario)
+    var senarai = opt.latihan && SN ? SN.senarai() : [];
+    if (senarai.length) {
+      var snAwal = (typeof opt.latihan === "string" && SN.dapat(opt.latihan)) || senarai[0];
+      st.latihan = { id: snAwal.id, semakan: null, grafSemak: null, selesai: {} };
+      st.graf = SN.grafAwal(snAwal);
+    }
     st.pilih = st.graf.keluk.length ? st.graf.keluk[0].id : null;
 
     /* ---------- kawalan ---------- */
@@ -53,7 +61,7 @@
     var segMod = G.segmen(kotakMod, [["gerak", MOD.gerak], ["alih", MOD.alih]], st.mod, function (v) {
       tukarMod(v);
     });
-    G.butang(K.kawalan, E.ikon("ulang") + " Situasi asal", function () {
+    var btnSemula = G.butang(K.kawalan, E.ikon("ulang") + " Situasi asal", function () {
       st.graf = B.setSemula(st.graf);
       lukis();
     });
@@ -448,6 +456,7 @@
       if (st.coretan && st.coretan.length > 1) plot.laluan(st.coretan, "bina-coretan", "atas");
       baca();
       if (!st.coretan) binaTerang();
+      kemasLatihan();
     }
 
     // Keseimbangan pasaran (EKO.keseimbangan): E, atau E₀ (pudar) → E₁ selepas peralihan.
@@ -848,7 +857,7 @@
       if (st.pilih === id) return;
       st.pilih = id;
       st.baruDilukis = null;
-      Array.prototype.forEach.call(panel.querySelectorAll("[data-pilih]"), function (b) {
+      Array.prototype.forEach.call(host.querySelectorAll("[data-pilih]"), function (b) {
         b.setAttribute("aria-pressed", b.getAttribute("data-pilih") === id ? "true" : "false");
       });
       binaParam();
@@ -1053,6 +1062,135 @@
       }
     });
 
+    /* ---------- latihan: Semak Jawapan (EKO.senario) ---------- */
+    var kotakLatihan = null, // soalan (di atas mod dan graf)
+      kotakSemak = null; // butang Semak Jawapan + maklum balas (betul-betul di bawah graf)
+    if (st.latihan) {
+      K.tajuk.querySelector("b").textContent = opt.tajuk || "Latihan graf";
+      // alat bina disorok supaya pelajar fokus pada soalan (dan penerangan tidak mendedahkan jawapan)
+      [pilihTambah.el, btnPers, btnLukis, btnTerang, btnSemula, panel].forEach(function (el) {
+        el.hidden = true;
+      });
+      kotakLatihan = G.div("bina-latihan");
+      host.insertBefore(kotakLatihan, K.kawalan);
+      kotakSemak = G.div("bina-latihan bina-semak");
+      kotakSemak.innerHTML =
+        '<div class="bina-latihan-butang">' +
+        '<button type="button" class="btn btn-utama" data-semak>' + E.ikon("betul") + " Semak Jawapan</button>" +
+        '<button type="button" class="cip" data-cuba>' + E.ikon("ulang") + " Cuba semula</button>" +
+        '<button type="button" class="cip" data-seterusnya>Soalan seterusnya ' + E.ikon("kanan") + "</button>" +
+        "</div>" +
+        '<div class="bina-maklum" role="status" aria-live="polite"></div>';
+      host.insertBefore(kotakSemak, kotakParam);
+      binaLatihan();
+      kotakSemak.addEventListener("click", function (e) {
+        var b = e.target.closest ? e.target.closest("button") : null;
+        if (!b) return;
+        if (b.hasAttribute("data-semak")) semakJawapan();
+        else if (b.hasAttribute("data-cuba")) muatSenario(st.latihan.id);
+        else if (b.hasAttribute("data-seterusnya")) {
+          var ids = senarai.map(function (s) {
+            return s.id;
+          });
+          muatSenario(ids[(ids.indexOf(st.latihan.id) + 1) % ids.length]);
+          if (kotakLatihan.scrollIntoView) kotakLatihan.scrollIntoView({ block: "nearest", behavior: E.kurangGerak() ? "auto" : "smooth" });
+        }
+      });
+      kotakLatihan.addEventListener("change", function (e) {
+        if (e.target.hasAttribute("data-senario")) muatSenario(e.target.value);
+      });
+      kotakLatihan.addEventListener("click", function (e) {
+        var b = e.target.closest ? e.target.closest("[data-pilih]") : null;
+        if (!b) return;
+        pilihKeluk(b.getAttribute("data-pilih"));
+        lukis();
+      });
+    }
+
+    function senarioSemasa() {
+      return SN.dapat(st.latihan.id);
+    }
+
+    function binaLatihan() {
+      var sn = senarioSemasa();
+      var no = senarai.indexOf(sn) + 1;
+      kotakLatihan.innerHTML =
+        '<div class="bina-latihan-kepala">' +
+        '<label class="medan"><span>Soalan ' + no + " daripada " + senarai.length + "</span><select data-senario>" +
+        senarai
+          .map(function (s, i) {
+            return '<option value="' + esc(s.id) + '"' + (s.id === sn.id ? " selected" : "") + ">" + (st.latihan.selesai[s.id] ? "✓ " : "") + (i + 1) + ". " + esc(s.tajuk || s.id) + "</option>";
+          })
+          .join("") +
+        "</select></label></div>" +
+        '<div class="kotak bina-soalan"><span class="kotak-label">Soalan</span><p>' + esc(sn.soalan) + "</p>" +
+        (sn.petunjuk ? '<details class="bina-faktor"><summary>Petunjuk</summary><p>' + esc(sn.petunjuk) + "</p></details>" : "") +
+        "</div>" +
+        // pilih keluk tanpa mengetuk graf (papan kekunci / skrin kecil) bila ada lebih daripada satu keluk
+        (st.graf.keluk.length > 1
+          ? '<div class="baris-cip bina-latihan-keluk" role="group" aria-label="Pilih keluk"><span class="teks-lemah">Keluk:</span>' +
+            st.graf.keluk
+              .map(function (k) {
+                return (
+                  '<button type="button" class="cip" data-pilih="' + esc(k.id) + '" aria-pressed="' + (k.id === st.pilih) + '"><span class="titik" style="color:' + TOKEN[k.warna] + '"></span>' +
+                  esc(k.label) + " (" + esc(JK.dapat(k.jenis) ? JK.dapat(k.jenis).pendek : "") + ")</button>"
+                );
+              })
+              .join("") +
+            "</div>"
+          : "");
+      maklumLatihan();
+    }
+
+    function maklumLatihan() {
+      var kotak = kotakSemak && kotakSemak.querySelector(".bina-maklum");
+      if (!kotak) return;
+      var r = st.latihan.semakan;
+      if (!r) {
+        kotak.innerHTML = "";
+        return;
+      }
+      kotak.innerHTML =
+        '<div class="kotak ' + (r.betul ? "betul" : "salah") + '"><span class="kotak-label">' + (r.betul ? "✓ Betul" : "Belum tepat") + "</span><p>" + r.mesej + "</p></div>";
+    }
+
+    function muatSenario(id) {
+      var sn = SN.dapat(id);
+      if (!sn) return;
+      st.latihan.id = id;
+      st.latihan.semakan = null;
+      st.latihan.grafSemak = null;
+      st.graf = SN.grafAwal(sn);
+      st.pilih = st.graf.keluk[0].id;
+      st.hover = null;
+      binaLatihan();
+      lukis();
+    }
+
+    function semakJawapan() {
+      var r = SN.semak(senarioSemasa(), st.graf);
+      st.latihan.semakan = r;
+      st.latihan.grafSemak = cap();
+      if (r.betul && !st.latihan.selesai[st.latihan.id]) {
+        st.latihan.selesai[st.latihan.id] = true;
+        binaLatihan(); // tanda ✓ dalam senarai soalan
+      } else maklumLatihan();
+    }
+
+    // Cap keadaan graf (keluk + titik) untuk mengesan perubahan selepas semakan
+    function cap() {
+      return JSON.stringify([st.graf.keluk, st.graf.titik]);
+    }
+
+    // Maklum balas lama dibuang apabila graf berubah selepas semakan
+    function kemasLatihan() {
+      if (!st.latihan || !st.latihan.semakan) return;
+      if (cap() !== st.latihan.grafSemak) {
+        st.latihan.semakan = null;
+        maklumLatihan();
+      }
+    }
+
     host.setAttribute("data-mod", st.mod);
     binaPanel();
     binaParam();
@@ -1071,14 +1209,23 @@
 
   G.daftar("bina-keluk", widget, { tajuk: "Bina graf" });
 
-  /* ---------- paparan #bina-graf ---------- */
-  B.papar = function (app) {
+  /* ---------- paparan #bina-graf dan #latihan-graf ---------- */
+  B.papar = function (app, jenis) {
+    var latihan = jenis === "latihan";
+    var tajuk = latihan ? "Latihan graf" : "Bina graf";
     app.innerHTML =
       '<div class="bekas pandangan halaman-bina">' +
-      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#graf">Graf</a><span>/</span><span>Bina graf</span></nav>' +
-      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">Bina graf</h1>' +
-      "<p>Bina graf ekonomi sendiri dan bezakan dua perubahan: <b>pergerakan di sepanjang keluk</b> (titik bergerak, keluk kekal) dan <b>peralihan keluk</b> (keseluruhan keluk beralih). Pilih mod dahulu, kemudian seret.</p></div></div>" +
-      '<figure class="bina-graf" data-graf="bina-keluk"></figure>' +
+      '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#graf">Graf</a><span>/</span><span>' + tajuk + "</span></nav>" +
+      '<div class="bahagian-kepala" style="margin-top:14px"><div><h1 style="font-size:clamp(30px,4.4vw,44px)">' + tajuk + "</h1>" +
+      (latihan
+        ? "<p>Baca soalan, tunjukkan jawapan dengan mengubah graf, kemudian tekan <b>Semak Jawapan</b>. Pilih mod yang betul: <b>pergerakan di sepanjang keluk</b> atau <b>peralihan keluk</b>.</p>"
+        : "<p>Bina graf ekonomi sendiri dan bezakan dua perubahan: <b>pergerakan di sepanjang keluk</b> (titik bergerak, keluk kekal) dan <b>peralihan keluk</b> (keseluruhan keluk beralih). Pilih mod dahulu, kemudian seret.</p>") +
+      "</div></div>" +
+      '<div class="baris-cip bina-halaman-pilih">' +
+      '<a class="cip' + (latihan ? "" : " aktif") + '" href="#bina-graf"' + (latihan ? "" : ' aria-current="page"') + ">" + E.ikon("pensel") + " Bina bebas</a>" +
+      '<a class="cip' + (latihan ? " aktif" : "") + '" href="#latihan-graf"' + (latihan ? ' aria-current="page"' : "") + ">" + E.ikon("kuiz") + " Latihan: Semak Jawapan</a>" +
+      "</div>" +
+      '<figure class="bina-graf" data-graf="bina-keluk"' + (latihan ? " data-opt='{\"latihan\":true}'" : "") + "></figure>" +
       "</div>";
   };
 })();

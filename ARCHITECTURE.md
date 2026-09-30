@@ -72,6 +72,8 @@ assets/js/graf-bina-model.js  EKO.bina: GrafBina model for #bina-graf (pure func
 assets/js/graf-persamaan.js   EKO.persamaan: equation parser → Keluk (no eval, no DOM)
 assets/js/graf-terang.js      EKO.jenisKeluk (curve-type registry) + EKO.terang (template explanations, no DOM)
 assets/js/graf-imbang.js      EKO.keseimbangan: D/S equilibrium E₀ → E₁ (path intersection; exact for equations; no DOM)
+assets/js/graf-senario.js     EKO.senario: graph exercises (Semak Jawapan), rule-based checking, no DOM
+assets/js/data/senario-pasaran.js   Graph exercises for T4 Bab 2 (8 questions, data only)
 assets/js/graf-bina.js        Bina graf widget (bina-keluk) + the #bina-graf view
 assets/js/data/t4-bab1.js …   One file per chapter: notes, flashcards, quiz
 assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 questions, marking scheme)
@@ -97,7 +99,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 `index.html` loads classic scripts with `defer`, so they execute in document order after parsing:
 
 1. `eko-core.js` creates `window.EKO` (alias `E`).
-2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, `graf-persamaan.js` adds `EKO.persamaan`, `graf-imbang.js` adds `EKO.keseimbangan`, `graf-terang.js` adds `EKO.jenisKeluk` and `EKO.terang`, and `graf-bina.js` registers `bina-keluk`.
+2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, `graf-persamaan.js` adds `EKO.persamaan`, `graf-imbang.js` adds `EKO.keseimbangan`, `graf-terang.js` adds `EKO.jenisKeluk` and `EKO.terang`, `graf-senario.js` adds `EKO.senario`, and `graf-bina.js` registers `bina-keluk`. Graph exercises (`data/senario-*.js`) load with the other data files.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
@@ -134,8 +136,9 @@ Routing is **hash-based** (`location.hash`), so the site works from `file://`, a
 | `#kuiz` | `pKuizSenarai` | Quiz picker with best scores |
 | `#kuiz-<id>` | `pKuizMula` | `id` = chapter id, `t4`, `t5`, `semua`, or a set id such as `kel25-k1`; timer, per-question explanation, review |
 | `#percubaan` | `pPercubaan` | One section per registered paper (K1 + K2 cards) |
-| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi); `<level>` = `t4`, `t5`, `stpm` or `matrik` mounts only that level's graphs. The chooser also links to *Bina graf* |
+| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi); `<level>` = `t4`, `t5`, `stpm` or `matrik` mounts only that level's graphs. The chooser also links to *Bina graf* and *Latihan graf* |
 | `#bina-graf` | `EKO.bina.papar` | Bina graf: build curves and practise movement along a curve vs a shift of the curve (§3.4a) |
+| `#latihan-graf` | `EKO.bina.papar(app, "latihan")` | Latihan graf: questions checked with *Semak Jawapan* (§3.4a) |
 | `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = a group key (`t4`, `t5`, `p1`, `p2`, `p3`, `m1`, `m2`) or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
 | `#k2`, `#k2-<paperId>` | `pK2` | Kertas 2 with answer boxes, self-marking against the scheme, level rubrics |
 
@@ -175,7 +178,7 @@ flowchart TB
 
 ### 3.4a Bina graf (`EKO.bina`)
 
-`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input), 3 (drawing), 5a (curve types and explanations) and 6 (equilibrium) of the owner's plan are done (PRD §10). Exercises and scanning come later, and they must all use this same model.
+`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input), 3 (drawing), 5a (curve types and explanations), 6 (equilibrium) and 7 (exercises) of the owner's plan are done (PRD §10). Scanning comes later, and they must all use this same model.
 
 ```js
 GrafBina {
@@ -231,6 +234,12 @@ GrafBina {
   - It returns `kes` (`D+`, `D-`, `S+`, `S-`, `DS`) with `arahP`/`arahQ` for the explanation and, later, *Semak Jawapan*.
   - The graph shows E before a shift, and E₀ (faint) → E₁ after one. Guides with P₀/P₁ and Q₀/Q₁ (or values) are shown only in shift mode, and chips that would overlap are hidden.
   - In shift mode, the explanation adds a *Kesan terhadap keseimbangan pasaran* block with the textbook mechanism (excess demand or supply at P₀ → price change → E₁) and the values.
+- **Exercises (`graf-senario.js`, `data/senario-*.js`).** Questions are data, registered with `EKO.senario.daftar({ id, tajuk, soalan, petunjuk?, graf: "d" | "s" | "ds", paksi?, jawapan, maklumBalas })`. `jawapan` is `{ tindakan: "anjak" | "gerak", keluk: "permintaan" | "penawaran", arah }` or a list of them when more than one curve changes.
+  - Checking is rule-based (no AI). `SN.semak` reads the final graph state: each curve's shift (at least 2% of the axis) and each point's movement along its curve.
+  - It returns one code: `betul`, `salahGerak` (moved along instead of shifting), `salahAnjak` (shifted instead of moving along), `salahArah`, `salahKeluk`, `belumLengkap` or `tiadaTindakan`. Each code has a default sentence; `maklumBalas` can replace any of them.
+  - The widget runs in exercise mode with `data-opt='{"latihan": true}'` or a question id, so a single exercise can later be embedded in a chapter note.
+  - In exercise mode the building tools and *Terangkan graf* are hidden. The question sits above the graph, and *Semak Jawapan*, *Cuba semula* and *Soalan seterusnya* with the feedback sit right below it (green `.kotak.betul`, red `.kotak.salah`).
+  - A curve chooser appears when there is more than one curve, so keyboard users can select S. Old feedback clears as soon as the graph changes, and solved questions get a ✓ for the session.
 - **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
@@ -407,7 +416,7 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | --- | --- | --- |
 | No framework, no build | A teacher can open `index.html` offline, edit data files on GitHub, and deploy anywhere | Views are string templates; no component reuse beyond helpers |
 | Hash routing | Works on `file://`, any static host, and behind the middleware without rewrites | URLs contain `#`; the hash is lost across the login redirect |
-| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 10 600 lines across ten `graf*.js` files) |
+| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 10 900 lines across eleven `graf*.js` files) |
 | Content as JS files | No fetch, works offline, one file per chapter is easy to review | Content editors must keep valid JS syntax |
 | Progress in `localStorage` | No accounts or database needed for learning features | Progress does not follow a student across devices |
 | Firebase Auth instead of Supabase | Free tier does not pause after inactivity; Google sign-in is a toggle; the owner's Supabase free slots were full | Adds a third-party identity provider |

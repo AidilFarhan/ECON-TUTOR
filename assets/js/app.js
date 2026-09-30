@@ -139,10 +139,10 @@
     } else if (h === "graf" || h.indexOf("graf-") === 0) {
       nav = "graf";
       pGraf(h.slice(5));
-    } else if (h === "bina-graf") {
+    } else if (h === "bina-graf" || h === "latihan-graf") {
       nav = "graf";
-      E.bina.papar(app);
-      tajuk = "Bina graf · Econ Tutor";
+      E.bina.papar(app, h === "latihan-graf" ? "latihan" : null);
+      tajuk = (h === "latihan-graf" ? "Latihan graf" : "Bina graf") + " · Econ Tutor";
     } else if (h === "kad" || h.indexOf("kad-") === 0) {
       nav = "kad";
       pKad(h.slice(4) || "semua");
@@ -574,6 +574,11 @@
         '<span class="ikon-bulat">' + E.ikon("pensel") + "</span>" +
         "<b>Bina graf</b>" +
         "<span>Tambah keluk sendiri, alihkan keluk atau gerakkan titik di sepanjang keluk</span>" +
+        "</a>" +
+        '<a class="kad-alat kaca" href="#latihan-graf">' +
+        '<span class="ikon-bulat">' + E.ikon("kuiz") + "</span>" +
+        "<b>Latihan graf</b>" +
+        "<span>Tunjukkan jawapan pada graf, kemudian tekan Semak Jawapan</span>" +
         "</a>" +
         "</div></div>";
       app.innerHTML = html;

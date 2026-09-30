@@ -4340,3 +4340,66 @@ ol.roman > li::before {
   display: flex;
   align-items: center;
 }
+
+/* bina graf: latihan Semak Jawapan */
+.bina-halaman-pilih {
+  margin: 16px 0 4px;
+}
+
+.bina-halaman-pilih .cip {
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.bina-latihan {
+  display: grid;
+  gap: 10px;
+}
+
+.bina-latihan-kepala .medan {
+  max-width: 520px;
+}
+
+.bina-latihan-kepala select {
+  min-height: 44px;
+}
+
+.bina-soalan {
+  margin: 0;
+}
+
+.bina-soalan p {
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.bina-latihan-butang {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.bina-latihan-butang .cip {
+  min-height: 44px;
+}
+
+.bina-maklum:empty {
+  display: none;
+}
+
+.bina-maklum .kotak {
+  margin: 0;
+}
+
+/* maklum balas Semak Jawapan: warna status (bukan warna keluk) */
+.kotak.betul {
+  --warna-kotak: var(--good);
+  background: linear-gradient(135deg, var(--good-soft), transparent 60%), var(--glass-2);
+}
+
+.kotak.salah {
+  --warna-kotak: var(--bad);
+  background: linear-gradient(135deg, var(--bad-soft), transparent 60%), var(--glass-2);
+}
