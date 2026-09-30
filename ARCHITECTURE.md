@@ -69,6 +69,7 @@ assets/js/graf-t5.js          Form 5 graph widgets
 assets/js/graf-stpm.js        STPM graph widgets
 assets/js/graf-matrik.js      Matrikulasi graph widgets (carta-jadual, lrac)
 assets/js/graf-bina-model.js  EKO.bina: GrafBina model for #bina-graf (pure functions, no DOM)
+assets/js/graf-persamaan.js   EKO.persamaan: equation parser → Keluk (no eval, no DOM)
 assets/js/graf-bina.js        Bina graf widget (bina-keluk) + the #bina-graf view
 assets/js/data/t4-bab1.js …   One file per chapter: notes, flashcards, quiz
 assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 questions, marking scheme)
@@ -94,7 +95,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 `index.html` loads classic scripts with `defer`, so they execute in document order after parsing:
 
 1. `eko-core.js` creates `window.EKO` (alias `E`).
-2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, and `graf-bina.js` registers `bina-keluk`.
+2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, `graf-persamaan.js` adds `EKO.persamaan`, and `graf-bina.js` registers `bina-keluk`.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
@@ -172,17 +173,19 @@ flowchart TB
 
 ### 3.4a Bina graf (`EKO.bina`)
 
-`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. This is phase 1 of the owner's plan (PRD §10). Equation input, drawing, scanning, explanations, equilibrium and exercises come later, and they must all produce this same model.
+`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine) and 2 (equation input) of the owner's plan are done (PRD §10). Drawing, scanning, explanations, equilibrium and exercises come later, and they must all produce this same model.
 
 ```js
 GrafBina {
   versi: 1,
-  paksi: { x: { label }, y: { label } },
+  paksi: { x: { label, maks? }, y: { label, maks? } },   // maks set = numeric axes (from 0); none = conceptual
   keluk: [{ id, label, jenis: null, warna: "d" | "s" | "c3" | "c4" | "c5",
             titik: [[x, y], …],          // normalised 0..1 inside the axes box, ordered along the path
             anjak: { x, y },             // SHIFT = translation only; titik[] is never rewritten
             arahSeret: "x" | "y" | "xy" | "tiada",
-            meta: { arah: "menurun" | "menaik" | "mendatar" | "tegak" | "lain", sumber } }],
+            meta: { arah: "menurun" | "menaik" | "mendatar" | "tegak" | "lain", sumber },
+            persamaan: null | { teks, kiri, kanan /* AST */, dep: "x" | "y", nama: { x, y }, sistem: "PQ" | "xy",
+                                param: { a: 100 }, julatParam: { a: [min, maks, langkah] }, linear } }],
   titik: [{ id, keluk, s, sAwal }],      // MOVEMENT along a curve; s = arc-length fraction, not x
   peristiwa: [{ jenis: "anjak", keluk, dari, ke } | { jenis: "gerak", keluk, titik, dari, ke }]
 }
@@ -194,6 +197,15 @@ GrafBina {
   - *Peralihan keluk* drags the whole curve D₀ → D₁ (`B.anjakKeluk`), with the original shown dashed.
   - Each drag or key press records one `peristiwa`. `B.catat` merges consecutive events of the same kind.
 - **Limits.** A shift keeps the curve's end inside 95% of the axis and keeps at least 30% of the axis visible. Parts past an axis are clipped (`B.klipKotak`). Horizontal curves shift vertically; all others shift horizontally.
+- **Equations (`EKO.persamaan`).** A hand-written recursive-descent parser. It does not use `eval`.
+  - Syntax: `+ − × ÷ ^`, brackets, implicit multiplication (`2P`, `bP`) and textbook thousands spaces (`1 000`).
+  - Variables: P goes on the Y axis; Q, Qd and Qs go on the X axis. `x`/`y` may be used instead, but a graph cannot mix the two systems.
+  - Other lowercase letters are parameters (`Qd = a − bP; a = 100; b = 2`, default 1, at most 4).
+  - Solving: the equation is solved for whichever variable it is linear in. This covers explicit forms, `2P + Q = 100`, `P = 10`, `Q = 40` and `P×Q = 100`.
+  - Axes: the first equation turns the axes numeric. `PS.cadangJulat` picks round maxima from the intercepts, so the curve ends inside 92% of each axis.
+  - Parameter sliders re-sample the curve, but the axes stay fixed so the change is visible.
+  - A shift is still only `anjak`, rounded to a tidy unit on numeric axes. The equivalent equation (for example `Qd = 110 − 2P`) is shown for straight lines but never stored.
+  - Readings on an equation curve round the free variable to one tidy unit and compute the other variable from the equation.
 - **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
@@ -370,7 +382,7 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | --- | --- | --- |
 | No framework, no build | A teacher can open `index.html` offline, edit data files on GitHub, and deploy anywhere | Views are string templates; no component reuse beyond helpers |
 | Hash routing | Works on `file://`, any static host, and behind the middleware without rewrites | URLs contain `#`; the hash is lost across the login redirect |
-| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 8 800 lines across seven `graf*.js` files) |
+| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 9 600 lines across eight `graf*.js` files) |
 | Content as JS files | No fetch, works offline, one file per chapter is easy to review | Content editors must keep valid JS syntax |
 | Progress in `localStorage` | No accounts or database needed for learning features | Progress does not follow a student across devices |
 | Firebase Auth instead of Supabase | Free tier does not pause after inactivity; Google sign-in is a toggle; the owner's Supabase free slots were full | Adds a third-party identity provider |

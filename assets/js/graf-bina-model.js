@@ -109,7 +109,9 @@
       titik: pts,
       anjak: { x: 0, y: 0 },
       arahSeret: o.arahSeret || B.arahSeretLalai(arah),
-      meta: { arah: arah, sumber: o.sumber || "contoh" }
+      meta: { arah: arah, sumber: o.sumber || "contoh" },
+      // hanya bagi keluk daripada persamaan (EKO.persamaan); keluk lain tidak perlu persamaan
+      persamaan: o.persamaan ? klon(o.persamaan) : null
     };
   };
 
@@ -153,7 +155,9 @@
       warna: warnaBebas(g, spek.warna),
       titik: spek.titik,
       sumber: spek.sumber,
-      arahSeret: spek.arahSeret
+      arahSeret: spek.arahSeret,
+      jenis: spek.jenis,
+      persamaan: spek.persamaan
     });
     g.keluk.push(k);
     var s0 = spek.s != null ? spek.s : 0.4;
@@ -259,7 +263,10 @@
 
   // Laluan licin keluk (ternormal). anjak: true = kedudukan semasa, false = kedudukan asal.
   B.laluan = function (k, denganAnjak) {
-    var poli = B.licin(k.titik);
+    // keluk persamaan sudah disampel rapat (atau garis lurus tepat): tidak perlu dilicinkan
+    var poli = k.persamaan ? k.titik.map(function (p) {
+      return [p[0], p[1]];
+    }) : B.licin(k.titik);
     return denganAnjak === false ? poli : tambahAnjak(poli, k.anjak);
   };
 
@@ -426,7 +433,8 @@
     var h = B.hadAnjak(k);
     var x = k.arahSeret === "y" ? 0 : E.clamp(ax, h.x[0], h.x[1]);
     var y = k.arahSeret === "x" ? 0 : E.clamp(ay, h.y[0], h.y[1]);
-    k.anjak = { x: bundar(x), y: bundar(y) };
+    // 6 tempat perpuluhan: anjakan unit kemas (contoh 10/120) kekal tepat dalam unit dunia
+    k.anjak = { x: Math.round(x * 1e6) / 1e6, y: Math.round(y * 1e6) / 1e6 };
     return g;
   };
 

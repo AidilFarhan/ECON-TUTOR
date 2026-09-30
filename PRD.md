@@ -117,7 +117,13 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - *Peralihan keluk* drags the whole curve D₀ → D₁ with the shape unchanged.
   - *Situasi asal* resets the graph.
   - Works with mouse, touch and keyboard.
-  - Phase 1 of the plan in §10; no equation input, drawing or scanning yet.
+  - **ƒ Persamaan** (phase 2) adds a curve from an equation:
+    - accepted forms include `Qd = 100 − 2P`, `Qs = 20 + 3P`, `y = −2x + 10`, `P = 10`, `Q = 40` and `Qd = a − bP; a = 100; b = 2`;
+    - the axes become numeric and readings show values (P 20 → 17.5, Qd 60 → 65);
+    - parameters get sliders;
+    - a shifted straight line shows its equivalent equation (Qd = 110 − 2P);
+    - invalid or unsupported equations show a short Malay error.
+  - Drawing and scanning come in later phases.
 
 **Acceptance.**
 - Every graph renders in light and dark mode without errors.
@@ -253,13 +259,14 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-30 | "Hubungi cikgu" WhatsApp button in the account menu |
 | 2026-09-30 | Calculator tables fit the screen with aligned columns (no horizontal scroll, no clipped values) |
 | 2026-10-01 | *Bina graf* phase 1: generic curve model (`EKO.bina`) and `#bina-graf` page with movement-along vs shift modes |
+| 2026-10-01 | *Bina graf* phase 2: equation input (`EKO.persamaan`) with numeric axes, parameter sliders and the equivalent equation after a shift |
 
 ## 10. Roadmap and open questions
 
 | Priority | Item | Notes |
 | --- | --- | --- |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
-| High | *Bina graf*, next phases | Order agreed with the owner: 2 equation input (with parameter sliders) → 3 manual drawing → 5a curve registry and textbook explanations (D, S first) → 6 D/S equilibrium → 7 scenario / *Semak Jawapan* exercises (rule-based, no AI) → 4 photo/upload scanner → 5b interpretation of scanned graphs. The scanner needs an owner decision first: AI is a non-goal (§2), and it has a cost and needs a privacy note for students |
+| High | *Bina graf*, next phases | Order agreed with the owner (1 and 2 done): 3 manual drawing → 5a curve registry and textbook explanations (D, S first) → 6 D/S equilibrium → 7 scenario / *Semak Jawapan* exercises (rule-based, no AI) → 4 photo/upload scanner → 5b interpretation of scanned graphs. The scanner needs an owner decision first: AI is a non-goal (§2), and it has a cost and needs a privacy note for students |
 | Medium | STPM quizzes | Deferred by the owner; module practice questions are available as a source |
 | Medium | Matrikulasi: replace *cadangan* sections (AE015 2.2–2.4, 6.5 Oligopoli) | Waiting for the owner to find the slides |
 | Medium | Matrikulasi quizzes | Kept empty for now by the owner's decision |
