@@ -143,7 +143,11 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - feedback distinguishes a correct answer, moving along the curve instead of shifting it (and the reverse), the wrong direction, the wrong curve, and an incomplete answer when two curves should change.
     - 8 questions from T4 Bab 2 cover demand factors, supply factors, movement along the curve, market effects and two curves shifting together.
     - Questions live in a data file, so teachers can add more without code changes.
-  - Scanning comes in a later phase.
+  - **Tekap gambar** (phase 4, no AI by owner decision):
+    - the student photographs or uploads a graph (textbook, slide, handwriting), aligns it with markers O and T, and traces each curve with a finger;
+    - the traced curves become normal curves (type, shift, explanation, equilibrium);
+    - the image never leaves the device and is not stored.
+  - Automatic recognition of a photo (5b) would need an AI service, so it waits for an owner decision on provider, cost and privacy.
 
 **Acceptance.**
 - Every graph renders in light and dark mode without errors.
@@ -284,13 +288,14 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | *Bina graf* phase 5a: curve-type registry (Permintaan, Penawaran) and *Terangkan graf* explanations in textbook terms |
 | 2026-10-01 | *Bina graf* phase 6: market equilibrium E₀ → E₁ with P and Q changes (`EKO.keseimbangan`) |
 | 2026-10-01 | *Bina graf* phase 7: *Latihan graf* with *Semak Jawapan* (`EKO.senario`, 8 T4 Bab 2 questions) |
+| 2026-10-01 | *Bina graf* phase 4: *Tekap gambar*, which traces a graph from a photo on the device without AI (`EKO.imbas`) |
 
 ## 10. Roadmap and open questions
 
 | Priority | Item | Notes |
 | --- | --- | --- |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
-| High | *Bina graf*, next phases | Order agreed with the owner (1–3, 5a, 6 and 7 done): 4 photo/upload scanner → 5b interpretation of scanned graphs. The scanner needs an owner decision first: AI is a non-goal (§2), and it has a cost and needs a privacy note for students |
+| Medium | *Bina graf*, remaining phase | Phases 1–3, 4 (tracing a photo, no AI), 5a, 6 and 7 are done. Remaining: 5b, automatic recognition of a photographed graph. It needs an AI vision service behind the existing `EKO.imbas.pengecam` hook. It waits for the owner to decide on provider, API key, cost limits and a privacy note for students, since AI is a non-goal in §2. The ChatGPT/Gemini apps cannot be used directly; only their developer APIs can |
 | Medium | STPM quizzes | Deferred by the owner; module practice questions are available as a source |
 | Medium | Matrikulasi: replace *cadangan* sections (AE015 2.2–2.4, 6.5 Oligopoli) | Waiting for the owner to find the slides |
 | Medium | Matrikulasi quizzes | Kept empty for now by the owner's decision |

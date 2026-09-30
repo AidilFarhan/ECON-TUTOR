@@ -72,6 +72,7 @@ assets/js/graf-bina-model.js  EKO.bina: GrafBina model for #bina-graf (pure func
 assets/js/graf-persamaan.js   EKO.persamaan: equation parser → Keluk (no eval, no DOM)
 assets/js/graf-terang.js      EKO.jenisKeluk (curve-type registry) + EKO.terang (template explanations, no DOM)
 assets/js/graf-imbang.js      EKO.keseimbangan: D/S equilibrium E₀ → E₁ (path intersection; exact for equations; no DOM)
+assets/js/graf-imbas.js       EKO.imbas: trace a graph from a photo (alignment maths, on-device image loading; no AI)
 assets/js/graf-senario.js     EKO.senario: graph exercises (Semak Jawapan), rule-based checking, no DOM
 assets/js/data/senario-pasaran.js   Graph exercises for T4 Bab 2 (8 questions, data only)
 assets/js/graf-bina.js        Bina graf widget (bina-keluk) + the #bina-graf view
@@ -99,7 +100,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 `index.html` loads classic scripts with `defer`, so they execute in document order after parsing:
 
 1. `eko-core.js` creates `window.EKO` (alias `E`).
-2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, `graf-persamaan.js` adds `EKO.persamaan`, `graf-imbang.js` adds `EKO.keseimbangan`, `graf-terang.js` adds `EKO.jenisKeluk` and `EKO.terang`, `graf-senario.js` adds `EKO.senario`, and `graf-bina.js` registers `bina-keluk`. Graph exercises (`data/senario-*.js`) load with the other data files.
+2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, `graf-persamaan.js` adds `EKO.persamaan`, `graf-imbang.js` adds `EKO.keseimbangan`, `graf-terang.js` adds `EKO.jenisKeluk` and `EKO.terang`, `graf-senario.js` adds `EKO.senario`, `graf-imbas.js` adds `EKO.imbas`, and `graf-bina.js` registers `bina-keluk`. Graph exercises (`data/senario-*.js`) load with the other data files.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
@@ -178,7 +179,7 @@ flowchart TB
 
 ### 3.4a Bina graf (`EKO.bina`)
 
-`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input), 3 (drawing), 5a (curve types and explanations), 6 (equilibrium) and 7 (exercises) of the owner's plan are done (PRD §10). Scanning comes later, and they must all use this same model.
+`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input), 3 (drawing), 5a (curve types and explanations), 6 (equilibrium), 7 (exercises) and 4 (tracing a photo, without AI) of the owner's plan are done (PRD §10). Automatic recognition (5b) comes later, and they must all use this same model.
 
 ```js
 GrafBina {
@@ -240,6 +241,13 @@ GrafBina {
   - The widget runs in exercise mode with `data-opt='{"latihan": true}'` or a question id, so a single exercise can later be embedded in a chapter note.
   - In exercise mode the building tools and *Terangkan graf* are hidden. The question sits above the graph, and *Semak Jawapan*, *Cuba semula* and *Soalan seterusnya* with the feedback sit right below it (green `.kotak.betul`, red `.kotak.salah`).
   - A curve chooser appears when there is more than one curve, so keyboard users can select S. Old feedback clears as soon as the graph changes, and solved questions get a ✓ for the session.
+- **Tracing a photo (`graf-imbas.js`), no AI (owner decision).** *Tekap gambar* has three steps:
+  1. The student takes a photo (`<input capture="environment">`), picks a file, or drops one on the graph.
+  2. The image is shown under the axes. The student drags marker **O** to the image's origin and **T** to the axis ends; `IM.padan` stretches the image so O → (0, 0) and T → (1, 1).
+  3. The student traces each curve with *Lukis keluk*, which stays on until *Selesai menekap*. The traced curves are ordinary `Keluk` objects.
+  - Privacy: the image stays on the device. It is downscaled to ≤ 1600 px and re-encoded as JPEG (dropping EXIF/GPS), kept as an object URL, never put in `GrafBina` or storage, and revoked when the widget is destroyed.
+  - Errors are short (not an image, cannot be opened, too small) and always allow a retry.
+  - `EKO.imbas.pengecam` is an empty hook where an automatic recogniser (AI) can later plug in without changing the UI.
 - **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
@@ -416,7 +424,7 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | --- | --- | --- |
 | No framework, no build | A teacher can open `index.html` offline, edit data files on GitHub, and deploy anywhere | Views are string templates; no component reuse beyond helpers |
 | Hash routing | Works on `file://`, any static host, and behind the middleware without rewrites | URLs contain `#`; the hash is lost across the login redirect |
-| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 10 900 lines across eleven `graf*.js` files) |
+| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 11 200 lines across twelve `graf*.js` files) |
 | Content as JS files | No fetch, works offline, one file per chapter is easy to review | Content editors must keep valid JS syntax |
 | Progress in `localStorage` | No accounts or database needed for learning features | Progress does not follow a student across devices |
 | Firebase Auth instead of Supabase | Free tier does not pause after inactivity; Google sign-in is a toggle; the owner's Supabase free slots were full | Adds a third-party identity provider |

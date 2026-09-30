@@ -4403,3 +4403,64 @@ ol.roman > li::before {
   --warna-kotak: var(--bad);
   background: linear-gradient(135deg, var(--bad-soft), transparent 60%), var(--glass-2);
 }
+
+/* bina graf: tekap graf daripada gambar (tanpa AI, gambar kekal dalam peranti) */
+.bina-imbas p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.bina-imbas-isi {
+  display: grid;
+  gap: 10px;
+}
+
+.bina-imbas-butang {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.bina-imbas-butang .cip {
+  min-height: 44px;
+}
+
+.bina-fail {
+  position: relative;
+  cursor: pointer;
+}
+
+.bina-fail:focus-within {
+  outline: 2.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.bina-kotak-laras {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 5;
+}
+
+.g-nod.bina-penanda {
+  stroke: var(--accent);
+  fill: var(--glass-3);
+}
+
+.bina-graf[data-seret-fail] .graf-kanvas {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* butang fail ialah <label>: jangan warisi gaya .graf-kawalan label (untuk gelangsar) */
+.graf-kawalan label.bina-fail {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.graf-kawalan label.bina-fail.btn-utama {
+  color: var(--accent-ink);
+}

@@ -102,6 +102,14 @@
       setLukis(!st.lukis);
     }, { tekan: false });
 
+    /* ---------- tekap gambar (EKO.imbas, tanpa AI) ---------- */
+    var btnImbas = G.butang(K.kawalan, E.ikon("kamera") + " Tekap gambar", function () {
+      var buka = kotakImbas.hidden;
+      kotakImbas.hidden = !buka;
+      btnImbas.setAttribute("aria-expanded", buka ? "true" : "false");
+    });
+    btnImbas.setAttribute("aria-expanded", "false");
+
     /* ---------- terangkan graf (EKO.terang) ---------- */
     var btnTerang = G.butang(K.kawalan, E.ikon("buku") + " Terangkan graf", function () {
       var buka = kotakTerang.hidden;
@@ -115,6 +123,8 @@
 
     function setLukis(on, pesan) {
       st.lukis = !!on && st.graf.keluk.length < B.MAKS_KELUK;
+      // keluar daripada mod lukis semasa menekap = tekapan selesai
+      if (!st.lukis && st.imej && st.imej.langkah === "tekap") st.imej.langkah = "siap";
       st.coretan = null;
       st.hover = null;
       st.pesanLukis = pesan || null;
@@ -124,7 +134,8 @@
       plot.svg.style.touchAction = st.lukis ? "none" : "";
       if (st.lukis) host.setAttribute("data-lukis", "1");
       else host.removeAttribute("data-lukis");
-      petunjuk.textContent = st.lukis ? "Lukis keluk dengan jari atau tetikus" : PETUNJUK[st.mod];
+      petunjuk.textContent = st.lukis ? (st.imej ? "Tekap keluk dalam gambar" : "Lukis keluk dengan jari atau tetikus") : PETUNJUK[st.mod];
+      binaImbas();
       lukis();
     }
 
@@ -142,7 +153,8 @@
       st.graf = B.tambahKeluk(st.graf, { label: "K", titik: h.titik, sumber: "lukis" });
       st.pilih = st.graf.keluk[st.graf.keluk.length - 1].id;
       st.baruDilukis = { id: st.pilih, diluruskan: h.diluruskan };
-      setLukis(false);
+      // semasa menekap gambar, mod lukis kekal supaya keluk seterusnya boleh terus ditekap
+      setLukis(!!(st.imej && st.imej.langkah === "tekap") && st.graf.keluk.length < B.MAKS_KELUK);
       binaPanel();
       binaParam();
       lukis();
@@ -214,6 +226,161 @@
       }
     });
 
+    /* ---------- panel tekap gambar ---------- */
+    // st.imej = { url, w, h, rect (ruang ternormal), O, T (penanda), langkah: "laras" | "tekap" | "siap", legap }
+    // Gambar tidak masuk ke dalam st.graf dan tidak disimpan.
+    var kotakImbas = G.div("bina-pers bina-imbas");
+    kotakImbas.hidden = true;
+    kotakImbas.innerHTML = '<div class="bina-imbas-isi"></div><p class="bina-ralat" role="alert" hidden></p>';
+    K.kawalan.appendChild(kotakImbas);
+    var isiImbas = kotakImbas.querySelector(".bina-imbas-isi");
+    var ralatImbas = kotakImbas.querySelector(".bina-ralat");
+
+    function binaImbas() {
+      if (!isiImbas) return;
+      var im = st.imej;
+      var html;
+      if (!im) {
+        html =
+          '<p class="bina-imbas-tajuk"><b>Tekap graf daripada gambar</b></p>' +
+          '<div class="bina-imbas-butang">' +
+          '<label class="btn btn-utama bina-fail">' + E.ikon("kamera") + ' Ambil gambar<input class="sr-only" type="file" accept="image/*" capture="environment" data-fail></label>' +
+          '<label class="btn bina-fail">' + E.ikon("kertas") + ' Pilih gambar<input class="sr-only" type="file" accept="image/*" data-fail></label>' +
+          "</div>" +
+          '<p class="medan-bantuan">Atau seret fail gambar ke dalam graf. Gambar hanya dipaparkan dalam peranti ini; ia tidak dimuat naik dan tidak disimpan.</p>';
+      } else if (im.langkah === "laras") {
+        html =
+          '<p><b>Langkah 1: Jajarkan paksi.</b> Seret penanda <b>O</b> ke asalan graf dalam gambar, dan penanda <b>T</b> ke hujung paksi (paras hujung paksi tegak dan hujung paksi datar).</p>' +
+          '<div class="bina-imbas-butang">' +
+          '<button type="button" class="btn btn-utama" data-siap-laras>' + E.ikon("betul") + " Siap, mula tekap</button>" +
+          '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
+          "</div>";
+      } else {
+        html =
+          (im.langkah === "tekap"
+            ? "<p><b>Langkah 2: Tekap keluk.</b> Surih setiap keluk dalam gambar dengan jari atau tetikus, satu demi satu. Kemudian namakan keluk dan tetapkan jenisnya dalam <b>Terangkan graf</b>.</p>"
+            : "<p><b>Tekapan selesai.</b> Keluk yang ditekap boleh dinamakan, dialih dan diterangkan seperti keluk lain.</p>") +
+          '<div class="bina-imbas-butang">' +
+          (im.langkah === "tekap"
+            ? '<button type="button" class="btn btn-utama" data-selesai-tekap>' + E.ikon("betul") + " Selesai menekap</button>"
+            : '<button type="button" class="btn" data-tekap-lagi>' + E.ikon("pensel") + " Tekap keluk lagi</button>") +
+          '<button type="button" class="cip" data-laras-semula>' + E.ikon("ulang") + " Laras semula</button>" +
+          '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
+          "</div>";
+      }
+      isiImbas.innerHTML = html;
+      if (im && im.langkah !== "laras") {
+        G.julat(isiImbas, {
+          label: "Kelegapan gambar",
+          min: 0.15,
+          max: 1,
+          step: 0.05,
+          nilai: im.legap,
+          fmt: function (v) {
+            return Math.round(v * 100) + "%";
+          },
+          ubah: function (v) {
+            st.imej.legap = v;
+            lukis();
+          }
+        });
+      }
+    }
+
+    function mesejImbas(teks) {
+      ralatImbas.textContent = teks || "";
+      ralatImbas.hidden = !teks;
+    }
+
+    function aspekKotak() {
+      return (plot.kanan() - plot.kiri()) / (plot.bawah() - plot.atas());
+    }
+
+    function muatFail(fail) {
+      if (!fail || st.latihan) return;
+      kotakImbas.hidden = false;
+      btnImbas.setAttribute("aria-expanded", "true");
+      mesejImbas("");
+      E.imbas.muat(fail, function (ralat, hasil) {
+        if (ralat) {
+          mesejImbas(ralat);
+          return;
+        }
+        E.imbas.buang(st.imej);
+        var rect = E.imbas.muatAwal(hasil.w, hasil.h, aspekKotak());
+        var p = E.imbas.penandaAwal(rect);
+        st.imej = { url: hasil.url, dataUrl: hasil.dataUrl, w: hasil.w, h: hasil.h, rect: rect, O: p.O, T: p.T, langkah: "laras", legap: 0.6 };
+        // graf contoh yang belum diubah dikosongkan supaya pelajar terus menekap
+        if (JSON.stringify(st.graf) === JSON.stringify(B.grafContoh())) {
+          st.graf = B.buatGraf();
+          st.pilih = null;
+        }
+        setLukis(false);
+        petunjuk.textContent = "Jajarkan paksi gambar";
+        binaPanel();
+        binaParam();
+        binaImbas();
+        lukis();
+      });
+    }
+
+    kotakImbas.addEventListener("change", function (e) {
+      if (e.target.hasAttribute("data-fail")) {
+        muatFail(e.target.files && e.target.files[0]);
+        e.target.value = "";
+      }
+    });
+
+    kotakImbas.addEventListener("click", function (e) {
+      var b = e.target.closest ? e.target.closest("button") : null;
+      if (!b || !st.imej) return;
+      mesejImbas("");
+      if (b.hasAttribute("data-siap-laras")) {
+        var r = E.imbas.padan(st.imej.rect, st.imej.O, st.imej.T);
+        if (!r) {
+          mesejImbas("Penanda O dan T terlalu rapat. Letakkan O di asalan dan T di hujung paksi dalam gambar.");
+          return;
+        }
+        st.imej.rect = r;
+        st.imej.langkah = "tekap";
+        setLukis(true);
+      } else if (b.hasAttribute("data-selesai-tekap")) {
+        setLukis(false);
+      } else if (b.hasAttribute("data-tekap-lagi")) {
+        st.imej.langkah = "tekap";
+        setLukis(true);
+      } else if (b.hasAttribute("data-laras-semula")) {
+        st.imej.langkah = "siap";
+        setLukis(false);
+        st.imej.langkah = "laras";
+        st.imej.O = [0, 0];
+        st.imej.T = [1, 1];
+        petunjuk.textContent = "Jajarkan paksi gambar";
+        binaImbas();
+        lukis();
+      } else if (b.hasAttribute("data-buang-imej")) {
+        E.imbas.buang(st.imej);
+        st.imej = null;
+        setLukis(false);
+      }
+    });
+
+    // seret fail gambar terus ke dalam graf
+    K.kanvas.addEventListener("dragover", function (e) {
+      if (st.latihan || !e.dataTransfer) return;
+      e.preventDefault();
+      host.setAttribute("data-seret-fail", "1");
+    });
+    K.kanvas.addEventListener("dragleave", function () {
+      host.removeAttribute("data-seret-fail");
+    });
+    K.kanvas.addEventListener("drop", function (e) {
+      host.removeAttribute("data-seret-fail");
+      if (st.latihan || !e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+      e.preventDefault();
+      muatFail(e.dataTransfer.files[0]);
+    });
+
     var plot = G.plot(K.kanvas, {
       x: [0, 1],
       y: [0, 1],
@@ -225,6 +392,10 @@
       },
       aria: "Graf bina interaktif. Pilih keluk dalam senarai di bawah graf. Kekunci anak panah menggerakkan titik atau mengalihkan keluk mengikut mod."
     });
+
+    // Klip gambar tekap pada kotak paksi (defs kekal walaupun lapisan dikosongkan)
+    var klipId = "bina-klip-" + plot.id;
+    var klipRect = G.svgEl("rect", {}, G.svgEl("clipPath", { id: klipId }, G.svgEl("defs", null, plot.svg)));
 
     // Gelangsar parameter keluk dipilih (di antara graf dan panel bacaan)
     var kotakParam = G.div("bina-param");
@@ -441,6 +612,7 @@
       }
       plot.kosong();
       plot.paksi();
+      lukisImej();
       labelDiletak = [];
       // dikira sekali setiap lukisan; digunakan oleh lukisImbang dan anak panah peralihan
       imbangSemasa = st.lukis ? null : KS.kira(st.graf, st.pilih);
@@ -452,11 +624,59 @@
       // keluk dipilih dilukis terakhir supaya kawasan sentuhnya di atas
       if (dipilih) lukisKeluk(dipilih);
       lukisImbang();
-      if (st.mod === "gerak" && dipilih && !st.lukis) lukisTitik(dipilih);
+      if (st.mod === "gerak" && dipilih && !st.lukis && !laras()) lukisTitik(dipilih);
       if (st.coretan && st.coretan.length > 1) plot.laluan(st.coretan, "bina-coretan", "atas");
       baca();
       if (!st.coretan) binaTerang();
       kemasLatihan();
+    }
+
+    function laras() {
+      return !!(st.imej && st.imej.langkah === "laras");
+    }
+
+    // Gambar (tekap) di lapisan paling bawah, dipotong pada kotak paksi. Semasa menjajarkan,
+    // penanda O dan T serta kotak paksi (putus-putus) dipaparkan.
+    function lukisImej() {
+      var im = st.imej;
+      if (!im) return;
+      klipRect.setAttribute("x", plot.kiri());
+      klipRect.setAttribute("y", plot.atas());
+      klipRect.setAttribute("width", Math.max(0, plot.kanan() - plot.kiri()));
+      klipRect.setAttribute("height", Math.max(0, plot.bawah() - plot.atas()));
+      var r = im.rect;
+      var x = plot.X(r.x),
+        y = plot.Y(r.y + r.h);
+      G.svgEl(
+        "image",
+        {
+          href: im.url,
+          x: x,
+          y: y,
+          width: Math.max(1, plot.X(r.x + r.w) - x),
+          height: Math.max(1, plot.Y(r.y) - y),
+          preserveAspectRatio: "none",
+          opacity: laras() ? 0.9 : im.legap,
+          "clip-path": laras() ? null : "url(#" + klipId + ")",
+          class: "bina-imej"
+        },
+        plot.lapis.latar
+      );
+      if (!laras()) return;
+      var O = im.O,
+        T = im.T;
+      G.svgEl("rect", {
+        x: Math.min(plot.X(O[0]), plot.X(T[0])),
+        y: Math.min(plot.Y(O[1]), plot.Y(T[1])),
+        width: Math.abs(plot.X(T[0]) - plot.X(O[0])),
+        height: Math.abs(plot.Y(T[1]) - plot.Y(O[1])),
+        class: "bina-kotak-laras"
+      }, plot.lapis.panduan);
+      plot.nod(O[0], O[1], { pegang: "imbas-O", kelas: "bina-penanda" });
+      plot.nod(T[0], T[1], { pegang: "imbas-T", kelas: "bina-penanda" });
+      // label sebagai cip (latar gelap) supaya kelihatan di atas gambar apa pun
+      plot.cip(plot.X(O[0]) - 16, plot.Y(O[1]) + 22, "O asalan", { anchor: "start" });
+      plot.cip(plot.X(T[0]) + 16, plot.Y(T[1]) - 22, "T hujung paksi", { anchor: "end" });
     }
 
     // Keseimbangan pasaran (EKO.keseimbangan): E, atau E₀ (pudar) → E₁ selepas peralihan.
@@ -531,7 +751,7 @@
       });
       labelHujung(keping, dianjak ? asas + "₁" : k.label, "g-teks " + kls + (dipilih ? " besar" : ""));
       // mod alih: keseluruhan keluk ialah pemegang
-      if (st.mod === "alih" && k.arahSeret !== "tiada" && !st.lukis) {
+      if (st.mod === "alih" && k.arahSeret !== "tiada" && !st.lukis && !laras()) {
         keping.forEach(function (p) {
           var gk = G.svgEl("g", { "data-pegang": "keluk:" + k.id, class: "g-pemegang", style: "touch-action:none;cursor:grab" }, plot.lapis.pemegang);
           gk.appendChild(plot.laluan(p, "g-lengkung tebal-hit bina-hit", "pemegang"));
@@ -955,6 +1175,11 @@
 
     G.interaksi(plot, {
       seret: function (nama, pt, fasa) {
+        if (nama === "imbas-O" || nama === "imbas-T") {
+          if (st.imej && pt.x != null) st.imej[nama.slice(6)] = [E.clamp(pt.x, -0.3, 1.3), E.clamp(pt.y, -0.3, 1.3)];
+          lukis();
+          return;
+        }
         if (fasa === "mula") st.baruDilukis = null;
         if (nama === "titik") {
           if (fasa === "mula") mulaGerak();
@@ -976,6 +1201,7 @@
       },
       // Ketukan di luar pemegang: pilih keluk terdekat; dalam mod gerak, ketuk/seret pada keluk dipilih menggerakkan titik
       tekan: function (pt, e) {
+        if (laras()) return;
         // mod lukis: kumpul titik lukisan (setiap ≥ 2 px)
         if (st.lukis) {
           if (e && e.type === "pointerdown") {
@@ -1015,7 +1241,7 @@
         else selesaiSeret();
       },
       hover: function (pt) {
-        if (st.lukis) return;
+        if (st.lukis || laras()) return;
         var d = dekat(pt);
         var h = d && d.jarak < JARAK ? d.id : null;
         if (h !== st.hover) {
@@ -1031,7 +1257,7 @@
       },
       kekunci: function (kk) {
         var k = cari(st.pilih);
-        if (!k || st.lukis) return false;
+        if (!k || st.lukis || laras()) return false;
         st.baruDilukis = null;
         var langkah = 0.01;
         if (st.mod === "alih") {
@@ -1068,7 +1294,7 @@
     if (st.latihan) {
       K.tajuk.querySelector("b").textContent = opt.tajuk || "Latihan graf";
       // alat bina disorok supaya pelajar fokus pada soalan (dan penerangan tidak mendedahkan jawapan)
-      [pilihTambah.el, btnPers, btnLukis, btnTerang, btnSemula, panel].forEach(function (el) {
+      [pilihTambah.el, btnPers, btnLukis, btnImbas, btnTerang, btnSemula, panel].forEach(function (el) {
         el.hidden = true;
       });
       kotakLatihan = G.div("bina-latihan");
@@ -1194,13 +1420,18 @@
     host.setAttribute("data-mod", st.mod);
     binaPanel();
     binaParam();
+    binaImbas();
     lukis();
     var henti = G.pantauSaiz(K.kanvas, function () {
       plot.ukur();
       lukis();
     });
     return {
-      musnah: henti,
+      musnah: function () {
+        henti();
+        E.imbas.buang(st.imej);
+        st.imej = null;
+      },
       dapat: function () {
         return B.klon(st.graf);
       }
