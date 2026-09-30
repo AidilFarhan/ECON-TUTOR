@@ -2794,12 +2794,20 @@
     );
   }
 
+  // tinggi textarea ikut isi (nama panjang turun ke baris kedua, bukan terpotong)
+  function tinggiAuto(t) {
+    t.style.height = "auto";
+    t.style.height = t.scrollHeight + 2 + "px";
+  }
+
   function htmlJadual(k, s, m, x) {
     var rows = s.j[m.k];
     var h = '<p class="kalk-leret" hidden>Leret jadual ke kiri untuk melihat semua lajur ' + E.ikon("kanan") + "</p>";
     h += '<div class="kalk-jadual jadual"><table><thead><tr>';
     m.lajur.forEach(function (c) {
-      h += '<th class="' + (c.teks && !c.hasil ? "" : "n") + (c.hasil ? " hasil" : "") + '" scope="col">' + esc(label(c, x)) + "</th>";
+      // kelas tajuk sama dengan sel di bawahnya: lajur teks (input nama atau hasil seperti Tahap) bukan "n"
+      var kelas = [c.teks ? "" : "n", c.hasil ? "hasil" : "", c.teks && !c.hasil ? "teks" : ""].join(" ").trim();
+      h += '<th class="' + kelas + '" scope="col">' + esc(label(c, x)) + "</th>";
     });
     h += "</tr></thead><tbody>";
     rows.forEach(function (r, ri) {
@@ -2811,8 +2819,11 @@
           return;
         }
         var nilaiSel = r[ci] == null ? "" : r[ci];
-        h +=
-          '<td><input class="sel' + (c.teks ? " teks" : "") + '" type="text" ' + (c.teks ? "" : 'inputmode="decimal" ') + 'autocomplete="off" spellcheck="false" data-j="' + m.k + '" data-r="' + ri + '" data-i="' + ci + '" value="' + esc(nilaiSel) + '" aria-label="' + esc(label(c, x)) + ", baris " + (ri + 1) + '"></td>';
+        var atr = 'autocomplete="off" spellcheck="false" data-j="' + m.k + '" data-r="' + ri + '" data-i="' + ci + '" aria-label="' + esc(label(c, x)) + ", baris " + (ri + 1) + '"';
+        // lajur teks (nama barang) guna textarea supaya nama panjang turun baris dan tidak terpotong di telefon
+        h += c.teks
+          ? '<td><textarea class="sel teks" rows="1" ' + atr + ">" + esc(nilaiSel) + "</textarea></td>"
+          : '<td><input class="sel" type="text" inputmode="decimal" ' + atr + ' value="' + esc(nilaiSel) + '"></td>';
         ci++;
       });
       h += "</tr>";
@@ -2921,6 +2932,7 @@
       td.textContent = v == null ? "–" : v;
     });
     el.querySelectorAll(".kalk-jadual").forEach(function (j) {
+      j.querySelectorAll("textarea.sel").forEach(tinggiAuto);
       j.previousElementSibling.hidden = j.scrollWidth <= j.clientWidth + 2;
     });
   }
@@ -3075,6 +3087,11 @@
       }
     });
 
+    // nama dalam jadual ialah satu baris: Enter tidak menambah baris baharu dalam textarea
+    akar.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && e.target.tagName === "TEXTAREA" && e.target.classList.contains("sel")) e.preventDefault();
+    });
+
     function pilihBaris(c, jk, r) {
       if (c.s.baris[jk] === r) return false;
       c.s.baris[jk] = r;
@@ -3134,7 +3151,7 @@
         for (var i = 0; i < n; i++) baris.push("");
         c.s.j[j].push(baris);
         c.s.baris[j] = c.s.j[j].length - 1;
-        lukisSemula(c, 'tr[data-r="' + c.s.baris[j] + '"] input.sel');
+        lukisSemula(c, 'tr[data-r="' + c.s.baris[j] + '"] .sel');
       } else if (t.hasAttribute("data-buang")) {
         var jb = t.getAttribute("data-buang");
         if (c.s.j[jb].length <= 2) return;

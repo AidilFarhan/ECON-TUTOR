@@ -166,7 +166,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
   - Matrikulasi: arc elasticity (ordinary and midpoint), consumer equilibrium with two goods, explicit and implicit cost, monopoly equilibrium (MR = MC), two- and three-sector equilibrium with multiplier and gaps, money supply M1/M2 and growth, money-value index, nominal terms of trade (KSP).
 - **FR-36** Each calculator shows the formula, live answers, numbered worked steps (*jalan kira*), each written first as an economic sentence (naming the numerator and denominator of every division) and then in numbers, and an interpretation. Invalid or missing input shows a clear message instead of a wrong number.
 - **FR-37** Initial values are the textbook's worked examples and reproduce the textbook answers. Some calculators offer several example chips.
-- **FR-38** Table calculators (market, equilibrium, TP/AP/MP, cost, CPI) allow editing cells and adding or removing rows; tapping a row shows that row's working.
+- **FR-38** Table calculators (market, equilibrium, TP/AP/MP, cost, CPI) allow editing cells and adding or removing rows; tapping a row shows that row's working. Every column fits on screen from 360 px up, with no horizontal scrolling and no clipped values; each value sits directly under its header.
 - **FR-39** Filter by form or chapter and search by keyword. Deep links: `#kalkulator-<chapterId>` and `#kalkulator-<calculatorId>`. Each chapter page has a "Kalkulator (n)" button.
 
 ## 6. Non-functional requirements
@@ -241,6 +241,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-29 | Home and Nota pages get level buttons (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi, Ijazah Sarjana Muda); "SPM" chip and hero eyebrow removed; home intro no longer lists the trial papers |
 | 2026-09-29 | PPC-shift graph with 8 cases and *Situasi asal*; all curves move smoothly; calculator steps written as economic sentences; *Dah ingat* button fixed |
 | 2026-09-30 | "Hubungi cikgu" WhatsApp button in the account menu |
+| 2026-09-30 | Calculator tables fit the screen with aligned columns (no horizontal scroll, no clipped values) |
 
 ## 10. Roadmap and open questions
 

@@ -192,7 +192,7 @@ tambah({
 });
 ```
 
-- **Parsing.** Inputs are `type="text" inputmode="decimal"`. Spaces, commas, a leading `RM` and a trailing `%` are stripped; blank required fields or non-numbers produce an error message instead of calling `kira`.
+- **Parsing.** Inputs are `type="text" inputmode="decimal"`; text-name cells in tables are `textarea.sel.teks` (auto height, Enter blocked). Handlers find cells by the `.sel` class, not the tag. Spaces, commas, a leading `RM` and a trailing `%` are stripped; blank required fields or non-numbers produce an error message instead of calling `kira`.
 - **Rendering.** A `pilih` change or a new example re-renders only that card (`lukisSemula`); typing only repaints the result block and computed table cells, so focus is never lost. Focusing or clicking a table row selects it and `kira` shows that row's working.
 - **Worked steps.** Each `langkah` entry starts with `ay("…")`, a `.kalk-ayat` sentence in economic terms that names every quantity (for a division, which is the numerator, *pengangka*, and which the denominator, *penyebut*), followed by the numeric line.
 - **State.** Per card, in memory only (`keadaan[id]`), reset on navigation. Nothing is stored in `localStorage`.
