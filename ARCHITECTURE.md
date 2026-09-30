@@ -220,7 +220,7 @@ GrafBina {
   - `EKO.jenisKeluk` is a registry of curve types stored as data, written in textbook terms: definition, relationship, law, movement terms (*pengembangan*/*penguncupan*), shift terms (*pertambahan*/*pengurangan*), non-price factors, and special shapes (horizontal = *anjal sempurna*, vertical = *tidak anjal sempurna*).
   - Registered now: `permintaan` and `penawaran`. Their factor lists reuse `G.FAKTOR_D`/`G.FAKTOR_S` from `graf.js`.
   - A new type (KKP, AD/AS, Lorenz…) is one `JK.daftar({...})` call, with no change to the engine.
-  - `EKO.terang.keluk(graf, id)` builds template explanation blocks from the registry plus the graph state (A → B direction, shift direction). No AI is involved.
+  - `EKO.terang.keluk(graf, id, mod)` builds template explanation blocks from the registry plus the graph state (A → B direction, shift direction). No AI is involved. With `mod` it returns only the current concept (owner request): shift mode gives the curve type with its definition plus the shift block; movement mode gives the curve type with its definition and law plus the movement block.
   - The *Terangkan graf* panel shows these blocks as the usual `.kotak` callouts, and the reading panel uses the same terms (for example "Pengembangan permintaan").
   - **A curve's meaning is never assumed from its shape.** `jenis` is set by the student (a dropdown), by `Qd`/`Qs` in an equation, or by the example graph.
   - `EKO.terang.cadang` only suggests types, with a score and reasons (label, direction, axis labels, equation), for the student to confirm.

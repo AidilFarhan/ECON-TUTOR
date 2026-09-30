@@ -205,8 +205,17 @@
     );
   }
 
-  // Pulang { tajuk, jenis, blok: [{ jenis, tajuk, html }], cadangan }
-  T.keluk = function (graf, id) {
+  // Hanya konsep bagi mod semasa: mod "alih" → peralihan sahaja, mod "gerak" → pergerakan sahaja.
+  // Tanpa mod, kedua-duanya dipulangkan.
+  function tapis(blok, mod) {
+    if (mod !== "gerak" && mod !== "alih") return blok;
+    return blok.filter(function (b) {
+      return !b.konsep || b.konsep === mod;
+    });
+  }
+
+  // Pulang { tajuk, jenis, blok: [{ jenis, konsep?, tajuk, html }], cadangan }. mod: "gerak" | "alih" (pilihan)
+  T.keluk = function (graf, id, mod) {
     var k = B.cari(graf, id);
     if (!k) return { tajuk: "Tiada keluk dipilih", jenis: null, blok: [], cadangan: [] };
     var j = JK.dapat(k.jenis);
@@ -225,21 +234,24 @@
       });
       blok.push({
         jenis: "tip",
+        konsep: "gerak",
         tajuk: "Pergerakan di sepanjang keluk",
         html: "<p>Titik bergerak di sepanjang keluk yang sama apabila pemboleh ubah pada paksi itu sendiri berubah. Keluk tidak beralih.</p>"
       });
       blok.push({
         jenis: "fokus",
+        konsep: "alih",
         tajuk: "Peralihan keluk",
         html: "<p>Keseluruhan keluk beralih apabila faktor selain pemboleh ubah pada paksi berubah. Bentuk keluk kekal.</p>"
       });
-      return { tajuk: "Keluk " + nama, jenis: null, blok: blok, cadangan: T.cadang(graf, id) };
+      return { tajuk: "Keluk " + nama, jenis: null, blok: tapis(blok, mod), cadangan: T.cadang(graf, id) };
     }
 
     blok.push({
       jenis: "def",
       tajuk: j.nama,
-      html: "<p>" + j.hubungan + "</p>" + senarai(j.hukum) + "<p>" + j.definisi + "</p>"
+      // mod peralihan: jenis keluk dan definisi sahaja (hukum harga–kuantiti ialah konsep pergerakan)
+      html: mod === "alih" ? "<p>" + j.definisi + "</p>" : "<p>" + j.hubungan + "</p>" + senarai(j.hukum) + "<p>" + j.definisi + "</p>"
     });
 
     // bentuk tidak sepadan dengan jenis
@@ -259,9 +271,10 @@
     var arahG = t ? T.arahGerak(k, t) : null;
     var dalamGraf = arahG
       ? "<p><b>Dalam graf ini:</b> titik bergerak dari A ke B ke " + arahG + " di sepanjang keluk " + nama + ", iaitu <b>" + j.gerak[arahG].istilah.toLowerCase() + "</b>.</p>"
-      : "<p><b>Dalam graf ini:</b> titik belum digerakkan. Pilih mod <i>Pergerakan di sepanjang keluk</i> dan seret titik A.</p>";
+      : "<p><b>Dalam graf ini:</b> titik belum digerakkan. Seret titik A di sepanjang keluk.</p>";
     blok.push({
       jenis: "tip",
+      konsep: "gerak",
       tajuk: "Pergerakan di sepanjang keluk",
       html:
         "<p>" + j.gerak.sebab + "</p>" +
@@ -279,13 +292,13 @@
         "<p><b>Dalam graf ini:</b> " + asas + "₀ → " + asas + "₁ ialah <b>" + alih.istilah.toLowerCase() + "</b>.</p>" +
         (kumpulan ? "<p>Antara faktor bukan harga yang boleh menyebabkannya:</p>" + senaraiFaktor(kumpulan) : "");
     } else {
-      htmlAlih += "<p><b>Dalam graf ini:</b> keluk belum beralih. Pilih mod <i>Peralihan keluk</i> dan seret keseluruhan keluk.</p>";
+      htmlAlih += "<p><b>Dalam graf ini:</b> keluk belum beralih. Seret keseluruhan keluk ke kiri atau ke kanan.</p>";
       faktor.forEach(function (kum) {
         htmlAlih += "<details class=\"bina-faktor\"><summary>" + esc(kum.label) + "</summary>" + senaraiFaktor(kum) + "</details>";
       });
     }
-    blok.push({ jenis: "fokus", tajuk: "Peralihan keluk", html: htmlAlih });
+    blok.push({ jenis: "fokus", konsep: "alih", tajuk: "Peralihan keluk", html: htmlAlih });
 
-    return { tajuk: j.nama + " (" + nama + ")", jenis: j.id, blok: blok, cadangan: [] };
+    return { tajuk: j.nama + " (" + nama + ")", jenis: j.id, blok: tapis(blok, mod), cadangan: [] };
   };
 })();

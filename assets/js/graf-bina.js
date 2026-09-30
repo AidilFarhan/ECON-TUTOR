@@ -242,7 +242,7 @@
         kotakTerang.innerHTML = '<p class="teks-lemah">Pilih atau tambah satu keluk untuk melihat penerangannya.</p>';
         return;
       }
-      var r = T.keluk(st.graf, k.id);
+      var r = T.keluk(st.graf, k.id, st.mod); // hanya konsep bagi mod semasa (permintaan pemilik)
       var html =
         '<div class="bina-terang-kepala"><b>' + r.tajuk + "</b>" +
         '<label class="medan bina-jenis"><span>Jenis keluk ' + esc(k.label) + "</span><select data-jenis>" +

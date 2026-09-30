@@ -128,10 +128,9 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - near-horizontal or near-vertical lines are straightened;
     - strokes that are too short are rejected with a message;
     - the new curve (labelled K, L, M…) can be renamed, shifted and tracked like any other.
-  - **Terangkan graf** (phase 5a) opens a panel of textbook-style explanations for the selected curve:
-    - the definition, relationship and law;
-    - movement along the curve (*pengembangan*/*penguncupan*), with what happened in the student's graph;
-    - a shift (*pertambahan*/*pengurangan*), with the non-price factors for that direction.
+  - **Terangkan graf** (phase 5a) opens a panel of textbook-style explanations for the selected curve. It explains only the concept of the current mode (owner request):
+    - in *Pergerakan di sepanjang keluk* mode: the curve type (definition, relationship, law) and movement along the curve (*pengembangan*/*penguncupan*), with what happened in the student's graph;
+    - in *Peralihan keluk* mode: the curve type (definition) and the shift (*pertambahan*/*pengurangan*), with the non-price factors for that direction.
     - The reading panel uses the same terms.
     - The curve type (Permintaan, Penawaran) is chosen by the student. Suggestions show a confidence score and reasons, and are never applied automatically. Equations with Qd/Qs set the type.
   - Scanning comes in a later phase.
