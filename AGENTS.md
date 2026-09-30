@@ -45,7 +45,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `assets/js/graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` | Form 4 / Form 5 / STPM / Matrikulasi graph widgets |
 | `assets/js/kalkulator.js` | `EKO.kalkulator`: every syllabus formula as a calculator with worked steps, plus the `#kalkulator` view |
 | `assets/js/app.js` | Hash router and all views |
-| `assets/js/akaun.js` | Header account button and sign-out |
+| `assets/js/akaun.js` | Header account button: menu with "Hubungi cikgu" (WhatsApp) and sign-out |
 | `assets/js/data/*.js` | Content: one file per chapter, one per trial paper |
 | `assets/css/style.css` | The whole design system |
 | `assets/js/vendor/` | Self-hosted Firebase Auth bundle (generated, do not edit) |
@@ -142,7 +142,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Pictures from a paper** | Crop each figure from the PDF with PyMuPDF at 200 dpi (`page.get_pixmap(dpi=200, clip=rect)`), trim white margins, save as WebP in `assets/img/percubaan/<paper>/`. Reference it with `gambar: { src, alt, w, h, kapsyen }` (w and h in pixels), put question text that comes after the figure in `s2`, and use `EKO.gambar(g, true)` for images inside answer options. Always write a meaningful `alt` |
 | **Show the Terengganu paper** | Only when the owner confirms permission: (1) add its script tag after the Kelantan one; (2) remove its line from `.vercelignore`; (3) update the footer and meta description in `index.html` |
 | **Allow a student** | Vercel → project **econwebsite** → Settings → Environment Variables → `EMAIL_DIBENARKAN` (comma-separated; `@domain` for a whole domain) → Redeploy |
-| **Change the "Hubungi cikgu" WhatsApp** | `assets/js/masuk.js`: `WHATSAPP_CIKGU` (international format, digits only, e.g. `601160757145`) and `MESEJ_AKSES` (ready message; the student's email is appended automatically) |
+| **Change the "Hubungi cikgu" WhatsApp** | The number lives in **two** files; change both. `assets/js/masuk.js`: `WHATSAPP_CIKGU` (international format, digits only, e.g. `601160757145`) and `MESEJ_AKSES` (ready message for the "Tiada akses" screen; the student's email is appended automatically). `assets/js/akaun.js`: `WHATSAPP_CIKGU` and `MESEJ_HUBUNGI` (ready message for the account menu; the student's name and email are appended) |
 | **Sign everyone out** | Change `RAHSIA_SESI` (random, at least 32 characters) in Vercel → Redeploy |
 | **Update the Firebase SDK** | Bundle the exports used by `masuk.js` with esbuild into `assets/js/vendor/firebase-auth-<version>.js`, update the import path, and delete the old bundle (see the README) |
 | **New sign-in domain** | Add it in Firebase → Authentication → Settings → Authorized domains (owner action) |

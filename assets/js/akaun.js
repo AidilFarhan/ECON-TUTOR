@@ -8,6 +8,16 @@
   var btnTema = document.getElementById("btn-tema");
   if (!btnTema || !window.fetch) return;
 
+  // Butang "Hubungi cikgu" dalam menu akaun: buka WhatsApp cikgu dengan mesej siap.
+  // Nombor sama dengan WHATSAPP_CIKGU dalam masuk.js (format antarabangsa, digit sahaja); tukar kedua-duanya bersama.
+  var WHATSAPP_CIKGU = "601160757145";
+  var MESEJ_HUBUNGI = "Salam cikgu, saya ada soalan tentang Nota Ekonomi Interaktif.";
+
+  function pautanWhatsApp(nama, email) {
+    var teks = MESEJ_HUBUNGI + "\nNama: " + nama + "\nEmail: " + email;
+    return "https://wa.me/" + WHATSAPP_CIKGU + "?text=" + encodeURIComponent(teks);
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -33,6 +43,9 @@
       "</button>" +
       '<div class="akaun-menu kaca" hidden>' +
       "<p><b>" + esc(nama) + "</b>" + esc(sesi.email) + "</p>" +
+      '<a class="btn btn-wa" href="' + esc(pautanWhatsApp(nama, sesi.email)) + '" target="_blank" rel="noopener">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2a8.8 8.8 0 0 0-7.6 13.2L3.3 20.7l4.4-1.1A8.8 8.8 0 1 0 12 3.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.2 8.6c.3 2.9 2.4 5 5.3 5.6l1.1-1.2-1.8-.9-.8.8c-1-.4-1.8-1.2-2.2-2.2l.8-.8-.9-1.8z" fill="currentColor"/></svg>' +
+      "Hubungi cikgu</a>" +
       '<button type="button" class="btn btn-kecil" data-keluar>Log keluar</button>' +
       "</div>";
     btnTema.insertAdjacentElement("afterend", w);

@@ -264,7 +264,7 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 - **Messages** use `.masuk-mesej`, which is neutral by default, with `.ralat` (bad) and `.baik` (good) variants.
 
 ### 9.7 Account menu
-`.akaun-btn` opens `.akaun-menu`, a near-opaque glass popover showing the name, email and a *Log keluar* button. It closes on outside click or `Escape`.
+`.akaun-btn` opens `.akaun-menu`, a near-opaque glass popover showing the name and email, a full-width `.btn-wa` "Hubungi cikgu" link (same WhatsApp green as the login page, 42 px here) that opens WhatsApp in a new tab, and a *Log keluar* button below it. It closes on outside click or `Escape`.
 
 ---
 

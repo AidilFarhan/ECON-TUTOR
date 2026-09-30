@@ -96,7 +96,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
-6. `akaun.js` asks `/api/sesi` who is signed in and adds the account button.
+6. `akaun.js` asks `/api/sesi` who is signed in and adds the account button. Its menu shows the name and email, a "Hubungi cikgu" link (`wa.me/<WHATSAPP_CIKGU>?text=…` with the student's name and email) and *Log keluar*.
 
 Every file is an IIFE that reads and extends `window.EKO`. No file uses `import`, except the login page scripts.
 

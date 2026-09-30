@@ -146,7 +146,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
   - **Email + password.** Includes registration, email verification and password reset.
 - **FR-28** Only emails on the teacher's allowlist (`EMAIL_DIBENARKAN`) can enter. Whole domains can be allowed with `@domain`. Others see a clear "Tiada akses" screen that tells them to ask the teacher, with a **Hubungi cikgu** button that opens WhatsApp with a ready message ("Saya nak akses Nota Ekonomi Interaktif" + their email).
 - **FR-29** Accounts that register with email and password must verify their email before entry.
-- **FR-30** The header shows the signed-in account and a *Log keluar* (sign-out) button.
+- **FR-30** The header shows the signed-in account. Its menu has a **Hubungi cikgu** button that opens the teacher's WhatsApp with a ready message ("Salam cikgu, saya ada soalan tentang Nota Ekonomi Interaktif." + the student's name and email), and a *Log keluar* (sign-out) button.
 - **FR-31** A session lasts 12 hours and renews silently while the Firebase sign-in is still valid. Removing an email blocks that user after the next redeploy.
 
 ### 5.8 Teacher operations: ✅
@@ -240,6 +240,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-09-29 | Matrikulasi level: AE015 Bab 1–6 and AE025 Bab 1–8 notes, 2 new graph widgets (`carta-jadual`, `lrac`) and 8 calculators |
 | 2026-09-29 | Home and Nota pages get level buttons (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi, Ijazah Sarjana Muda); "SPM" chip and hero eyebrow removed; home intro no longer lists the trial papers |
 | 2026-09-29 | PPC-shift graph with 8 cases and *Situasi asal*; all curves move smoothly; calculator steps written as economic sentences; *Dah ingat* button fixed |
+| 2026-09-30 | "Hubungi cikgu" WhatsApp button in the account menu |
 
 ## 10. Roadmap and open questions
 

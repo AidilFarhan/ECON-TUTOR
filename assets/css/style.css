@@ -3564,6 +3564,14 @@ ol.roman > li::before {
 .akaun-menu .btn {
   width: 100%;
 }
+.akaun-menu .btn-wa {
+  min-height: 42px;
+  font-size: 14.5px;
+}
+.akaun-menu .btn-wa svg {
+  width: 19px;
+  height: 19px;
+}
 
 /* ---------- gambar daripada kertas asal (soalan, pilihan, skema) ---------- */
 .gambar-soalan {
