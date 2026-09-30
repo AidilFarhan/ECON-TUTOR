@@ -139,6 +139,10 @@
     } else if (h === "graf" || h.indexOf("graf-") === 0) {
       nav = "graf";
       pGraf(h.slice(5));
+    } else if (h === "bina-graf") {
+      nav = "graf";
+      E.bina.papar(app);
+      tajuk = "Bina graf · Econ Tutor";
     } else if (h === "kad" || h.indexOf("kad-") === 0) {
       nav = "kad";
       pKad(h.slice(4) || "semua");
@@ -566,6 +570,11 @@
             );
           })
           .join("") +
+        '<a class="kad-alat kaca" href="#bina-graf">' +
+        '<span class="ikon-bulat">' + E.ikon("pensel") + "</span>" +
+        "<b>Bina graf</b>" +
+        "<span>Tambah keluk sendiri, alihkan keluk atau gerakkan titik di sepanjang keluk</span>" +
+        "</a>" +
         "</div></div>";
       app.innerHTML = html;
       return;

@@ -270,7 +270,7 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 
 ## 10. Graph design language
 
-These rules are shared by all 38 widgets. Follow them for new graphs.
+These rules are shared by all 39 widgets (the 38 used in the notes plus `bina-keluk` on the *Bina graf* page). Follow them for new graphs.
 
 **Show every curve in full** (owner request). Each curve ends at an axis intercept or at a clear end point inside the plot, and its label sits at that end inside the plot. Never let a curve run into the top or right frame: leave headroom on the axes (for example an axis to 24 for curves that end at 20), start asymptotic curves such as AC or Md below the top of the Y axis, and cap draggable values so key points (such as equilibrium E) stay on the chart. `keseimbangan` takes `data.qHujung` to end SS inside the plot.
 
@@ -284,6 +284,7 @@ These rules are shared by all 38 widgets. Follow them for new graphs.
 | Handles (`[data-pegang]`) | 8 px node + 14 px soft halo + invisible 22 px hit area; cursor `grab`. A whole curve can also be a handle through an invisible thick hit path (`.tebal-hit`) |
 | Motion | Smooth, not node by node (owner request): dragged values round to 0.01 and trackers interpolate between table rows, snapping to a row only within 5 px. Arrow keys move 1% of the range; Shift + arrow jumps to the next table row. Only yearly series jump year by year |
 | Reset | A graph that can move away from a dashed original curve gets a "↺ Situasi asal" button (`G.butang`) that restores it |
+| Movement vs shift | When a graph supports both, use an explicit mode control (*Pergerakan di sepanjang keluk* / *Peralihan keluk*) and show the active mode in the title hint and the reading panel. Never let one free drag do either. In *Bina graf*, the two mode buttons sit side by side in their own row (two columns below 520 px), the whole curve is the handle in shift mode (34 px hit path), and the selected curve has a soft `--accent-soft` halo |
 | Value chips (`.cip` in SVG) | Ink pill with background-coloured text, kept inside the canvas; stagger chips that would overlap |
 | Areas (`.g-kawasan`) | `-soft` fills for surplus, revenue, deadweight loss |
 | Tracker (`.g-garis-silang`) | Dashed vertical line; value labels next to each node with a halo stroke (`.g-teks-nilai`), stacked so they never overlap, flipping side near the right edge |

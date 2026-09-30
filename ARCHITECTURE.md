@@ -68,6 +68,8 @@ assets/js/graf-t4.js          Form 4 graph widgets + chart helpers (G.carta, G.l
 assets/js/graf-t5.js          Form 5 graph widgets
 assets/js/graf-stpm.js        STPM graph widgets
 assets/js/graf-matrik.js      Matrikulasi graph widgets (carta-jadual, lrac)
+assets/js/graf-bina-model.js  EKO.bina: GrafBina model for #bina-graf (pure functions, no DOM)
+assets/js/graf-bina.js        Bina graf widget (bina-keluk) + the #bina-graf view
 assets/js/data/t4-bab1.js …   One file per chapter: notes, flashcards, quiz
 assets/js/data/percubaan-kelantan-2025.js     Trial paper K1 (40 MCQ) + K2 (7 questions, marking scheme)
 assets/js/data/percubaan-seberang-perai-2025.js, percubaan-perak-2024.js   More trial papers (same shape)
@@ -92,7 +94,7 @@ assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bund
 `index.html` loads classic scripts with `defer`, so they execute in document order after parsing:
 
 1. `eko-core.js` creates `window.EKO` (alias `E`).
-2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets.
+2. `graf.js`, `graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` attach `EKO.graf` (alias `G`) and register graph widgets. `graf-bina-model.js` then adds `EKO.bina`, and `graf-bina.js` registers `bina-keluk`.
 3. `data/*.js` register chapters, quiz sets and Kertas 2 papers.
 4. `kalkulator.js` defines the calculators and exposes `EKO.kalkulator`.
 5. `app.js` builds navigation, reads the hash and renders the first view.
@@ -129,7 +131,8 @@ Routing is **hash-based** (`location.hash`), so the site works from `file://`, a
 | `#kuiz` | `pKuizSenarai` | Quiz picker with best scores |
 | `#kuiz-<id>` | `pKuizMula` | `id` = chapter id, `t4`, `t5`, `semua`, or a set id such as `kel25-k1`; timer, per-question explanation, review |
 | `#percubaan` | `pPercubaan` | One section per registered paper (K1 + K2 cards) |
-| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi); `<level>` = `t4`, `t5`, `stpm` or `matrik` mounts only that level's graphs |
+| `#graf`, `#graf-<level>` | `pGraf` | Graph lab. Without a level it shows a chooser (Tingkatan 4, Tingkatan 5, STPM, Matrikulasi); `<level>` = `t4`, `t5`, `stpm` or `matrik` mounts only that level's graphs. The chooser also links to *Bina graf* |
+| `#bina-graf` | `EKO.bina.papar` | Bina graf: build curves and practise movement along a curve vs a shift of the curve (§3.4a) |
 | `#kalkulator`, `#kalkulator-<filter>` | `EKO.kalkulator.papar` | Kalkulator Ekonomi. `<filter>` = a group key (`t4`, `t5`, `p1`, `p2`, `p3`, `m1`, `m2`) or a chapter id (filters the list), or a calculator id such as `ed` (scrolls to and highlights that card) |
 | `#k2`, `#k2-<paperId>` | `pK2` | Kertas 2 with answer boxes, self-marking against the scheme, level rubrics |
 
@@ -166,6 +169,33 @@ flowchart TB
   - Layout, reading panel and static figures: `G.pantauSaiz` (ResizeObserver), `G.nilai` (reading chips), `G.statik(spec)` (non-interactive figures for quiz diagrams).
 - **Series charts.** `G.carta` (in `graf-t4.js`) draws line charts with a vertical tracker. By default (`selanjar` not `false`) the tracker moves continuously (0.01 unit) along the curves, reads interpolated values, and snaps to a table node within 5 px; arrow keys step 1% of the x range and Shift + arrow jumps to the next node. Set `selanjar: false` for yearly series that must jump between data points (guna tenaga, and `carta-jadual` with `"diskret": true`). Other draggable graphs round to 0.01 instead of whole steps, so every curve moves smoothly (owner request).
 - **Lifecycle.** Each widget returns `{ musnah }` to disconnect observers and timers. `G.tanggal()` calls them all on navigation.
+
+### 3.4a Bina graf (`EKO.bina`)
+
+`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. This is phase 1 of the owner's plan (PRD §10). Equation input, drawing, scanning, explanations, equilibrium and exercises come later, and they must all produce this same model.
+
+```js
+GrafBina {
+  versi: 1,
+  paksi: { x: { label }, y: { label } },
+  keluk: [{ id, label, jenis: null, warna: "d" | "s" | "c3" | "c4" | "c5",
+            titik: [[x, y], …],          // normalised 0..1 inside the axes box, ordered along the path
+            anjak: { x, y },             // SHIFT = translation only; titik[] is never rewritten
+            arahSeret: "x" | "y" | "xy" | "tiada",
+            meta: { arah: "menurun" | "menaik" | "mendatar" | "tegak" | "lain", sumber } }],
+  titik: [{ id, keluk, s, sAwal }],      // MOVEMENT along a curve; s = arc-length fraction, not x
+  peristiwa: [{ jenis: "anjak", keluk, dari, ke } | { jenis: "gerak", keluk, titik, dari, ke }]
+}
+```
+
+- **Curves need no equation.** A curve is a list of points, smoothed with centripetal Catmull-Rom (`B.licin`). This also works for vertical curves and for curves that are not `y = f(x)`. The drawn position is the points plus `anjak`.
+- **Two explicit modes.**
+  - *Pergerakan di sepanjang keluk* drags point A → B along the same curve (`B.gerakTitik`).
+  - *Peralihan keluk* drags the whole curve D₀ → D₁ (`B.anjakKeluk`), with the original shown dashed.
+  - Each drag or key press records one `peristiwa`. `B.catat` merges consecutive events of the same kind.
+- **Limits.** A shift keeps the curve's end inside 95% of the axis and keeps at least 30% of the axis visible. Parts past an axis are clipped (`B.klipKotak`). Horizontal curves shift vertically; all others shift horizontally.
+- **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
+- **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
 ### 3.5 Economics calculator (`EKO.kalkulator`)
 
@@ -340,7 +370,7 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | --- | --- | --- |
 | No framework, no build | A teacher can open `index.html` offline, edit data files on GitHub, and deploy anywhere | Views are string templates; no component reuse beyond helpers |
 | Hash routing | Works on `file://`, any static host, and behind the middleware without rewrites | URLs contain `#`; the hash is lost across the login redirect |
-| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 7 700 lines across five `graf*.js` files) |
+| Custom SVG graph engine | Economics conventions (origin axes, textbook labels, draggable curves), accessibility, zero dependencies | More code to maintain (about 8 800 lines across seven `graf*.js` files) |
 | Content as JS files | No fetch, works offline, one file per chapter is easy to review | Content editors must keep valid JS syntax |
 | Progress in `localStorage` | No accounts or database needed for learning features | Progress does not follow a student across devices |
 | Firebase Auth instead of Supabase | Free tier does not pause after inactivity; Google sign-in is a toggle; the owner's Supabase free slots were full | Adds a third-party identity provider |

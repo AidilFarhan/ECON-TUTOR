@@ -43,6 +43,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `assets/js/eko-core.js` | `window.EKO`: registries, storage, formatting, icons |
 | `assets/js/graf.js` | `EKO.graf` SVG engine + market graphs |
 | `assets/js/graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` | Form 4 / Form 5 / STPM / Matrikulasi graph widgets |
+| `assets/js/graf-bina-model.js`, `graf-bina.js` | `EKO.bina` curve model (pure, Node-testable) and the *Bina graf* widget and `#bina-graf` view (ARCHITECTURE §3.4a) |
 | `assets/js/kalkulator.js` | `EKO.kalkulator`: every syllabus formula as a calculator with worked steps, plus the `#kalkulator` view |
 | `assets/js/app.js` | Hash router and all views |
 | `assets/js/akaun.js` | Header account button: menu with "Hubungi cikgu" (WhatsApp) and sign-out |
@@ -218,6 +219,7 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | `ay`, `pengangka`, `penyebut` | economic-sentence line at the start of a worked step, numerator, denominator |
 | `KES_KKP`, `PUNCA`, `Situasi asal` | PPC-shift cases, cause templates (increase and reversed decrease), reset-to-original button |
 | `pasang` / `tanggal` / `musnah` | mount graphs / unmount all / destroy one widget |
+| `bina`, `anjak`, `gerak`, `peristiwa`, `s` | Bina graf model, curve shift (translation), movement along a curve, interaction log, arc-length position on a curve |
 | `plot`, `lapis`, `paksi`, `keluk`, `nod`, `pegang`/`seret`, `panduan`, `cip` | plot, layers, axis, curve, node, handle/drag, guide line, chip |
 | `baca`/`bacaan`, `julat`, `pilih`, `butang`, `legenda`, `carta`, `selanjar` | reading panel, slider, segmented control, button, legend, series chart, continuous tracker |
 | `data()`, `kemas()`, `dibaca`, `diingat`, `terbaik`, `akhir` | read storage, update storage, read (chapters), remembered (cards), best score, last opened |

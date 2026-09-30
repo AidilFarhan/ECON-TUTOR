@@ -4052,3 +4052,147 @@ ol.roman > li::before {
     font-size: 18px;
   }
 }
+
+/* ---------- bina graf (#bina-graf, widget bina-keluk) ---------- */
+.halaman-bina .bina-graf {
+  margin-top: 18px;
+}
+
+.bina-mod {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+}
+
+.bina-mod .cip {
+  justify-content: center;
+  text-align: center;
+}
+
+.bina-mod-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin-right: 2px;
+}
+
+@media (max-width: 520px) {
+  .bina-mod {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .bina-mod-label {
+    grid-column: 1 / -1;
+  }
+}
+
+.bina-graf .graf-kawalan .cip {
+  min-height: 40px;
+}
+
+.g-lengkung.bina-dipilih {
+  stroke-width: 3.6;
+}
+
+.bina-sorot {
+  fill: none;
+  stroke: var(--accent-soft);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+.bina-sorot.dipilih {
+  stroke-width: 16;
+  opacity: 1;
+}
+
+.g-lengkung.tebal-hit.bina-hit {
+  stroke-width: 34;
+}
+
+.g-anak-panah.bina-jejak {
+  stroke-width: 3;
+  opacity: 0.85;
+}
+
+.bina-panel {
+  display: grid;
+  gap: 12px;
+  padding: 12px 4px 2px;
+  border-top: 1px solid var(--line);
+}
+
+.bina-panel-kepala {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.bina-panel-kepala b {
+  font-family: var(--font-d);
+  font-size: 15.5px;
+}
+
+.bina-senarai {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.bina-baris {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.bina-baris .cip {
+  min-height: 44px;
+}
+
+.bina-pilih {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.bina-nama-cip {
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.bina-arah {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cip[aria-pressed="true"] .bina-arah {
+  color: inherit;
+  opacity: 0.75;
+}
+
+.bina-nama input,
+.bina-paksi input {
+  min-height: 44px;
+}
+
+.bina-padam {
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+}
+
+.bina-padam .ikon {
+  width: 18px;
+  height: 18px;
+}
