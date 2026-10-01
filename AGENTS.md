@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5), STPM (Ekonomi 944, Penggal 1–3) and Matrikulasi (AE015 Mikroekonomi, AE025 Makroekonomi). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google or email sign-in with an allowlist.
+Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5), STPM (Ekonomi 944, Penggal 1–3) and Matrikulasi (AE015 Mikroekonomi, AE025 Makroekonomi). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google sign-in with an allowlist.
 
 Claude Code loads this file through [CLAUDE.md](CLAUDE.md), which adds a few Claude-specific notes.
 

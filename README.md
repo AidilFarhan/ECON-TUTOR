@@ -2,6 +2,10 @@
 
 Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), **Ekonomi STPM (944) Penggal 1–3** dan **Ekonomi Matrikulasi (AE015 Mikroekonomi, AE025 Makroekonomi)**, dibina dengan HTML, CSS dan JavaScript biasa sahaja. Tiada pustaka, tiada proses *build* dan tiada pelayan khas.
 
+## Log masuk
+
+Tekan **Teruskan dengan Google** untuk log masuk atau daftar akaun. Email Google mesti berada dalam senarai akses cikgu. Halaman masuk tiada medan email atau kata laluan.
+
 ## Kandungan
 
 | Bahagian | Isi |

@@ -31,7 +31,7 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 4. Let students **practise every syllabus calculation** with a calculator that shows the formula, the answer and the worked steps.
 5. Provide **exam practice** with state trial papers: Kertas 1 as a timed quiz, and Kertas 2 with answer boxes and self-marking against the scheme.
 6. Work well on **phones**, in light and dark mode, including slow connections.
-7. Restrict access to **students the teacher approves** (Google or email sign-in with an allowlist).
+7. Restrict access to **students the teacher approves** (Google sign-in with an allowlist).
 8. Stay **free to run** and **easy for the teacher to maintain**, with no build tools and content in plain files.
 
 ### Non-goals (v1)
@@ -63,7 +63,7 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 | U6 | student | take a trial Kertas 1 in its original order with a timer | I practise under exam conditions |
 | U7 | student | write a Kertas 2 answer, reveal the scheme and tick the points I made | I can estimate my mark and see what I missed |
 | U8 | student | see my progress and continue where I left off | I know what to revise next |
-| U9 | student | sign in with my Google account or email | I can get in quickly without another password to remember |
+| U9 | student | sign in or register with my Google account | I can get in quickly without another password to remember |
 | U10 | teacher | allow only my students' emails | the materials stay within my class |
 | U11 | teacher | add a new trial paper or fix a note by editing one file | I can maintain the site myself |
 | U12 | student | enter the numbers from a question (Ed, PBG, IHP, KDNK…) and see the answer with the working | I can check my own calculation and learn the steps the scheme expects |
@@ -183,10 +183,9 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 ### 5.7 Access control: ✅
 - **FR-26** All content requires sign-in. Unauthenticated visitors are redirected to the login page. Direct requests for content files return 401.
 - **FR-27** Sign-in methods:
-  - **Google.**
-  - **Email + password.** Includes registration, email verification and password reset.
+  - **Google only.** One *Teruskan dengan Google* button handles sign-in and account creation. No email/password fields, registration tabs, password-reset link or promotional subtitle.
 - **FR-28** Only emails on the teacher's allowlist (`EMAIL_DIBENARKAN`) can enter. Whole domains can be allowed with `@domain`. Others see a clear "Tiada akses" screen that tells them to ask the teacher, with a **Hubungi cikgu** button that opens WhatsApp with a ready message ("Saya nak akses Nota Ekonomi Interaktif" + their email).
-- **FR-29** Accounts that register with email and password must verify their email before entry.
+- **FR-29** The server requires a verified email before entry, including for existing sessions. Unverified accounts return to the Google button with a clear message.
 - **FR-30** The header shows the signed-in account. Its menu has a **Hubungi cikgu** button that opens the teacher's WhatsApp with a ready message ("Salam cikgu, saya ada soalan tentang Nota Ekonomi Interaktif." + the student's name and email), and a *Log keluar* (sign-out) button.
 - **FR-31** A session lasts 12 hours and renews silently while the Firebase sign-in is still valid. Removing an email blocks that user after the next redeploy.
 
@@ -319,8 +318,8 @@ Measuring these automatically needs the planned progress sync (§10).
 
 | Risk | Mitigation |
 | --- | --- |
-| Google sign-in fails inside in-app browsers (Instagram, TikTok) | The login page detects these browsers and tells students to open Chrome or Safari; email sign-in still works |
-| Verification emails land in spam | The UI tells students to check Spam; resend button |
+| Google sign-in fails inside in-app browsers (Instagram, TikTok) | The login page detects these browsers and tells students to open Chrome or Safari |
+| Existing account uses a conflicting sign-in provider | The UI tells the student to contact the teacher for help using Google |
 | Allowlist changes forgotten (no redeploy) | Documented in the README and in the env var comment; could be solved by the self-service page |
 | Content errors against the textbook | Content is sourced from the textbook; teacher reviews; *cadangan* labels mark non-official points |
 | Copyright of exam papers | Source PDFs are never deployed; papers are published only with permission (Terengganu is hidden) |
