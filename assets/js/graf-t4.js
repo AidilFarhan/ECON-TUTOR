@@ -1773,7 +1773,7 @@
       var pilihan = 4;
       function keadaan(x) {
         if (x === 0) return "Output sifar: TC = FC";
-        if (x === qMinAC && xAC != null) return "MC = AC: AC minimum";
+        if (x === qMinAC && xAC != null) return "AC minimum"; // Jadual 4.4 buku teks: AC terendah pada output ini
         return MC[x] < AC[x] ? "MC &lt; AC: AC menurun" : MC[x] > AC[x] ? "MC &gt; AC: AC meningkat" : "MC = AC: AC minimum";
       }
       function jadualPenuh(x) {
