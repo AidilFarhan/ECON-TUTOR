@@ -295,6 +295,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | Short-run cost graph in Form 4 shows only AC and MC curves; STPM keeps AVC |
 | 2026-10-01 | T4 Bab 4: when a firm should shut down, written as the textbook table (P > AVC, P = AVC, P < AVC) |
 | 2026-10-01 | T4 Bab 4: Jadual 4.8 tidied (centred columns, one Tahap cell per group, hovering a labour row highlights its stage) |
+| 2026-10-01 | Profit and economic profit calculator made universal: free lists of explicit and implicit costs, TR given or P × Q, examples Puan Surayati and Encik Semang (textbook) |
 
 ## 10. Roadmap and open questions
 

@@ -4579,3 +4579,13 @@ ol.roman > li::before {
     font-size: 12.5px;
   }
 }
+
+/* ---------- jadual senarai kalkulator (butiran + nilai, contoh senarai kos) ---------- */
+.kalk-senarai th.teks,
+.kalk-jadual.kalk-senarai th.teks {
+  width: 64%;
+}
+
+.kalk-senarai .sel.teks {
+  max-width: none;
+}

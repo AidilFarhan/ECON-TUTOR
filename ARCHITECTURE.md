@@ -269,7 +269,8 @@ tambah({
     { k: "nama", l: "…", teks: true },                         // free text
     { k: "cari", jenis: "pilih", l: "Cari", pilihan: [["q1", "…"], ["p1", "…"]], ubah?: fn(state, value) },
     { k: "q1", l: "…", bila: function (x) { return x.cari === "q1"; } },   // conditional field
-    { k: "j", jenis: "jadual", pilihBaris: 4, lajur: [{ k: "l", l: "Buruh (L)" }, { k: "ap", l: "AP", hasil: true }] }
+    { k: "j", jenis: "jadual", pilihBaris: 4, lajur: [{ k: "l", l: "Buruh (L)" }, { k: "ap", l: "AP", hasil: true }] },
+    { k: "eks", jenis: "jadual", tanpaPilih: true, lajur: [{ k: "n", l: "Kos eksplisit", teks: true }, { k: "v", l: "Nilai (RM)" }] }  // free list: no row selection, wide name column (.kalk-senarai); rows with a blank value are skipped by kira
   ],
   contoh: [{ n: "RM5 → RM6", v: { p0: 5, … } }],            // chips; the first one is the initial state
   kira: function (x) {                                       // x: parsed values, x._baris[tableKey] = selected row
@@ -280,7 +281,7 @@ tambah({
 ```
 
 - **Parsing.** Inputs are `type="text" inputmode="decimal"`; text-name cells in tables are `textarea.sel.teks` (auto height, Enter blocked). Handlers find cells by the `.sel` class, not the tag. Spaces, commas, a leading `RM` and a trailing `%` are stripped; blank required fields or non-numbers produce an error message instead of calling `kira`.
-- **Rendering.** A `pilih` change or a new example re-renders only that card (`lukisSemula`); typing only repaints the result block and computed table cells, so focus is never lost. Focusing or clicking a table row selects it and `kira` shows that row's working.
+- **Rendering.** A `pilih` change or a new example re-renders only that card (`lukisSemula`); typing only repaints the result block and computed table cells, so focus is never lost. Focusing or clicking a table row selects it and `kira` shows that row's working (only within that table; tables with `tanpaPilih` never highlight a row).
 - **Worked steps.** Each `langkah` entry starts with `ay("…")`, a `.kalk-ayat` sentence in economic terms that names every quantity (for a division, which is the numerator, *pengangka*, and which the denominator, *penyebut*), followed by the numeric line.
 - **State.** Per card, in memory only (`keadaan[id]`), reset on navigation. Nothing is stored in `localStorage`.
 - **Integration.** `EKO.kalkulator.bilanganBab(id)` feeds the "Kalkulator (n)" button in each chapter header; `senarai.length` feeds the home statistics.

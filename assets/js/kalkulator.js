@@ -1065,34 +1065,182 @@
     }
   });
 
+  // Senarai kos bebas: pelajar menulis sendiri butiran kos eksplisit dan implisit (tidak terikat pada satu contoh).
+  function lajurKos(k, l) {
+    return {
+      k: k,
+      jenis: "jadual",
+      tanpaPilih: true,
+      lajur: [
+        { k: "n", l: l, teks: true },
+        { k: "v", l: "Nilai (RM)" }
+      ]
+    };
+  }
+  // Baris yang ada nilai sahaja; butiran tanpa nama diberi nama lalai
+  function senaraiKos(baris, lalai) {
+    var out = [];
+    baris.forEach(function (r, i) {
+      if (r.v == null) return;
+      out.push({ n: String(r.n || "").trim() || lalai + " " + (i + 1), v: r.v });
+    });
+    return out;
+  }
+  function langkahKos(tajuk, senarai) {
+    var j = jumlah(
+      senarai.map(function (c) {
+        return c.v;
+      })
+    );
+    if (!senarai.length) return { j: 0, teks: tajuk + " = " + wang(0) + " (tiada)" };
+    var nama = senarai
+      .map(function (c) {
+        return esc(c.n);
+      })
+      .join(" + ");
+    var nilaiK = senarai
+      .map(function (c) {
+        return wang(c.v);
+      })
+      .join(" + ");
+    return { j: j, teks: tajuk + " = " + nama + " = " + (senarai.length > 1 ? nilaiK + " = " : "") + wang(j) };
+  }
+
   tambah({
     id: "untung-ekonomi",
     bab: "t4-b4",
     no: "4.1.6",
-    tajuk: "Untung perakaunan dan untung ekonomi",
-    kunci: "untung ekonomi kos eksplisit kos implisit perakaunan kos lepas usahawan",
+    tajuk: "Untung dan untung ekonomi",
+    kunci: "untung ekonomi kos eksplisit kos implisit perakaunan kos lepas usahawan sewa faedah gaji dilepaskan",
     rumus: ["Untung = Jumlah hasil − Kos eksplisit", "Untung ekonomi = Jumlah hasil − (Kos eksplisit + Kos implisit)"],
-    petunjuk: "Kos implisit ialah kos lepas sumber milik sendiri, contohnya gaji yang dilepaskan dan faedah simpanan yang tidak diperoleh.",
+    petunjuk:
+      "Tulis sendiri setiap butiran kos dan nilainya; tekan <b>+ Tambah baris</b> jika perlu. <b>Kos eksplisit</b> dibayar dengan nyata kepada pihak lain (bahan mentah, upah pekerja, sewa premis, bil). <b>Kos implisit</b> ialah kos lepas sumber milik sendiri (gaji yang dilepaskan, sewa tapak sendiri, faedah atas modal sendiri = kadar faedah × modal; bahagi 12 jika sebulan). Pastikan semua nilai bagi tempoh yang sama.",
     medan: [
-      { k: "tr", l: "Jumlah hasil (RM)" },
-      { k: "eks", l: "Kos eksplisit (RM)" },
-      { k: "gaji", l: "Gaji dilepaskan (RM)" },
-      { k: "faedah", l: "Faedah simpanan dilepaskan (RM)" },
-      { k: "lain", l: "Kos implisit lain (RM)" }
+      {
+        k: "cara",
+        jenis: "pilih",
+        l: "Jumlah hasil",
+        pilihan: [
+          ["tr", "Diberi terus (RM)"],
+          ["pq", "Harga × kuantiti jualan"]
+        ]
+      },
+      {
+        k: "tr",
+        l: "Jumlah hasil TR (RM)",
+        bila: function (x) {
+          return x.cara === "tr";
+        }
+      },
+      {
+        k: "p",
+        l: "Harga seunit P (RM)",
+        bila: function (x) {
+          return x.cara === "pq";
+        }
+      },
+      {
+        k: "q",
+        l: "Kuantiti jualan Q",
+        bila: function (x) {
+          return x.cara === "pq";
+        }
+      },
+      lajurKos("eks", "Kos eksplisit"),
+      lajurKos("imp", "Kos implisit")
     ],
-    contoh: [{ n: "Usahawan (sebulan)", v: { tr: 10000, eks: 4900, gaji: 3000, faedah: 40, lain: 0 } }],
+    contoh: [
+      {
+        n: "Puan Surayati (sebulan)",
+        v: {
+          cara: "tr",
+          tr: 10000,
+          eks: [
+            ["Bahan mentah", 3000],
+            ["Gaji pembantu", 900],
+            ["Bil", 1000]
+          ],
+          imp: [
+            ["Gaji yang dilepaskan", 3000],
+            ["Faedah simpanan (4% × RM12 000 ÷ 12)", 40]
+          ]
+        }
+      },
+      {
+        n: "Encik Semang (semusim)",
+        v: {
+          cara: "tr",
+          tr: 10000,
+          eks: [
+            ["Anak ayam", 1000],
+            ["Makanan ayam", 2000],
+            ["Alatan", 1000]
+          ],
+          imp: [
+            ["Sewa tapak milik sendiri", 3000],
+            ["", ""]
+          ]
+        }
+      },
+      {
+        n: "Nilai contoh (P × Q)",
+        v: {
+          cara: "pq",
+          p: 5,
+          q: 3000,
+          eks: [
+            ["Tepung dan bahan", 4000],
+            ["Sewa kedai", 2000],
+            ["Upah pekerja", 3000]
+          ],
+          imp: [
+            ["Gaji yang dilepaskan", 2500],
+            ["Faedah modal sendiri (6% × RM40 000 ÷ 12)", 200]
+          ]
+        }
+      }
+    ],
     kira: function (x) {
-      var imp = x.gaji + x.faedah + x.lain;
-      var ua = x.tr - x.eks;
-      var ue = x.tr - (x.eks + imp);
+      var eks = senaraiKos(x.eks, "Kos eksplisit");
+      var imp = senaraiKos(x.imp, "Kos implisit");
+      var negatif = eks.concat(imp).filter(function (c) {
+        return c.v < 0;
+      });
+      if (negatif.length) return { ralat: "Nilai kos tidak boleh negatif: " + esc(negatif[0].n) + "." };
+      if (!eks.length && !imp.length) return { ralat: "Isi sekurang-kurangnya satu butiran kos dan nilainya." };
+      var L = [];
+      var tr = x.tr;
+      if (x.cara === "pq") {
+        tr = x.p * x.q;
+        L.push(ay("Jumlah hasil = harga seunit × kuantiti jualan") + "TR = " + wang(x.p) + " × " + nom(x.q, 0) + " = " + wang(tr));
+      }
+      var ke = langkahKos("Kos eksplisit", eks);
+      var ki = langkahKos("Kos implisit", imp);
+      var ua = tr - ke.j;
+      var ue = tr - (ke.j + ki.j);
+      L.push(
+        ay("Kos eksplisit = jumlah semua bayaran nyata kepada pihak lain") + ke.teks,
+        ay("Kos implisit = jumlah kos lepas sumber milik sendiri") + ki.teks,
+        ay("Untung = jumlah hasil − kos eksplisit") + "Untung = " + wang(tr) + " − " + wang(ke.j) + " = <b>" + wang(ua) + "</b>",
+        ay("Untung ekonomi = jumlah hasil − (kos eksplisit + kos implisit)") +
+          "Untung ekonomi = " + wang(tr) + " − (" + wang(ke.j) + " + " + wang(ki.j) + ") = <b>" + wang(ue) + "</b>"
+      );
+      var nota =
+        ue > 0
+          ? "Untung ekonomi positif: perniagaan ini memberi pulangan lebih tinggi daripada pilihan kedua terbaik, maka berbaloi diteruskan."
+          : ue < 0
+          ? "Untung ekonomi negatif: pilihan kedua terbaik (contohnya kekal makan gaji atau menyewakan sumber sendiri) memberi pulangan lebih tinggi."
+          : "Untung ekonomi sifar (untung normal): pulangan perniagaan sama dengan pilihan kedua terbaik.";
+      if (ua > 0 && ue < 0) nota = "Perniagaan ini untung dari segi perakaunan, tetapi " + nota.charAt(0).toLowerCase() + nota.slice(1);
       return {
-        hasil: [H("Untung perakaunan", wang(ua)), H("Kos implisit", wang(imp)), H("Untung ekonomi", wang(ue), ue > 0 ? "baik" : ue < 0 ? "buruk" : "neutral")],
-        langkah: [
-          ay("Kos implisit = gaji dilepaskan + faedah dilepaskan + kos lepas lain") + "Kos implisit = " + wang(x.gaji) + " + " + wang(x.faedah) + " + " + wang(x.lain) + " = " + wang(imp),
-          ay("Untung perakaunan = jumlah hasil − kos eksplisit") + "Untung = " + wang(x.tr) + " − " + wang(x.eks) + " = " + wang(ua),
-          ay("Untung ekonomi = jumlah hasil − (kos eksplisit + kos implisit)") + "Untung ekonomi = " + wang(x.tr) + " − (" + wang(x.eks) + " + " + wang(imp) + ") = <b>" + wang(ue) + "</b>"
+        hasil: [
+          H("Kos eksplisit", wang(ke.j)),
+          H("Kos implisit", wang(ki.j)),
+          H("Untung", wang(ua), ua > 0 ? "baik" : ua < 0 ? "buruk" : "neutral"),
+          H("Untung ekonomi", wang(ue), ue > 0 ? "baik" : ue < 0 ? "buruk" : "neutral")
         ],
-        nota: ue > 0 ? "Untung ekonomi positif: perniagaan ini lebih baik daripada pilihan kedua terbaik." : ue < 0 ? "Untung ekonomi negatif: pilihan kedua terbaik (contohnya kekal makan gaji) memberi pulangan lebih tinggi." : "Untung ekonomi sifar: pulangan perniagaan sama dengan pilihan kedua terbaik."
+        langkah: L,
+        nota: nota
       };
     }
   });
@@ -2803,7 +2951,7 @@
   function htmlJadual(k, s, m, x) {
     var rows = s.j[m.k];
     var h = '<p class="kalk-leret" hidden>Leret jadual ke kiri untuk melihat semua lajur ' + E.ikon("kanan") + "</p>";
-    h += '<div class="kalk-jadual jadual"><table><thead><tr>';
+    h += '<div class="kalk-jadual jadual' + (m.tanpaPilih ? " kalk-senarai" : "") + '" data-jk="' + m.k + '"><table><thead><tr>';
     m.lajur.forEach(function (c) {
       // kelas tajuk sama dengan sel di bawahnya: lajur teks (input nama atau hasil seperti Tahap) bukan "n"
       var kelas = [c.teks ? "" : "n", c.hasil ? "hasil" : "", c.teks && !c.hasil ? "teks" : ""].join(" ").trim();
@@ -2811,7 +2959,7 @@
     });
     h += "</tr></thead><tbody>";
     rows.forEach(function (r, ri) {
-      h += '<tr data-r="' + ri + '"' + (s.baris[m.k] === ri ? ' class="dipilih"' : "") + ">";
+      h += '<tr data-r="' + ri + '"' + (!m.tanpaPilih && s.baris[m.k] === ri ? ' class="dipilih"' : "") + ">";
       var ci = 0;
       m.lajur.forEach(function (c) {
         if (c.hasil) {
@@ -3095,7 +3243,11 @@
     function pilihBaris(c, jk, r) {
       if (c.s.baris[jk] === r) return false;
       c.s.baris[jk] = r;
-      c.el.querySelectorAll('tr[data-r]').forEach(function (tr) {
+      var mj = medanJadual(c.k).filter(function (x) {
+        return x.k === jk;
+      })[0];
+      if (mj && mj.tanpaPilih) return false;
+      c.el.querySelectorAll('.kalk-jadual[data-jk="' + jk + '"] tr[data-r]').forEach(function (tr) {
         tr.classList.toggle("dipilih", +tr.getAttribute("data-r") === r);
       });
       return true;
