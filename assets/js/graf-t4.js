@@ -1602,6 +1602,8 @@
     "kos",
     function (host, opt) {
       var K = G.kad(host, { tajuk: opt.tajuk || "Kos pengeluaran jangka pendek", petunjuk: "Gerakkan tetikus atau seret sepanjang keluk" });
+      // Tingkatan 4 (data-opt peringkat "spm") hanya belajar keluk AC dan MC; keluk AVC untuk STPM
+      var spm = opt.peringkat === "spm";
       var Q = [0, 1, 2, 3, 4, 5, 6, 7, 8];
       var VC = [0, 50, 95, 130, 160, 195, 245, 315, 395];
       var TC = VC.map(function (v) {
@@ -1650,7 +1652,17 @@
         { id: "ac", nama: "AC", label: "AC", kelas: "d", warna: "c-d", data: d(AC), f: fAC },
         { id: "avc", nama: "AVC", label: "AVC", kelas: "c3", warna: "c-3", data: d(AVC), f: fAVC },
         { id: "mc", nama: "MC", label: "MC", kelas: "c4", warna: "c-4", data: d(MC) }
-      ];
+      ].filter(function (s) {
+        return !spm || s.id !== "avc";
+      });
+      function siri2(id) {
+        for (var i = 0; i < S2.length; i++) if (S2[i].id === id) return S2[i];
+        return null;
+      }
+      function tunjuk2(id) {
+        var s = siri2(id);
+        return !!s && s.tunjuk !== false;
+      }
       var Q1 = [1, 2, 3, 4, 5, 6, 7, 8];
       var fMC = G.monoton(Q1, MC.slice(1));
       function silang(f, g, a, b) {
@@ -1663,7 +1675,7 @@
         return null;
       }
       var xAC = silang(fMC, fAC, 4, 8);
-      var xAVC = silang(fMC, fAVC, 3, 8);
+      var xAVC = spm ? null : silang(fMC, fAVC, 3, 8);
       // Buku teks (4.1.5): "MC = AC apabila kos purata mencapai nilai minimum, iaitu antara output ke-6 unit dan ke-7 unit".
       // Keluk MC diplot pada output integer seperti rajah buku teks, jadi persilangan berada di antara dua baris jadual.
       var xACr = xAC == null ? null : Math.round(xAC * 100) / 100;
@@ -1738,17 +1750,17 @@
           selanjar: true,
           labelNilai: labelNilai,
           nisbah: nisbah,
-          aria: "Keluk kos purata, kos berubah purata dan kos marginal",
+          aria: spm ? "Keluk kos purata dan kos marginal" : "Keluk kos purata, kos berubah purata dan kos marginal",
           anotasi: function (plot, x) {
             // label titik persilangan disorok apabila penjejak cukup dekat, supaya tidak bertindih dengan label nilai
             var dekat = function (xs) {
               return x != null && Math.abs(plot.X(x) - plot.X(xs)) < 110;
             };
-            if (xAC != null && S2[0].tunjuk !== false && S2[2].tunjuk !== false) {
+            if (xAC != null && tunjuk2("ac") && tunjuk2("mc")) {
               plot.bulat(xAC, fAC(xAC), 7, "g-nod", "tanda");
               if (!dekat(xAC)) plot.teks(xAC, fAC(xAC), "AC minimum: MC = AC", "g-teks", "end", "label", -10, -10);
             }
-            if (xAVC != null && S2[1].tunjuk !== false && S2[2].tunjuk !== false) {
+            if (xAVC != null && tunjuk2("avc") && tunjuk2("mc")) {
               plot.bulat(xAVC, fAVC(xAVC), 7, "g-nod", "tanda");
               if (!dekat(xAVC)) plot.teks(xAVC, fAVC(xAVC), "MC = AVC", "g-teks lemah", "start", "label", 8, 22);
             }
@@ -1812,7 +1824,7 @@
           "Q = " + E.fmt(x, 2) + " terletak antara baris Q = " + q0 + " dan Q = " + q1 + " dalam Jadual 4.3, jadi nilai ini <b>dibaca daripada keluk</b>. " +
           "TC = FC + VC = RM100 + " + E.rm(vc, 1) + " = <b>" + E.rm(tc, 1) + "</b>. AFC = RM100 ÷ " + E.fmt(x, 2) + " = <b>" + E.rm(100 / x, 1) + "</b>. ";
         if (x < 1) {
-          ayat += "Keluk AVC, AC dan MC bermula pada Q = 1, iaitu baris pertama jadual yang mempunyai kos seunit.";
+          ayat += (spm ? "Keluk AC dan MC" : "Keluk AVC, AC dan MC") + " bermula pada Q = 1, iaitu baris pertama jadual yang mempunyai kos seunit.";
         } else {
           var ac = fAC(x),
             mc = fMC(x);
@@ -1820,7 +1832,7 @@
           // di titik MC = AC, AC dan MC dipaparkan pada persilangan tepat (penjejak dibundar ke 0.01)
           var acPapar = diMin ? E.rm(fAC(xAC), 1) : E.rm(ac, 1),
             mcPapar = diMin ? acPapar : E.rm(mc, 1);
-          bits.push(["AVC", E.rm(fAVC(x), 1), "c3"], ["AC", acPapar, "d"], ["MC", mcPapar, "c4"]);
+          bits.push(spm ? null : ["AVC", E.rm(fAVC(x), 1), "c3"], ["AC", acPapar, "d"], ["MC", mcPapar, "c4"]);
           if (diMin) bits.push(["Keadaan", "MC = AC: AC minimum", "d"]);
           ayat +=
             "AC = TC ÷ Q = " + E.rm(tc, 1) + " ÷ " + E.fmt(x, 2) + " = <b>" + E.rm(ac, 1) + "</b>. MC dibaca pada keluk MC. " +
@@ -1855,9 +1867,9 @@
         if (x === 0) {
           ayat = "Pada output sifar, kos berubah = 0 tetapi firma tetap menanggung <b>kos tetap RM100</b> (contohnya sewa bangunan, premium insurans), maka TC = FC.";
         } else {
-          bits.push(["AFC", E.rm(100 / x, 1), ""], ["AVC", E.rm(AVC[x], 1), "c3"], ["AC", E.rm(AC[x], 1), "d"], ["MC", "RM" + MC[x], "c4"]);
+          bits.push(["AFC", E.rm(100 / x, 1), ""], spm ? null : ["AVC", E.rm(AVC[x], 1), "c3"], ["AC", E.rm(AC[x], 1), "d"], ["MC", "RM" + MC[x], "c4"]);
           ayat =
-            "TC = FC + VC = RM100 + RM" + VC[x] + " = <b>RM" + TC[x] + "</b>. AC = TC ÷ Q = RM" + TC[x] + " ÷ " + x + " = <b>" + E.rm(AC[x], 1) + "</b> (AFC " + E.rm(100 / x, 1) + " + AVC " + E.rm(AVC[x], 1) + "). MC = ΔTC ÷ ΔQ = (RM" + TC[x] + " − RM" + TC[x - 1] + ") ÷ 1 = <b>RM" + MC[x] + "</b>. " +
+            "TC = FC + VC = RM100 + RM" + VC[x] + " = <b>RM" + TC[x] + "</b>. AC = TC ÷ Q = RM" + TC[x] + " ÷ " + x + " = <b>" + E.rm(AC[x], 1) + "</b>" + (spm ? "" : " (AFC " + E.rm(100 / x, 1) + " + AVC " + E.rm(AVC[x], 1) + ")") + ". MC = ΔTC ÷ ΔQ = (RM" + TC[x] + " − RM" + TC[x - 1] + ") ÷ 1 = <b>RM" + MC[x] + "</b>. " +
             (x === qMinAC && xAC != null
               ? '<span class="status baik">MC = AC: AC minimum</span> Output ' + x + ' memberikan <b>AC terendah dalam jadual</b>. MC dalam jadual (RM' + MC[x] + ') ialah perubahan kos daripada output ' + (x - 1) + ' ke ' + x + ', jadi keluk MC memotong keluk AC ' + antaraAC + ', iaitu di titik minimum AC. Selepas output ini MC &gt; AC dan AC meningkat.'
               : MC[x] < AC[x]

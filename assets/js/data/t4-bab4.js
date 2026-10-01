@@ -90,7 +90,7 @@ EKO.daftarBab({
 <div class="baris">AVC (output ke-6) = RM245 ÷ 6 = RM40.80</div></div></div>
 
 <h3><span class="no">4.1.5</span> Hubungan antara Perubahan Output dengan Kos</h3>
-<figure data-graf="kos"></figure>
+<figure data-graf="kos" data-opt='{"peringkat":"spm"}'></figure>
 <ul>
   <li><b>Jumlah kos</b> berhubung positif dengan output: meningkat daripada RM100 kepada RM495. Perubahan TC sama dengan perubahan VC.</li>
   <li><b>Kos purata</b> menurun daripada RM150 kepada minimum RM57.50 (output ke-6), kemudian meningkat.</li>
