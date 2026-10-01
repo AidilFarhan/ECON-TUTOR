@@ -4464,3 +4464,74 @@ ol.roman > li::before {
 .graf-kawalan label.bina-fail.btn-utama {
   color: var(--accent-ink);
 }
+
+/* jadual titik penutupan operasi firma (T4 Bab 4): 3 lajur seperti buku teks; disusun menegak pada telefon */
+.jadual-tutup {
+  margin-top: 10px;
+}
+
+.jadual-tutup table {
+  table-layout: fixed;
+}
+
+.jadual-tutup th {
+  white-space: normal;
+  width: 33.33%;
+}
+
+.jadual-tutup td ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.jadual-tutup td li + li {
+  margin-top: 6px;
+}
+
+.jadual-tutup tbody tr:first-child td {
+  background: var(--glass-3);
+}
+
+@media (max-width: 640px) {
+  .jadual-tutup table {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .jadual-tutup caption {
+    display: block;
+    order: 0;
+  }
+
+  .jadual-tutup thead,
+  .jadual-tutup tbody,
+  .jadual-tutup tr {
+    display: contents;
+  }
+
+  .jadual-tutup th,
+  .jadual-tutup td {
+    display: block;
+    width: auto;
+  }
+
+  /* lajur demi lajur: syarat → keputusan → penerangan */
+  .jadual-tutup th:nth-child(1) { order: 1; }
+  .jadual-tutup tbody tr:nth-child(1) td:nth-child(1) { order: 2; }
+  .jadual-tutup tbody tr:nth-child(2) td:nth-child(1) { order: 3; }
+  .jadual-tutup th:nth-child(2) { order: 4; }
+  .jadual-tutup tbody tr:nth-child(1) td:nth-child(2) { order: 5; }
+  .jadual-tutup tbody tr:nth-child(2) td:nth-child(2) { order: 6; }
+  .jadual-tutup th:nth-child(3) { order: 7; }
+  .jadual-tutup tbody tr:nth-child(1) td:nth-child(3) { order: 8; }
+  .jadual-tutup tbody tr:nth-child(2) td:nth-child(3) { order: 9; }
+
+  .jadual-tutup tbody tr:nth-child(2) td {
+    border-bottom: 2px solid var(--line-2);
+  }
+
+  .jadual-tutup th,
+  .jadual-tutup tbody tr:nth-child(1) td {
+    border-bottom: 0;
+  }
+}

@@ -221,6 +221,7 @@ The **brand mark** (`EKO.tandaJenama()`) is a dark rounded square with a blue de
 | Flow | `.aliran` > `span` + `i` (arrow) | Cause → effect chains |
 | Mini cards | `.grid-2` / `.grid-3` > `.kad-mini` | Side-by-side short concepts (not graphs) |
 | Table | `.jadual` > `table` (`caption`, `.n` numeric, `.c` centred) | Textbook tables |
+| Comparison table | `.jadual.jadual-tutup` > `table` with three condition columns (header, decision row with `.status`, bullet row) | Textbook comparison in columns (e.g. P > AVC / P = AVC / P < AVC). Equal columns on wide screens; below 640 px each column stacks vertically so there is no horizontal scroll |
 | Term | `.istilah` | Highlighted key term |
 | Graph | `<figure data-graf="name" data-opt='{…}'>` | Mounted by the graph engine |
 
