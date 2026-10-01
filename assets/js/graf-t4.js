@@ -1664,6 +1664,14 @@
       }
       var xAC = silang(fMC, fAC, 4, 8);
       var xAVC = silang(fMC, fAVC, 3, 8);
+      // Buku teks (4.1.5): "MC = AC apabila kos purata mencapai nilai minimum, iaitu antara output ke-6 unit dan ke-7 unit".
+      // Keluk MC diplot pada output integer seperti rajah buku teks, jadi persilangan berada di antara dua baris jadual.
+      var xACr = xAC == null ? null : Math.round(xAC * 100) / 100;
+      var qMinAC = 1;
+      AC.forEach(function (v, i) {
+        if (v != null && v < AC[qMinAC]) qMinAC = i;
+      });
+      var antaraAC = xAC == null ? "" : "antara output ke-" + Math.floor(xAC) + " unit dan ke-" + Math.ceil(xAC) + " unit";
       var nisbah = function (w) {
         return w < 480 ? 0.72 : 0.44;
       };
@@ -1738,7 +1746,7 @@
             };
             if (xAC != null && S2[0].tunjuk !== false && S2[2].tunjuk !== false) {
               plot.bulat(xAC, fAC(xAC), 7, "g-nod", "tanda");
-              if (!dekat(xAC)) plot.teks(xAC, fAC(xAC), "MC = AC", "g-teks", "end", "label", -10, -10);
+              if (!dekat(xAC)) plot.teks(xAC, fAC(xAC), "AC minimum: MC = AC", "g-teks", "end", "label", -10, -10);
             }
             if (xAVC != null && S2[1].tunjuk !== false && S2[2].tunjuk !== false) {
               plot.bulat(xAVC, fAVC(xAVC), 7, "g-nod", "tanda");
@@ -1756,10 +1764,16 @@
         c1.lukis();
         c2.lukis();
       });
+      if (xACr != null) {
+        G.butang(K.kawalan, "AC minimum (MC = AC)", function () {
+          c1.set(xACr); // carta kedua dan bacaan dikemas kini melalui panggilan balik
+        });
+      }
 
       var pilihan = 4;
       function keadaan(x) {
         if (x === 0) return "Output sifar: TC = FC";
+        if (x === qMinAC && xAC != null) return "MC = AC: AC minimum";
         return MC[x] < AC[x] ? "MC &lt; AC: AC menurun" : MC[x] > AC[x] ? "MC &gt; AC: AC meningkat" : "MC = AC: AC minimum";
       }
       function jadualPenuh(x) {
@@ -1802,10 +1816,19 @@
         } else {
           var ac = fAC(x),
             mc = fMC(x);
-          bits.push(["AVC", E.rm(fAVC(x), 1), "c3"], ["AC", E.rm(ac, 1), "d"], ["MC", E.rm(mc, 1), "c4"]);
+          var diMin = xACr != null && Math.abs(x - xACr) <= 0.02;
+          // di titik MC = AC, AC dan MC dipaparkan pada persilangan tepat (penjejak dibundar ke 0.01)
+          var acPapar = diMin ? E.rm(fAC(xAC), 1) : E.rm(ac, 1),
+            mcPapar = diMin ? acPapar : E.rm(mc, 1);
+          bits.push(["AVC", E.rm(fAVC(x), 1), "c3"], ["AC", acPapar, "d"], ["MC", mcPapar, "c4"]);
+          if (diMin) bits.push(["Keadaan", "MC = AC: AC minimum", "d"]);
           ayat +=
             "AC = TC ÷ Q = " + E.rm(tc, 1) + " ÷ " + E.fmt(x, 2) + " = <b>" + E.rm(ac, 1) + "</b>. MC dibaca pada keluk MC. " +
-            (Math.abs(mc - ac) < 0.5
+            (diMin
+              ? '<span class="status baik">MC = AC: AC minimum</span> Keluk MC memotong keluk AC pada <b>titik minimum AC</b>, iaitu ' + antaraAC +
+                ". Sebelum titik ini MC &lt; AC, maka AC menurun; selepas titik ini MC &gt; AC, maka AC meningkat. Dalam Jadual 4.3, nilai AC terendah ialah <b>" +
+                E.rm(AC[qMinAC], 2) + "</b> pada output " + qMinAC + " unit."
+              : Math.abs(mc - ac) < 0.5
               ? '<span class="status baik">MC ≈ AC</span> maka AC berada di sekitar <b>titik minimum</b>.'
               : mc < ac
                 ? '<span class="status biru">MC &lt; AC</span> maka AC sedang <b>menurun</b>.'
@@ -1835,8 +1858,13 @@
           bits.push(["AFC", E.rm(100 / x, 1), ""], ["AVC", E.rm(AVC[x], 1), "c3"], ["AC", E.rm(AC[x], 1), "d"], ["MC", "RM" + MC[x], "c4"]);
           ayat =
             "TC = FC + VC = RM100 + RM" + VC[x] + " = <b>RM" + TC[x] + "</b>. AC = TC ÷ Q = RM" + TC[x] + " ÷ " + x + " = <b>" + E.rm(AC[x], 1) + "</b> (AFC " + E.rm(100 / x, 1) + " + AVC " + E.rm(AVC[x], 1) + "). MC = ΔTC ÷ ΔQ = (RM" + TC[x] + " − RM" + TC[x - 1] + ") ÷ 1 = <b>RM" + MC[x] + "</b>. " +
-            (MC[x] < AC[x] ? '<span class="status biru">MC &lt; AC</span> maka AC sedang <b>menurun</b>.' : '<span class="status merah">MC &gt; AC</span> maka AC sedang <b>meningkat</b>.') +
-            " MC memotong AC pada titik minimum AC. AFC sentiasa menurun kerana FC yang sama dibahagi dengan output yang semakin besar.";
+            (x === qMinAC && xAC != null
+              ? '<span class="status baik">MC = AC: AC minimum</span> Output ' + x + ' memberikan <b>AC terendah dalam jadual</b>. MC dalam jadual (RM' + MC[x] + ') ialah perubahan kos daripada output ' + (x - 1) + ' ke ' + x + ', jadi keluk MC memotong keluk AC ' + antaraAC + ', iaitu di titik minimum AC. Selepas output ini MC &gt; AC dan AC meningkat.'
+              : MC[x] < AC[x]
+                ? '<span class="status biru">MC &lt; AC</span> maka AC sedang <b>menurun</b>.'
+                : '<span class="status merah">MC &gt; AC</span> maka AC sedang <b>meningkat</b>.') +
+            (x === qMinAC ? "" : " MC memotong AC pada titik minimum AC, iaitu " + antaraAC + " (tekan <b>AC minimum (MC = AC)</b>).") +
+            " AFC sentiasa menurun kerana FC yang sama dibahagi dengan output yang semakin besar.";
         }
         K.baca.innerHTML = G.nilai(bits) + '<div class="ayat">' + ayat + "</div>" + jadualPenuh(x);
       }

@@ -94,7 +94,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-7** Each graph has a live reading panel with values and a one-to-two-sentence explanation that includes the calculation.
 - **FR-8** Market graphs cover individual and market demand/supply, equilibrium, price controls, elasticity, taxes and subsidies. In the market demand/supply graphs, each individual curve can be dragged independently.
 - **FR-8a** The STPM PPC-shift graph (`kkp-anjakan`) offers 8 cases: shift right, shift left, only Y or only X increases, only Y or only X decreases, and one good increases while the other decreases. For each cause (resource endowment, technology, capital-goods composition) the reading names the cause of an increase and, for a decrease, the reverse cause (for resources: depletion of minerals, fewer foreign workers, lower investment). A *Situasi asal* button resets the curve to the dashed original.
-- **FR-9** The short-run cost graph tracks continuously along the curves and shows decimal values. AC and AVC are derived as TC ÷ Q and VC ÷ Q, so decimal readings are consistent with the formula. A full Jadual 4.3 table is shown, and its rows are clickable.
+- **FR-9** The short-run cost graph tracks continuously along the curves and shows decimal values. AC and AVC are derived as TC ÷ Q and VC ÷ Q, so decimal readings are consistent with the formula. A full Jadual 4.3 table is shown, and its rows are clickable. Following the Form 4 textbook (4.1.5), MC is plotted at whole outputs and **MC = AC: AC minimum** is shown where MC cuts AC, between the 6th and 7th unit: an *AC minimum (MC = AC)* button moves the tracker there and explains it, and the Keadaan column marks output 6 (lowest AC in the table) as "MC = AC: AC minimum".
 - **FR-10** Form 5 graphs cover:
   - price index
   - AD–AS
@@ -291,6 +291,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | *Bina graf* phase 7: *Latihan graf* with *Semak Jawapan* (`EKO.senario`, 8 T4 Bab 2 questions) |
 | 2026-10-01 | *Bina graf* phase 4: *Tekap gambar*, which traces a graph from a photo on the device without AI (`EKO.imbas`) |
 | 2026-10-01 | *Bina graf*: curve type KKP (opportunity cost along the curve, economic growth as an outward shift from the origin) |
+| 2026-10-01 | Short-run cost graph: *MC = AC: AC minimum* state (button, reading, Keadaan column), following the Form 4 textbook |
 
 ## 10. Roadmap and open questions
 

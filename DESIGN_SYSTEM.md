@@ -288,7 +288,7 @@ These rules are shared by all 39 widgets (the 38 used in the notes plus `bina-ke
 | Value chips (`.cip` in SVG) | Ink pill with background-coloured text, kept inside the canvas; stagger chips that would overlap |
 | Areas (`.g-kawasan`) | `-soft` fills for surplus, revenue, deadweight loss |
 | Tracker (`.g-garis-silang`) | Dashed vertical line; value labels next to each node with a halo stroke (`.g-teks-nilai`), stacked so they never overlap, flipping side near the right edge |
-| Intersections | Plain 7 px node with a small label ("MC = AC"); the label hides when the tracker is close |
+| Intersections | Plain 7 px node with a small label ("AC minimum: MC = AC"); the label hides when the tracker is close |
 | Reading panel | Always update it: key values as chips, then one or two sentences of reasoning with the calculation |
 | Size | Width = container (max 780 px); height from an aspect-ratio function, taller on phones |
 
