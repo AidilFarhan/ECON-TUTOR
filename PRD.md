@@ -294,6 +294,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | Short-run cost graph: *MC = AC: AC minimum* state (button, reading, Keadaan column), following the Form 4 textbook |
 | 2026-10-01 | Short-run cost graph in Form 4 shows only AC and MC curves; STPM keeps AVC |
 | 2026-10-01 | T4 Bab 4: when a firm should shut down, written as the textbook table (P > AVC, P = AVC, P < AVC) |
+| 2026-10-01 | T4 Bab 4: Jadual 4.8 tidied (centred columns, one Tahap cell per group, hovering a labour row highlights its stage) |
 
 ## 10. Roadmap and open questions
 

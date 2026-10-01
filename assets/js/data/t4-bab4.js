@@ -118,18 +118,18 @@ EKO.daftarBab({
 
 <h3><span class="no">4.1.8</span> Tahap Pengeluaran Paling Cekap</h3>
 <div class="kotak def"><span class="kotak-label">Hukum pulangan berkurangan</span><p>Apabila suatu input berubah (contoh buruh) ditambahkan secara berterusan kepada satu input tetap (contoh tanah), maka jumlah keluaran semakin bertambah, tetapi tambahannya semakin berkurangan bagi setiap unit tambahan input berubah. Hukum ini berdasarkan andaian: input berubah homogen (sifat sama), input tetap tidak berubah, dan tingkat teknologi tetap.</p></div>
-<div class="jadual"><table><caption>Jadual 4.8 Tahap pengeluaran (tanah = input tetap)</caption>
-<thead><tr><th class="n">Buruh</th><th class="n">TP</th><th class="n">AP</th><th class="n">MP</th><th>Tahap</th></tr></thead><tbody>
-<tr><td class="n">1</td><td class="n">6</td><td class="n">6</td><td class="n">6</td><td rowspan="3">I: tidak cekap (pembaziran input tetap)</td></tr>
-<tr><td class="n">2</td><td class="n">14</td><td class="n">7</td><td class="n">8</td></tr>
-<tr><td class="n">3</td><td class="n">24</td><td class="n">8</td><td class="n">10</td></tr>
-<tr><td class="n">4</td><td class="n">32</td><td class="n">8</td><td class="n">8</td><td rowspan="6">II: paling cekap (hukum pulangan berkurangan mula di sini)</td></tr>
-<tr><td class="n">5</td><td class="n">37</td><td class="n">7.4</td><td class="n">5</td></tr>
-<tr><td class="n">6</td><td class="n">41</td><td class="n">6.83</td><td class="n">4</td></tr>
-<tr><td class="n">7</td><td class="n">44</td><td class="n">6.28</td><td class="n">3</td></tr>
-<tr><td class="n">8</td><td class="n">46</td><td class="n">5.75</td><td class="n">2</td></tr>
-<tr><td class="n">9</td><td class="n">46</td><td class="n">5.1</td><td class="n">0</td></tr>
-<tr><td class="n">10</td><td class="n">45</td><td class="n">4.5</td><td class="n">−1</td><td>III: tidak cekap (pembaziran input berubah)</td></tr>
+<div class="jadual jadual-tahap"><table><caption>Jadual 4.8 Tahap pengeluaran (tanah = input tetap)</caption>
+<thead><tr><th class="c">Buruh</th><th class="c">TP</th><th class="c">AP</th><th class="c">MP</th><th class="c">Tahap</th></tr></thead><tbody>
+<tr data-tahap="1"><td class="c">1</td><td class="c">6</td><td class="c">6</td><td class="c">6</td><td class="tahap" rowspan="3"><b>Tahap I</b><span>Tidak cekap (pembaziran input tetap)</span></td></tr>
+<tr data-tahap="1"><td class="c">2</td><td class="c">14</td><td class="c">7</td><td class="c">8</td></tr>
+<tr data-tahap="1"><td class="c">3</td><td class="c">24</td><td class="c">8</td><td class="c">10</td></tr>
+<tr data-tahap="2"><td class="c">4</td><td class="c">32</td><td class="c">8</td><td class="c">8</td><td class="tahap" rowspan="6"><b>Tahap II</b><span>Paling cekap (hukum pulangan berkurangan mula di sini)</span></td></tr>
+<tr data-tahap="2"><td class="c">5</td><td class="c">37</td><td class="c">7.4</td><td class="c">5</td></tr>
+<tr data-tahap="2"><td class="c">6</td><td class="c">41</td><td class="c">6.83</td><td class="c">4</td></tr>
+<tr data-tahap="2"><td class="c">7</td><td class="c">44</td><td class="c">6.28</td><td class="c">3</td></tr>
+<tr data-tahap="2"><td class="c">8</td><td class="c">46</td><td class="c">5.75</td><td class="c">2</td></tr>
+<tr data-tahap="2"><td class="c">9</td><td class="c">46</td><td class="c">5.1</td><td class="c">0</td></tr>
+<tr data-tahap="3"><td class="c">10</td><td class="c">45</td><td class="c">4.5</td><td class="c">−1</td><td class="tahap" rowspan="1"><b>Tahap III</b><span>Tidak cekap (pembaziran input berubah)</span></td></tr>
 </tbody></table></div>
 <figure data-graf="tp-ap-mp"></figure>
 <div class="grid-3">

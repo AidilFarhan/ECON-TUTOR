@@ -222,6 +222,7 @@ The **brand mark** (`EKO.tandaJenama()`) is a dark rounded square with a blue de
 | Mini cards | `.grid-2` / `.grid-3` > `.kad-mini` | Side-by-side short concepts (not graphs) |
 | Table | `.jadual` > `table` (`caption`, `.n` numeric, `.c` centred) | Textbook tables |
 | Comparison table | `.jadual.jadual-tutup` > `table` with three condition columns (header, decision row with `.status`, bullet row) | Textbook comparison in columns (e.g. P > AVC / P = AVC / P < AVC). Equal columns on wide screens; below 640 px each column stacks vertically so there is no horizontal scroll |
+| Grouped stage table | `.jadual.jadual-tahap` > `table`, rows tagged `data-tahap="N"`, one centred `td.tahap` per group (`rowspan`, `<b>` name + `<span>` note) | Textbook tables whose last column names a stage for several rows (Jadual 4.8). Hovering any row in a group highlights that group's stage cell; a thicker line separates groups; below 640 px padding shrinks so the table fits without scrolling |
 | Term | `.istilah` | Highlighted key term |
 | Graph | `<figure data-graf="name" data-opt='{…}'>` | Mounted by the graph engine |
 

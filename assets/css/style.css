@@ -4535,3 +4535,47 @@ ol.roman > li::before {
     border-bottom: 0;
   }
 }
+
+/* Jadual 4.8 (T4 Bab 4): nombor di tengah, sel Tahap seragam, dan sel Tahap berwarna bila mana-mana baris kumpulannya dihover */
+.jadual-tahap td.tahap {
+  text-align: center;
+  vertical-align: middle;
+  border-left: 1px solid var(--line);
+  width: 42%;
+  transition: background 0.15s var(--ease);
+}
+
+.jadual-tahap td.tahap b {
+  display: block;
+  color: var(--ink);
+}
+
+.jadual-tahap td.tahap span {
+  display: block;
+  margin-top: 2px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.jadual-tahap tr[data-tahap="1"] + tr[data-tahap="2"] td,
+.jadual-tahap tr[data-tahap="2"] + tr[data-tahap="3"] td {
+  border-top: 2px solid var(--line-2);
+}
+
+.jadual-tahap tbody:has(tr[data-tahap="1"]:hover) tr[data-tahap="1"] td.tahap,
+.jadual-tahap tbody:has(tr[data-tahap="2"]:hover) tr[data-tahap="2"] td.tahap,
+.jadual-tahap tbody:has(tr[data-tahap="3"]:hover) tr[data-tahap="3"] td.tahap {
+  background: var(--accent-soft);
+}
+@media (max-width: 640px) {
+  .jadual-tahap th,
+  .jadual-tahap td {
+    padding: 8px 6px;
+  }
+  .jadual-tahap th {
+    min-width: 0;
+  }
+  .jadual-tahap td.tahap span {
+    font-size: 12.5px;
+  }
+}
