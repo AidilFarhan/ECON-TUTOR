@@ -3298,6 +3298,9 @@ ol.roman > li::before {
   width: 20px;
   height: 20px;
 }
+.masuk-kad .btn:focus-visible {
+  outline-color: var(--accent);
+}
 .masuk-atau {
   display: flex;
   align-items: center;
@@ -3433,7 +3436,7 @@ ol.roman > li::before {
 }
 .masuk-nota {
   font-size: 13.5px !important;
-  color: var(--ink-3) !important;
+  color: var(--ink-2) !important;
 }
 .masuk-ikon-besar {
   width: 52px;
@@ -3502,7 +3505,7 @@ ol.roman > li::before {
 .masuk-kaki {
   max-width: 420px;
   text-align: center;
-  color: var(--ink-3);
+  color: var(--ink-2);
   font-size: 13px;
 }
 @media (max-width: 420px) {

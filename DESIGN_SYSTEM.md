@@ -255,15 +255,14 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 - **Card:** a centred `.masuk-kad.kaca` (max 420 px, `--radius-xl`) on the aurora background.
 - **Card contents, top to bottom:**
   - brand
-  - title and subtitle
+  - title (*Log masuk*) without a promotional subtitle
   - Google button (`.masuk-google`, 48 px, `--glass-3`)
-  - "atau guna email" divider
-  - segmented tabs (`.masuk-tab`, *Log masuk / Daftar akaun*)
-  - fields (`.medan`, 48 px inputs, with a *Tunjuk/Sorok* toggle)
-  - primary submit button
-  - text link (`.masuk-pautan`)
-- **States** are separate panels: loading (`.pusing`), verify email (mail icon), no access (amber lock icon). The no-access panel ends with `.btn-wa` ("Hubungi cikgu"): full width, 48 px, WhatsApp green `#25d366` with dark text `#053d20` for contrast, opening `wa.me` in a new tab.
+  - in-app-browser guidance when applicable
+- **Google only:** the same button handles sign-in and registration. While the popup opens, it is disabled, has `aria-busy="true"` and reads *Membuka Google…*. It returns to its original label after completion or cancellation.
+- **States** are separate panels: loading (`.pusing`), Google sign-in, no access (amber lock icon). Unverified-email errors return to Google sign-in with a message. The no-access panel ends with `.btn-wa` ("Hubungi cikgu"): full width, 48 px, WhatsApp green `#25d366` with dark text `#053d20` for contrast, opening `wa.me` in a new tab.
+- **Design intent:** ENERGY 1 / RHYTHM 1 / MOTION 1 for a short student sign-in task. Keep the existing teal palette and curve brand mark to match the learning site; Bricolage headings and Jakarta body text preserve its voice. One centred glass card groups identity and the Google action; the 20 px gaps separate those roles. Google's existing G identifies the provider. No new illustration or decorative motion; the spinner communicates session checks.
 - **Messages** use `.masuk-mesej`, which is neutral by default, with `.ralat` (bad) and `.baik` (good) variants.
+- **Legibility:** guidance and the access footer use `--ink-2` for contrast in both themes; login buttons use `--accent` for the visible keyboard focus outline.
 
 ### 9.7 Account menu
 `.akaun-btn` opens `.akaun-menu`, a near-opaque glass popover showing the name and email, a full-width `.btn-wa` "Hubungi cikgu" link (same WhatsApp green as the login page, 42 px here) that opens WhatsApp in a new tab, and a *Log keluar* button below it. It closes on outside click or `Escape`.

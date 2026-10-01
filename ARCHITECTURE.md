@@ -26,7 +26,7 @@ flowchart LR
   FB[Firebase Authentication<br/>project econ-tutor-fc576]
   JW[Google public keys<br/>securetoken JWKS]
 
-  L <-->|Google popup /<br/>email + password| FB
+  L <-->|Google popup| FB
   S -->|verify RS256| JW
   A -->|every request| M
   M -->|valid econ_sesi cookie<br/>+ email on allowlist| ST
@@ -37,11 +37,11 @@ flowchart LR
 | --- | --- | --- |
 | Content app | `index.html` + `assets/js/*.js` (classic scripts, `defer`) | Notes, interactive graphs, flashcards, quizzes, trial papers |
 | Styling | `assets/css/style.css` (one file, CSS custom properties) | Glass theme, light/dark, all components |
-| Sign-in UI | `masuk.html` + `assets/js/masuk.js` (ES module) | Google or email/password sign-in via Firebase |
+| Sign-in UI | `masuk.html` + `assets/js/masuk.js` (ES module) | Google sign-in and account creation via Firebase |
 | Session API | `api/sesi.js` (Vercel Node function, Web `Request`/`Response`) | Verify Firebase ID token, check allowlist, issue/clear session cookie |
 | Access gate | `middleware.js` (Vercel Routing Middleware, Edge) | Block every path except the login page and its assets unless the session is valid |
 | Shared server lib | `lib/sesi.js`, `lib/token-firebase.js` | Signed cookie, allowlist parsing, Firebase token verification (Web Crypto, no dependencies) |
-| Identity | Firebase Authentication (Spark/free) | Accounts, Google OAuth, email verification, password reset |
+| Identity | Firebase Authentication (Spark/free) | Accounts and Google OAuth |
 | Hosting | Vercel (Git integration on `main`) | Static files, middleware, function, env vars |
 
 There is **no build step, no bundler and no runtime dependency** for the content app. `package.json` exists only to mark the server files as ES modules (`"type": "module"`).
@@ -352,7 +352,7 @@ sequenceDiagram
   U->>M: GET /
   M-->>U: 302 /masuk.html (no valid cookie)
   U->>P: load login page (public)
-  P->>F: signInWithPopup(Google) or email + password
+  P->>F: signInWithPopup(Google)
   F-->>P: user + ID token (JWT, RS256, 1 h)
   P->>S: POST { idToken }
   S->>S: verify signature (Google JWKS, cached), aud/iss/exp/iat/auth_time,<br/>email_verified, EMAIL_DIBENARKAN
@@ -363,6 +363,8 @@ sequenceDiagram
 ```
 
 Possible outcomes of `POST /api/sesi`: `200 ok`, `401 token`, `403 belum_sah` (email not verified), `403 tiada_akses` (not on allowlist; the login page shows the "Tiada akses" panel with a "Hubungi cikgu" WhatsApp link, `wa.me/<WHATSAPP_CIKGU>?text=…` with the student's email, built in `masuk.js`), `403 asal` (cross-origin), `500 konfigurasi` (missing secret), and `503 pelayan` (JWKS fetch failed).
+
+The login page offers one Google button for existing and new accounts. Email/password forms, password reset and verification-email controls are absent. Existing verified Firebase sessions still follow the same server checks; `belum_sah` returns to the Google button with an explanatory message. Firebase provider settings and server access rules are unchanged.
 
 ### 4.2 Session cookie
 
