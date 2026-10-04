@@ -4,3 +4,6 @@
 STPM SEM *
 # Kertas MPP3 Terengganu disorok sehingga kebenaran diperoleh.
 assets/js/data/percubaan-terengganu-2025.js
+# Skill AI (HyperFrames dll.) untuk ejen pengekodan, bukan untuk laman web.
+.claude/
+skills-lock.json
