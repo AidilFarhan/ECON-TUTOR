@@ -7,3 +7,5 @@ assets/js/data/percubaan-terengganu-2025.js
 # Skill AI (HyperFrames dll.) untuk ejen pengekodan, bukan untuk laman web.
 .claude/
 skills-lock.json
+# Projek video Remotion (jika dicipta nanti dengan npx create-video).
+video/
