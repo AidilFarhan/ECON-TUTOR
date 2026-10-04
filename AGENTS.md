@@ -148,6 +148,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Sign everyone out** | Change `RAHSIA_SESI` (random, at least 32 characters) in Vercel → Redeploy |
 | **Update the Firebase SDK** | Bundle the exports used by `masuk.js` with esbuild into `assets/js/vendor/firebase-auth-<version>.js`, update the import path, and delete the old bundle (see the README) |
 | **New sign-in domain** | Add it in Firebase → Authentication → Settings → Authorized domains (owner action) |
+| **Make a video** | Use the HyperFrames skills in `.claude/skills/` (start with `/hyperframes`); they are excluded from deploys by `.vercelignore`. Only if the owner asks for Remotion: `npx create-video@latest --yes --hello-world video` from the repo root (`video/` is already in `.vercelignore`). Keep video code out of the content app |
 
 ---
 
