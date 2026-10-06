@@ -206,6 +206,55 @@
     gagal: "Imbasan AI tidak berjaya. Sila cuba lagi, atau tekap keluk sendiri."
   };
 
+  // Salinan gambar untuk AI: grid 10 × 10 bernombor (0..100) dilukis di atasnya, supaya model membaca
+  // kedudukan daripada grid dan tidak meneka koordinat. Nombor grid diletakkan pada jidar putih di luar gambar.
+  // Koordinat grid merujuk kawasan gambar asal sahaja. selesai(blob JPEG) atau selesai(null).
+  IM.JIDAR_GRID = 0.06; // lebar jidar sebagai pecahan sisi gambar yang lebih panjang
+  IM.denganGrid = function (url, selesai) {
+    var img = new Image();
+    img.onload = function () {
+      var w = img.naturalWidth,
+        h = img.naturalHeight;
+      var m = Math.max(28, Math.round(Math.max(w, h) * IM.JIDAR_GRID));
+      var c = document.createElement("canvas");
+      c.width = w + 2 * m;
+      c.height = h + 2 * m;
+      try {
+        var x = c.getContext("2d");
+        x.fillStyle = "#fff";
+        x.fillRect(0, 0, c.width, c.height);
+        x.drawImage(img, m, m);
+        x.strokeStyle = "rgba(230, 0, 180, 0.6)";
+        x.lineWidth = Math.max(1, Math.round(Math.max(w, h) / 800));
+        x.fillStyle = "#c4009a";
+        x.font = "bold " + Math.round(m * 0.48) + "px sans-serif";
+        x.textAlign = "center";
+        x.textBaseline = "middle";
+        for (var i = 0; i <= 10; i++) {
+          var gx = m + (w * i) / 10,
+            gy = m + (h * i) / 10;
+          x.beginPath();
+          x.moveTo(gx, m);
+          x.lineTo(gx, m + h);
+          x.moveTo(m, gy);
+          x.lineTo(m + w, gy);
+          x.stroke();
+          x.fillText(String(i * 10), gx, m / 2);
+          x.fillText(String(i * 10), gx, m + h + m / 2);
+          x.fillText(String(i * 10), m / 2, gy);
+          x.fillText(String(i * 10), m + w + m / 2, gy);
+        }
+        c.toBlob(selesai, "image/jpeg", 0.88);
+      } catch (e) {
+        selesai(null);
+      }
+    };
+    img.onerror = function () {
+      selesai(null);
+    };
+    img.src = url;
+  };
+
   // Gambar dihantar ke pelayan HANYA apabila analisis() dipanggil (selepas pelajar bersetuju).
   // hasil = { url } daripada IM.muat. selesai(mesejRalat) atau selesai(null, { keluk, paksi, baki }) (bentuk: api/kesan-graf.js).
   IM.pengecam = {
@@ -215,10 +264,12 @@
         selesai(M.tutup);
         return;
       }
-      fetch(hasil.url)
-        .then(function (r) {
-          return r.blob();
-        })
+      new Promise(function (ok, tak) {
+        IM.denganGrid(hasil.url, function (blob) {
+          if (blob) ok(blob);
+          else tak();
+        });
+      })
         .then(function (blob) {
           return fetch("/api/kesan-graf", { method: "POST", credentials: "same-origin", headers: { "content-type": "image/jpeg" }, body: blob });
         })
