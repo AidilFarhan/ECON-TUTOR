@@ -196,6 +196,8 @@ async function tanyaAI(b64, cfg, ambil) {
   if (!res.ok) {
     const e = new Error("API AI " + res.status);
     e.status = res.status;
+    // sebab penolakan pembekal (contoh: model tidak dibenarkan) untuk log pelayan sahaja
+    e.butiran = (await res.text().catch(() => "")).replace(/\s+/g, " ").slice(0, 300);
     throw e;
   }
   return res.json();
@@ -244,7 +246,7 @@ export async function kendaliPost(req, pilihan = {}) {
     jawapan = await tanyaAI(keB64(bait), cfg, pilihan.ambil || fetch);
   } catch (e) {
     // kunci atau model salah, kredit habis atau had kadar: tiada butiran dihantar kepada pelajar
-    console.error("kesan-graf:", e.status || e.name || "ralat");
+    console.error("kesan-graf:", e.status || e.name || "ralat", e.butiran || "");
     return json(502, { ralat: "ai" });
   }
 
