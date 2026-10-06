@@ -1,0 +1,37 @@
+/* Watak dan barang di tangan berada dalam satu ruang ilustrasi bersama latar. */
+#ilustrasi{position:absolute;z-index:-3;pointer-events:none;overflow:hidden;transition:left .85s ease,top .85s ease}
+.scene-hidup .latar{background-image:none!important;background-color:#142536}
+#ilustrasi .fondo,#ilustrasi .depan{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;transform:none}
+.depan{z-index:3}
+.pelakon{position:absolute;z-index:1;transform-origin:50% 92%;filter:brightness(1) saturate(1);transition:filter .35s ease}
+.pelakon.hakim{z-index:2}
+#ilustrasi[data-scene="persediaan"] .mira[data-emosi="fokus"] .gerak-aksi,#ilustrasi[data-scene="persediaan"] .mira[data-emosi="risau"] .gerak-aksi{clip-path:inset(5.4% 0 0 0)}
+.gerak-aksi{position:absolute;inset:0;transform-origin:50% 88%;animation:aksi-nafas 4.8s ease-in-out infinite}
+.hakim .gerak-aksi{animation-delay:-2.4s}
+.pose-aksi,.mulut-aksi,.pandangan-player{position:absolute;inset:0;background-size:200% 300%;background-repeat:no-repeat;background-position:var(--kolum) var(--raut);filter:drop-shadow(0 3px 3px #0002)}
+.pose-aksi,.pandangan-player{transition:opacity .3s ease}
+.pandangan-player{opacity:0}
+.giliran-player .pelakon{filter:brightness(.78) saturate(.92)}
+.giliran-player .pose-aksi{opacity:0}
+.giliran-player .pandangan-player{opacity:1}
+.giliran-player .pelakon .mulut-aksi{animation:none;opacity:0!important}
+.giliran-player .pelakon .gerak-aksi{animation:aksi-nafas 4.8s ease-in-out infinite}
+.mulut-aksi{filter:none;background-position:var(--kolum) var(--bibir);opacity:0}
+.pelakon.cakap .mulut-aksi{animation:aksi-bibir .34s steps(1,end) infinite}
+.pelakon.cakap .gerak-aksi{animation:aksi-cakap 1.25s ease-in-out infinite}
+.pelakon[data-emosi="risau"] .gerak-aksi{animation:aksi-cemas 2.2s ease-in-out infinite}
+.pelakon[data-emosi="risau"].cakap .gerak-aksi{animation:aksi-cakap-cemas .9s ease-in-out infinite}
+.pelakon.respon-aksi{animation:aksi-respon .65s ease-out}
+.pelakon.sedia-aksi .gerak-aksi{animation:aksi-sedia 2.5s ease-in-out infinite}
+.pelakon.kemas-aksi .gerak-aksi{animation:aksi-kemas 2.7s ease-in-out infinite}
+.menjelajah #ilustrasi{transition:none}
+.tanpa-gerak .mulut-aksi{opacity:0!important}
+@keyframes aksi-nafas{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-.5%) scaleY(1.004)}}
+@keyframes aksi-cakap{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(.65deg) translateY(-.4%)}70%{transform:rotate(-.2deg) translateY(.2%)}}
+@keyframes aksi-cemas{0%,100%{transform:rotate(-.15deg)}35%{transform:rotate(.28deg) translateY(-.25%)}65%{transform:rotate(-.28deg)}}
+@keyframes aksi-cakap-cemas{0%,100%{transform:rotate(-.3deg)}50%{transform:rotate(.65deg) translateY(-.45%)}}
+@keyframes aksi-bibir{0%,45%,100%{opacity:0}46%,85%{opacity:1}}
+@keyframes aksi-respon{0%{transform:translateY(0)}35%{transform:translateY(-1.5%) rotate(-.7deg)}70%{transform:translateY(.3%) rotate(.3deg)}100%{transform:none}}
+@keyframes aksi-sedia{0%,100%{transform:rotate(-.4deg) translateY(-.5%)}50%{transform:rotate(.55deg) translateY(.65%)}}
+@keyframes aksi-kemas{0%,100%{transform:rotate(-.25deg) translateY(-.4%)}50%{transform:rotate(.5deg) translateY(1%)}}
+@media(prefers-reduced-motion:reduce){#ilustrasi,.pelakon,.gerak-aksi,.mulut-aksi,.pose-aksi,.pandangan-player{transition:none!important;animation:none!important}.mulut-aksi{opacity:0!important}}

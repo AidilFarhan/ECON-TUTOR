@@ -1,0 +1,8 @@
+/* Integrasi Econ Tutor: pautan "Kembali ke nota Bab 1". Rupa mengikut butang game sedia ada. */
+a.balik{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:12px 20px;font:600 15px system-ui,sans-serif;text-decoration:none;color:var(--putih);background:var(--kaca);border:1px solid var(--garis);border-radius:10px}
+a.balik:hover{border-color:var(--emas);background:var(--gelap)}
+nav a.balik{padding:9px 15px;font-size:12px;background:#102337bd;backdrop-filter:blur(8px);text-shadow:none}
+.opsyen-menu a.balik{color:var(--dakwat);background:transparent;border-color:#bac6c6}
+.opsyen-menu a.balik:hover{background:#e5ece5;border-color:var(--hijau)}
+/* Telefon: anak panah sahaja (teks kekal untuk pembaca skrin); butang asal kekal saiz dan kedudukan. */
+@media(max-width:700px){header nav{flex-shrink:0}#nota{max-width:58px}nav a.balik{min-width:40px;padding:8px 6px;font-size:15px}nav a.balik .teks-balik{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.pengakhiran{max-height:calc(93dvh - 112px)}}

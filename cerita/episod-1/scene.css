@@ -1,0 +1,24 @@
+/* Empat ilustrasi lengkap ialah pentas utama, termasuk watak dan aksi mereka. */
+.watak-pentas{display:none}
+.latar{inset:0;left:0;top:0;width:100%;height:100%;transform:none;background-image:url('assets/kelas.png');background-size:cover;background-position:var(--kamera-x,50%) 35%;transition:background-position .85s ease,filter .6s;filter:none}
+.latar[data-scene="kelas"]{background-image:url('assets/kelas.png');background-position:var(--kamera-x,50%) 35%}
+.latar[data-scene="persediaan"]{background-image:url('assets/persediaan.png');background-position:var(--kamera-x,50%) 35%}
+.latar[data-scene="hujan"]{background-image:url('assets/hujan.png');background-position:var(--kamera-x,50%) 35%;filter:none}
+.latar[data-scene="senja"]{background-image:url('assets/senja.png');background-position:var(--kamera-x,50%) 35%}
+.teduh{background:linear-gradient(#09182c55,transparent 24%,transparent 68%,#07172b55)}
+.cuaca.hujan{opacity:.12}.cuaca.senja{opacity:.15}
+.kawalan-scene{position:absolute;right:3vw;top:153px;z-index:5;display:flex;align-items:center;gap:6px}.kawalan-scene button{font-size:12px;background:#142b3ee0;padding:9px 13px;backdrop-filter:blur(8px)}.arah-scene{display:flex;gap:6px}
+.titik-scene{position:absolute;inset:0;z-index:3;pointer-events:none}
+.titik{position:absolute;transform:translate(-50%,-50%);border:2px solid #ffe2a7;background:#ffe9a91a;width:52px;height:52px;min-height:44px;padding:0;border-radius:50%;pointer-events:auto;box-shadow:0 0 0 7px #ffe2a728,0 0 25px #fff2b444;transition:box-shadow .2s,background .2s}
+.titik::before{content:'+';font:400 27px system-ui;color:#fff8d9;text-shadow:0 2px 4px #000}.titik span{position:absolute;left:50%;bottom:calc(100% + 12px);transform:translateX(-50%);white-space:nowrap;background:#152b3ef2;color:#fff9e9;border:1px solid #ffe2a777;border-radius:18px;padding:6px 12px;font:600 12px system-ui}
+.titik:hover,.titik:focus-visible{background:#ffe2a75c;box-shadow:0 0 0 10px #ffe2a735,0 0 30px #fff2b466}.titik.dilihat{border-color:#b7ecd2;background:#5da38155}.titik.dilihat::before{content:'✓'}
+.reaksi-scene{position:absolute;z-index:8;left:50%;bottom:20px;transform:translateX(-50%);width:min(650px,94%);background:#102536f5;border:1px solid #ffe2a799;border-radius:14px;padding:20px 24px;box-shadow:0 8px 30px #0006;backdrop-filter:blur(10px)}.reaksi-scene strong{color:var(--emas);font:700 15px system-ui}.reaksi-scene p{font:19px/1.5 Georgia;margin:11px 0}.reaksi-scene button{float:right;font-size:12px;padding:8px 15px}.reaksi-scene::after{content:'';display:block;clear:both}
+.menjelajah .mainan,.menjelajah .pengakhiran{visibility:hidden;pointer-events:none}.menjelajah .hud{opacity:.3}.menjelajah .kawalan-scene{top:auto;bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:max-content}.menjelajah .teduh{opacity:.25}.menjelajah .reaksi-scene~.mainan{visibility:hidden}
+.menjelajah.ada-respons .kawalan-scene{bottom:230px}
+.menjelajah.lihat-semua .latar{background-size:contain;background-repeat:no-repeat;background-position:center!important;background-color:#152536}
+.menjelajah .latar{transition:none}
+.menjelajah .kawalan-scene{max-width:94%;flex-wrap:wrap;justify-content:center}
+.novel-sorot{animation:sorot .5s ease-out}
+@keyframes sorot{from{filter:brightness(1.12)}to{filter:brightness(1)}}
+@media(max-width:700px){.kawalan-scene{top:145px;right:16px}.kawalan-scene button{padding:8px 10px;font-size:11px}.titik{width:44px;height:44px}.titik span{font-size:11px;padding:5px 9px}.reaksi-scene{bottom:12px;padding:16px 19px}.reaksi-scene p{font-size:18px}.menjelajah .kawalan-scene{bottom:12px}.menjelajah.ada-respons .kawalan-scene{bottom:250px}}
+@media(prefers-reduced-motion:reduce){.latar,.novel-sorot{transition:none!important;animation:none!important}}

@@ -1,0 +1,40 @@
+/* Latar tanpa watak memenuhi viewport; sprite bergerak secara berasingan. */
+html,body{height:100%;overflow:hidden}
+#novel{height:100dvh;min-height:0;overflow:clip}
+.latar{inset:auto;left:50%;top:50%;width:max(100vw,100dvh);height:max(100vw,100dvh);transform:translate(-50%,-50%);background-image:url('assets/latar-atlas.png');background-size:200% 200%;background-position:0 0;transition:filter .7s}
+.latar[data-scene="persediaan"]{background-position:100% 0}
+.latar[data-scene="hujan"]{background-position:0 100%;filter:brightness(.8)}
+.latar[data-scene="senja"]{background-position:100% 100%}
+.watak-pentas{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+.watak{position:absolute;bottom:8dvh;width:46vw;height:80dvh;transform-origin:center bottom;filter:brightness(.78) saturate(.85);transition:filter .35s,transform .35s;will-change:transform}
+.watak.mira{left:2vw}.watak.hakim{right:2vw}
+.gerak{width:100%;height:100%;animation:nafas 4.5s ease-in-out infinite;transform-origin:50% 90%}
+.hakim .gerak{animation-delay:-2s}
+.watak img{width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 22px #09213055);user-select:none}
+.watak.aktif{filter:brightness(1.06) saturate(1.03);transform:translateY(-6px) scale(1.025);z-index:1}
+.watak.masuk .gerak{animation:respon .45s ease-out,nafas 4.5s .45s ease-in-out infinite}
+.watak.bercakap .gerak{animation:cakap .55s ease-in-out infinite}
+.teduh{z-index:-1;background:linear-gradient(#09182c55,transparent 22%,transparent 55%,#07172b66)}
+header{position:relative;z-index:3;padding:18px 3vw;background:linear-gradient(#0c1b2b8c,transparent);align-items:flex-start}
+.logo{font-size:clamp(23px,3vw,34px)}nav button{background:#102337bd;backdrop-filter:blur(8px)}#skrin{font-size:24px;padding:3px 12px;line-height:1}
+.hud{display:flex;align-items:center;justify-content:space-between;position:absolute;left:3vw;right:3vw;top:100px;pointer-events:none;color:#fff9eb;font-family:system-ui;text-shadow:0 1px 4px #0008;z-index:2}
+.dana{display:flex;align-items:center;gap:9px;background:#0d243176;border:1px solid #f7d99555;border-radius:30px;padding:7px 14px 7px 8px;backdrop-filter:blur(8px)}
+.syiling{display:grid;place-items:center;border:1px solid var(--emas);background:#8c683455;color:var(--emas);width:32px;height:32px;border-radius:50%;font-size:11px;font-weight:700}.dana small{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase}.dana strong{font-size:15px}.langkah{display:flex;gap:5px;background:#10233391;padding:12px;border-radius:20px}.langkah i{width:9px;height:9px;border:1px solid var(--emas);border-radius:50%}.langkah i.siap{background:var(--emas)}
+.mainan{bottom:18px;width:min(1200px,94%);z-index:4}.dialog{min-height:170px;background:linear-gradient(115deg,#101e32f0,#152b3ded);padding:20px 26px 12px;box-shadow:0 8px 40px #0005;border-color:#fff4bf7a;border-radius:6px 18px 6px 18px}#nama{font-size:16px}#ayat{font-size:clamp(18px,2vw,25px);line-height:1.45;min-height:38px;margin:13px 0}.baris-atas{padding-bottom:9px}.pilihan{margin-bottom:14px;gap:10px}.pilihan button{background:#142b3ef0;border-color:#ffe2a785;padding:16px 18px;font-size:15px;transition:transform .18s,background .18s}.pilihan button:hover{transform:translateY(-4px);background:#284b5a}.pilihan button::before{content:'›';color:var(--emas);margin-right:9px}.pilihan button:active{transform:scale(.98)}
+.kesan{position:absolute;top:164px;left:3vw;z-index:6;font:600 13px system-ui;background:#153d35ef;padding:12px 18px;border-left:3px solid var(--emas);border-radius:5px;max-width:90%;box-shadow:0 6px 20px #0004;animation:pesan .35s ease-out}
+.pembukaan{position:relative;z-index:4;margin-top:6dvh;background:linear-gradient(115deg,#0d2138ec,#183649b5);max-width:490px;padding:28px}.pembukaan h1{font-size:clamp(40px,5vw,60px)}.pembukaan .bawah{margin-top:18px}.pembukaan .mula{margin-top:20px}
+.pengakhiran{position:relative;z-index:4;margin:2dvh auto 0;max-height:calc(100dvh - 130px)}
+.cuaca{pointer-events:none;position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .7s}
+.cuaca.hujan{opacity:.22;background:repeating-linear-gradient(108deg,transparent 0px,transparent 61px,#d5ecff 62px,transparent 63px,transparent 120px);background-size:120px 150%;animation:hujan .65s linear infinite}
+.cuaca.senja{opacity:.55;background:radial-gradient(ellipse at 15% 10%,#ffda7566,transparent 65%)}
+.tanpa-gerak *{animation:none!important;transition:none!important}
+@keyframes nafas{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(.25deg)}}
+@keyframes respon{0%{transform:translateY(15px) rotate(-1deg)}60%{transform:translateY(-5px) rotate(.3deg)}100%{transform:translateY(0) rotate(0)}}
+@keyframes cakap{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(.35deg)}}
+@keyframes pesan{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes hujan{from{background-position:0 0}to{background-position:-30px 100px}}
+@media(max-width:700px){header{padding:14px 16px}.logo{font-size:24px}.episod{font-size:8px;max-width:220px}.hud{top:89px;left:16px;right:16px}nav{gap:4px}nav button{padding:8px;font-size:10px}#skrin{font-size:21px;padding:6px 9px}.kesan{top:151px;left:16px;font-size:12px}.watak{width:65vw;height:76dvh;bottom:18dvh}.watak.mira{left:-8vw}.watak.hakim{right:-8vw}.mainan{bottom:max(10px,env(safe-area-inset-bottom));width:94%}.dialog{padding:16px 17px 10px;min-height:160px}#ayat{font-size:18px;line-height:1.45}#masa{max-width:145px;font-size:9px}.pilihan{gap:7px;margin-bottom:10px}.pilihan button{min-height:45px;padding:10px 14px;font-size:13px}.pembukaan{margin:25dvh 16px 0;padding:22px;max-height:calc(75dvh - 95px);overflow:auto}.pembukaan h1{font-size:40px}.pembukaan p{font-size:17px}.pembukaan .bawah{font-size:11px}.pengakhiran{margin-top:7dvh;max-height:calc(100dvh - 140px)}}
+@media(min-width:701px) and (max-aspect-ratio:4/5){.watak{width:62vw;bottom:13dvh}.watak.mira{left:-7vw}.watak.hakim{right:-7vw}}
+@media(max-height:600px){.hud{top:79px}.logo{font-size:23px}.episod{font-size:8px}.mainan{bottom:8px}.dialog{min-height:130px;padding:10px 20px 6px}#ayat{font-size:17px;margin:8px 0}.pilihan{margin-bottom:8px}.pilihan button{padding:10px 14px}.watak{bottom:5dvh;height:83dvh}.kesan{top:135px}.pembukaan{margin-top:0;padding:20px;max-height:calc(100dvh - 95px);overflow:auto}.pembukaan h1{font-size:36px;margin:8px 0}.pembukaan p{margin:10px 0}.pembukaan .mula{margin-top:14px}.pembukaan .bawah{margin-top:10px}.pengakhiran{margin-top:0;max-height:calc(100dvh - 105px)}}
+@media(prefers-reduced-motion:reduce){.watak,.gerak,.cuaca,.kesan{animation:none!important;transition:none!important}}
+.watak{filter:brightness(.9) saturate(.95)}.watak.aktif{filter:brightness(1.06) saturate(1.03)}
