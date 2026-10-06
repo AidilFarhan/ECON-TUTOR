@@ -8,7 +8,7 @@
      masuk ke dalam model GrafBina dan tidak disimpan. Tekap sendiri: gambar kekal dalam peranti.
    - Matematik penjajaran (IM.muatAwal, IM.padan) dan petaan hasil AI (IM.dariAI, IM.paksiAI, IM.maksPaksi) ialah fungsi tulen: boleh diuji dalam Node.
    - IM.pengecam: pengecam automatik (AI). analisis() menghantar JPEG itu ke /api/kesan-graf
-     (Claude API) dan hanya dipanggil selepas pelajar bersetuju dalam UI. Hasilnya ialah
+     (pembekal AI luar) dan hanya dipanggil selepas pelajar bersetuju dalam UI. Hasilnya ialah
      cadangan yang mesti disahkan oleh pelajar ([Sahkan] / [Sunting]).
    ========================================================= */
 (function () {

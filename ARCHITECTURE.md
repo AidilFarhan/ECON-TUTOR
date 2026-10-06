@@ -39,7 +39,7 @@ flowchart LR
 | Styling | `assets/css/style.css` (one file, CSS custom properties) | Glass theme, light/dark, all components |
 | Sign-in UI | `masuk.html` + `assets/js/masuk.js` (ES module) | Google sign-in and account creation via Firebase |
 | Session API | `api/sesi.js` (Vercel Node function, Web `Request`/`Response`) | Verify Firebase ID token, check allowlist, issue/clear session cookie |
-| AI detection API | `api/kesan-graf.js` (Vercel Node function) | Send a student's graph photo to the Claude API and return the detected curves (§3.4a); daily limit per student |
+| AI detection API | `api/kesan-graf.js` (Vercel Node function) | Send a student's graph photo to the AI provider and return the detected curves (§3.4a); daily limit per student |
 | Access gate | `middleware.js` (Vercel Routing Middleware, Edge) | Block every path except the login page and its assets unless the session is valid |
 | Shared server lib | `lib/sesi.js`, `lib/token-firebase.js` | Signed cookie, allowlist parsing, Firebase token verification (Web Crypto, no dependencies) |
 | Identity | Firebase Authentication (Spark/free) | Accounts and Google OAuth |
@@ -56,7 +56,7 @@ index.html                    SPA shell (header, <main id="app">, footer, bottom
 masuk.html                    Login page (same theme, standalone)
 middleware.js                 Vercel Routing Middleware: access gate
 api/sesi.js                   POST/GET/DELETE /api/sesi
-api/kesan-graf.js             POST /api/kesan-graf: AI curve detection for Tekap gambar (Claude API)
+api/kesan-graf.js             POST /api/kesan-graf: AI graph detection for Tekap gambar (OpenAI-style provider, default mireld.my)
 lib/had-ai.js                 Signed daily-limit cookie for AI scans (10 a day per student)
 lib/sesi.js                   HMAC session cookie + allowlist (shared by middleware and API)
 lib/token-firebase.js         Firebase ID-token verification with Google JWKS
@@ -257,13 +257,13 @@ GrafBina {
   - Privacy: unless the student chooses AI detection (below), the image stays on the device. It is downscaled to ≤ 1600 px and re-encoded as JPEG (dropping EXIF/GPS), kept as an object URL, never put in `GrafBina` or storage, and revoked when the widget is destroyed.
   - Errors are short (not an image, cannot be opened, too small) and always allow a retry.
 - **AI detection (phase 5b, `EKO.imbas.pengecam` → `POST /api/kesan-graf`).** Right after choosing a photo (or after aligning it by hand) the student can press *Kesan graf dengan AI* instead of tracing. The AI finds the axes, the numbers written on them and the curves.
-  - Consent first: a notice says the photo will be sent to an AI service (Claude by Anthropic), and nothing is sent until the student presses *Setuju, hantar gambar*.
-  - The function accepts only a JPEG of at most 3 MB from a signed-in student on the allowlist with a same-origin `Origin`. It forwards the image to the Claude API (`claude-opus-5-5`, structured JSON output, server-side refusal fallback) with plain `fetch` and no npm package, stores nothing, and returns `{ keluk: [{ label, jenis, titik }], paksi: { x, y, O, hujungX, hujungY, tandaX, tandaY }, baki }` with points as fractions of the image (u from the left, v from the bottom), clamped and capped (6 curves, 12 points each, 12 numbers per axis).
+  - Consent first: a notice says the photo will be sent to an external AI service (through mireld.my), and nothing is sent until the student presses *Setuju, hantar gambar*.
+  - The function accepts only a JPEG of at most 3 MB from a signed-in student on the allowlist with a same-origin `Origin`. It forwards the image to the provider's OpenAI-style `chat/completions` endpoint (base URL `MIRELD_BASE_URL`, default `https://api.mireld.my/v1`; model from `MIRELD_MODEL`) with plain `fetch` and no npm package. It asks for a JSON-schema answer first and, if the provider rejects that with `400`, retries once with the JSON shape described in the prompt only. It stores nothing, and returns `{ keluk: [{ label, jenis, titik }], paksi: { x, y, O, hujungX, hujungY, tandaX, tandaY }, baki }` with points as fractions of the image (u from the left, v from the bottom), clamped and capped (6 curves, 12 points each, 12 numbers per axis).
   - Alignment: when AI is asked before the student has aligned the photo, `IM.paksiAI` turns the detected origin and axis ends into the O and T markers and the photo is aligned automatically (if no axes were found, the current markers are used). `IM.dariAI` then maps the curve points through the aligned image rectangle into the axes box, and the curves become ordinary `Keluk` objects (`sumber: "imbas"`).
   - Numbers: `IM.maksPaksi` fits the numbers found on each axis (`tandaX`, `tandaY`) to a line through the origin and gives the value at the end of each axis, rounded to 3 significant figures. It returns nothing when either axis has no number or does not start at 0. `B.tetapSkala` then makes the axes numeric and marks the detected curves with `meta.skala`. `B.adaNilai` decides whether a curve has real values: an equation curve, or a photo curve while the axes still have its scale. For those curves the point readings, the shift size and the equilibrium P and Q (`EKO.keseimbangan`) are shown, rounded to a tidy unit by `B.nilaiKemas`. The values are estimates read from the photo. A graph that already has equation curves keeps its own axes, so photo curves added to it have no values.
   - The result is a suggestion. *Sahkan* applies the suggested curve types, axis labels and axis scale, *Sunting* keeps the curves only, and *Buang keluk AI* removes them. A curve type is never set without the student's confirmation.
-  - Limit: 10 scans a day per student (`HAD_SEHARI`), counted in the signed HttpOnly cookie `econ_ai` (HMAC with `RAHSIA_SESI`, bound to the email and the Malaysian date). There is no database, so the count restarts if the cookie is deleted; the hard cap is the monthly spend limit in the Claude Console.
-  - Failures show one short sentence (not detected, limit reached, session expired, AI unavailable) and manual tracing always remains. Without `ANTHROPIC_API_KEY` the function answers `503` and the UI says AI is unavailable.
+  - Limit: 10 scans a day per student (`HAD_SEHARI`), counted in the signed HttpOnly cookie `econ_ai` (HMAC with `RAHSIA_SESI`, bound to the email and the Malaysian date). There is no database, so the count restarts if the cookie is deleted; the hard cap is the balance in the provider account.
+  - Failures show one short sentence (not detected, limit reached, session expired, AI unavailable) and manual tracing always remains. Without `MIRELD_API_KEY` or `MIRELD_MODEL` the function answers `503` and the UI says AI is unavailable.
 - **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
@@ -435,7 +435,7 @@ flowchart LR
 - **Env vars.**
   - `RAHSIA_SESI` (sensitive; production + preview)
   - `EMAIL_DIBENARKAN` (encrypted; all environments)
-  - `ANTHROPIC_API_KEY` (sensitive; production) for AI detection in *Tekap gambar*. Optional: without it the feature reports that AI is unavailable
+  - `MIRELD_API_KEY` (sensitive; production) and `MIRELD_MODEL` (model ID that can read images) for AI detection in *Tekap gambar*; `MIRELD_BASE_URL` only when another OpenAI-style provider is used. Optional: without them the feature reports that AI is unavailable
 - **Domain.** `econwebsite.vercel.app` is the only production domain and the only one in Firebase **Authorized domains**, so Google sign-in works there. (A duplicate project, `econ-tutor`, created during setup has been deleted.) A new custom domain must be added to Firebase Authorized domains before Google sign-in works on it.
 - **Merging.** The agent merges its own PR once all checks pass (AGENTS §6) and reports "SAYA DAH MERGE KE MAIN"; access, exam-material and deletion changes still wait for the owner.
 - **Previews.** Preview deployments sit behind Vercel SSO (Standard Protection). Production domains are public and gated by the middleware.

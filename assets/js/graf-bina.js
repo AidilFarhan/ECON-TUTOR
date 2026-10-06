@@ -255,7 +255,7 @@
       } else if (im.ai === "izin") {
         // tiada gambar dihantar sebelum pelajar menekan butang setuju
         html =
-          "<p><b>Kesan graf dengan AI.</b> Gambar ini akan dihantar kepada perkhidmatan AI (Claude oleh Anthropic) untuk dikesan. Laman ini tidak menyimpan gambar itu. Pastikan tiada nama, wajah atau maklumat peribadi dalam gambar.</p>" +
+          "<p><b>Kesan graf dengan AI.</b> Gambar ini akan dihantar kepada perkhidmatan AI luar (melalui mireld.my) untuk dikesan. Laman ini tidak menyimpan gambar itu. Pastikan tiada nama, wajah atau maklumat peribadi dalam gambar.</p>" +
           '<div class="bina-imbas-butang">' +
           '<button type="button" class="btn btn-utama" data-ai-hantar>' + E.ikon("betul") + " Setuju, hantar gambar</button>" +
           '<button type="button" class="btn" data-ai-batal>Batal</button>' +
