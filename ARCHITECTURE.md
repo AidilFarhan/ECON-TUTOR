@@ -1,6 +1,6 @@
 # Econ Tutor · Architecture
 
-Econ Tutor is an interactive study site for **SPM Economics, Form 4 and Form 5 (KSSM)** and **STPM Economics (944), Penggal 1–3** and **Matrikulasi Economics (AE015 Mikroekonomi, AE025 Makroekonomi)**. It is a static, build-free web app: plain HTML, CSS and ES5-style JavaScript in the browser, plus a small Vercel layer (Routing Middleware and one function) that puts all content behind a sign-in.
+Econ Tutor is an interactive study site for **SPM Economics, Form 4 and Form 5 (KSSM)** and **STPM Economics (944), Penggal 1–3** and **Matrikulasi Economics (AE015 Mikroekonomi, AE025 Makroekonomi)**. It is a static, build-free web app: plain HTML, CSS and ES5-style JavaScript in the browser, plus a small Vercel layer (Routing Middleware and two functions) that puts all content behind a sign-in.
 
 This document explains how the pieces fit together. For visual rules see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). For product scope see [PRD.md](PRD.md). For contributor and AI-agent rules see [AGENTS.md](AGENTS.md).
 
@@ -39,6 +39,7 @@ flowchart LR
 | Styling | `assets/css/style.css` (one file, CSS custom properties) | Glass theme, light/dark, all components |
 | Sign-in UI | `masuk.html` + `assets/js/masuk.js` (ES module) | Google sign-in and account creation via Firebase |
 | Session API | `api/sesi.js` (Vercel Node function, Web `Request`/`Response`) | Verify Firebase ID token, check allowlist, issue/clear session cookie |
+| AI detection API | `api/kesan-graf.js` (Vercel Node function) | Send a student's graph photo to the Claude API and return the detected curves (§3.4a); daily limit per student |
 | Access gate | `middleware.js` (Vercel Routing Middleware, Edge) | Block every path except the login page and its assets unless the session is valid |
 | Shared server lib | `lib/sesi.js`, `lib/token-firebase.js` | Signed cookie, allowlist parsing, Firebase token verification (Web Crypto, no dependencies) |
 | Identity | Firebase Authentication (Spark/free) | Accounts and Google OAuth |
@@ -55,6 +56,8 @@ index.html                    SPA shell (header, <main id="app">, footer, bottom
 masuk.html                    Login page (same theme, standalone)
 middleware.js                 Vercel Routing Middleware: access gate
 api/sesi.js                   POST/GET/DELETE /api/sesi
+api/kesan-graf.js             POST /api/kesan-graf: AI curve detection for Tekap gambar (Claude API)
+lib/had-ai.js                 Signed daily-limit cookie for AI scans (10 a day per student)
 lib/sesi.js                   HMAC session cookie + allowlist (shared by middleware and API)
 lib/token-firebase.js         Firebase ID-token verification with Google JWKS
 package.json                  { "type": "module" } only, no dependencies
@@ -72,7 +75,7 @@ assets/js/graf-bina-model.js  EKO.bina: GrafBina model for #bina-graf (pure func
 assets/js/graf-persamaan.js   EKO.persamaan: equation parser → Keluk (no eval, no DOM)
 assets/js/graf-terang.js      EKO.jenisKeluk (curve-type registry) + EKO.terang (template explanations, no DOM)
 assets/js/graf-imbang.js      EKO.keseimbangan: D/S equilibrium E₀ → E₁ (path intersection; exact for equations; no DOM)
-assets/js/graf-imbas.js       EKO.imbas: trace a graph from a photo (alignment maths, on-device image loading; no AI)
+assets/js/graf-imbas.js       EKO.imbas: trace a graph from a photo (alignment maths, on-device image loading) + optional AI detection (EKO.imbas.pengecam)
 assets/js/graf-senario.js     EKO.senario: graph exercises (Semak Jawapan), rule-based checking, no DOM
 assets/js/data/senario-pasaran.js   Graph exercises for T4 Bab 2 (8 questions, data only)
 assets/js/graf-bina.js        Bina graf widget (bina-keluk) + the #bina-graf view
@@ -179,7 +182,7 @@ flowchart TB
 
 ### 3.4a Bina graf (`EKO.bina`)
 
-`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input), 3 (drawing), 5a (curve types and explanations), 6 (equilibrium), 7 (exercises) and 4 (tracing a photo, without AI) of the owner's plan are done (PRD §10). Automatic recognition (5b) comes later, and they must all use this same model.
+`EKO.bina` is a generic curve model on top of `EKO.graf`. The `#bina-graf` page uses it through the widget `bina-keluk`. The 38 note widgets are unchanged. Phases 1 (engine), 2 (equation input), 3 (drawing), 5a (curve types and explanations), 6 (equilibrium), 7 (exercises) 4 (tracing a photo) and 5b (AI detection of the curves in a photo) of the owner's plan are done (PRD §10), and they all use this same model.
 
 ```js
 GrafBina {
@@ -244,13 +247,19 @@ GrafBina {
   - The widget runs in exercise mode with `data-opt='{"latihan": true}'` or a question id, so a single exercise can later be embedded in a chapter note.
   - In exercise mode the building tools and *Terangkan graf* are hidden. The question sits above the graph, and *Semak Jawapan*, *Cuba semula* and *Soalan seterusnya* with the feedback sit right below it (green `.kotak.betul`, red `.kotak.salah`).
   - A curve chooser appears when there is more than one curve, so keyboard users can select S. Old feedback clears as soon as the graph changes, and solved questions get a ✓ for the session.
-- **Tracing a photo (`graf-imbas.js`), no AI (owner decision).** *Tekap gambar* has three steps:
+- **Tracing a photo (`graf-imbas.js`).** *Tekap gambar* has three steps:
   1. The student takes a photo (`<input capture="environment">`), picks a file, or drops one on the graph.
   2. The image is shown under the axes. The student drags marker **O** to the image's origin and **T** to the axis ends; `IM.padan` stretches the image so O → (0, 0) and T → (1, 1).
   3. The student traces each curve with *Lukis keluk*, which stays on until *Selesai menekap*. The traced curves are ordinary `Keluk` objects.
-  - Privacy: the image stays on the device. It is downscaled to ≤ 1600 px and re-encoded as JPEG (dropping EXIF/GPS), kept as an object URL, never put in `GrafBina` or storage, and revoked when the widget is destroyed.
+  - Privacy: unless the student chooses AI detection (below), the image stays on the device. It is downscaled to ≤ 1600 px and re-encoded as JPEG (dropping EXIF/GPS), kept as an object URL, never put in `GrafBina` or storage, and revoked when the widget is destroyed.
   - Errors are short (not an image, cannot be opened, too small) and always allow a retry.
-  - `EKO.imbas.pengecam` is an empty hook where an automatic recogniser (AI) can later plug in without changing the UI.
+- **AI detection (phase 5b, `EKO.imbas.pengecam` → `POST /api/kesan-graf`).** After aligning the axes the student can press *Kesan keluk dengan AI* instead of tracing.
+  - Consent first: a notice says the photo will be sent to an AI service (Claude by Anthropic), and nothing is sent until the student presses *Setuju, hantar gambar*.
+  - The function accepts only a JPEG of at most 3 MB from a signed-in student on the allowlist with a same-origin `Origin`. It forwards the image to the Claude API (`claude-opus-5-5`, structured JSON output, server-side refusal fallback) with plain `fetch` and no npm package, stores nothing, and returns `{ keluk: [{ label, jenis, titik }], paksi, baki }` with points as fractions of the image (u from the left, v from the bottom), clamped and capped (6 curves, 12 points each).
+  - `IM.dariAI` maps those points through the aligned image rectangle into the axes box, and the curves become ordinary `Keluk` objects (`sumber: "imbas"`).
+  - The result is a suggestion. *Sahkan* applies the suggested curve types and axis labels, *Sunting* keeps the curves only, and *Buang keluk AI* removes them. A curve type is never set without the student's confirmation.
+  - Limit: 10 scans a day per student (`HAD_SEHARI`), counted in the signed HttpOnly cookie `econ_ai` (HMAC with `RAHSIA_SESI`, bound to the email and the Malaysian date). There is no database, so the count restarts if the cookie is deleted; the hard cap is the monthly spend limit in the Claude Console.
+  - Failures show one short sentence (not detected, limit reached, session expired, AI unavailable) and manual tracing always remains. Without `ANTHROPIC_API_KEY` the function answers `503` and the UI says AI is unavailable.
 - **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
@@ -403,11 +412,12 @@ flowchart LR
   MAIN -->|Git integration| V1[Vercel project econwebsite<br/>econwebsite.vercel.app]
 ```
 
-- **Build.** Vercel runs `vercel build` with framework "Other". It uploads the static files, bundles `middleware.js` for Edge and `api/sesi.js` as a Node function. No install or build command is needed.
+- **Build.** Vercel runs `vercel build` with framework "Other". It uploads the static files, bundles `middleware.js` for Edge and `api/sesi.js` and `api/kesan-graf.js` as Node functions. No install or build command is needed.
 - **Excluded files.** `.vercelignore` removes `*.pdf` and `assets/js/data/percubaan-terengganu-2025.js` before the build.
 - **Env vars.**
   - `RAHSIA_SESI` (sensitive; production + preview)
   - `EMAIL_DIBENARKAN` (encrypted; all environments)
+  - `ANTHROPIC_API_KEY` (sensitive; production) for AI detection in *Tekap gambar*. Optional: without it the feature reports that AI is unavailable
 - **Domain.** `econwebsite.vercel.app` is the only production domain and the only one in Firebase **Authorized domains**, so Google sign-in works there. (A duplicate project, `econ-tutor`, created during setup has been deleted.) A new custom domain must be added to Firebase Authorized domains before Google sign-in works on it.
 - **Merging.** The agent merges its own PR once all checks pass (AGENTS §6) and reports "SAYA DAH MERGE KE MAIN"; access, exam-material and deletion changes still wait for the owner.
 - **Previews.** Preview deployments sit behind Vercel SSO (Standard Protection). Production domains are public and gated by the middleware.

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5), STPM (Ekonomi 944, Penggal 1–3) and Matrikulasi (AE015 Mikroekonomi, AE025 Makroekonomi). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google sign-in with an allowlist.
+Guidance for AI coding agents (and human contributors) working on **Econ Tutor**, an interactive Economics study site for SPM (KSSM Form 4 and 5), STPM (Ekonomi 944, Penggal 1–3) and Matrikulasi (AE015 Mikroekonomi, AE025 Makroekonomi). It is plain HTML/CSS/JS with no build step, plus a Vercel middleware and one function that put the content behind a Google sign-in with an allowlist, and one function that sends a student's graph photo to the Claude API for curve detection.
 
 Claude Code loads this file through [CLAUDE.md](CLAUDE.md), which adds a few Claude-specific notes.
 
@@ -22,7 +22,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 - Verify your change (§4) before committing, including dark mode and a 360–390 px viewport.
 
 **Never**
-- Commit secrets. `RAHSIA_SESI` and `EMAIL_DIBENARKAN` live only in Vercel env vars. (`assets/js/firebase-config.js` is public by design and is fine to commit.)
+- Commit secrets. `RAHSIA_SESI`, `EMAIL_DIBENARKAN` and `ANTHROPIC_API_KEY` live only in Vercel env vars. (`assets/js/firebase-config.js` is public by design and is fine to commit.)
 - Add a content path to the `TERBUKA` (public) list in `middleware.js`. Only the login page and the assets it needs may be public.
 - Weaken token checks in `lib/token-firebase.js`: algorithm pin, `kid`, `aud`/`iss`/`exp`/`iat`/`auth_time`, and `email_verified` in `api/sesi.js`.
 - Deploy source PDFs or the hidden Terengganu paper. Keep `.vercelignore` as it is unless the owner asks.
@@ -40,10 +40,11 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `masuk.html`, `assets/js/masuk.js` | Login page (Firebase Auth, ES module) |
 | `middleware.js` | Vercel Routing Middleware: access gate |
 | `api/sesi.js`, `lib/*.js` | Session API, signed cookie, allowlist, Firebase token verification |
+| `api/kesan-graf.js`, `lib/had-ai.js` | AI curve detection for *Tekap gambar*: sends the student's photo to the Claude API (signed-in students only, after consent in the UI) and the signed daily-limit cookie (10 scans a day) |
 | `assets/js/eko-core.js` | `window.EKO`: registries, storage, formatting, icons |
 | `assets/js/graf.js` | `EKO.graf` SVG engine + market graphs |
 | `assets/js/graf-t4.js`, `graf-t5.js`, `graf-stpm.js`, `graf-matrik.js` | Form 4 / Form 5 / STPM / Matrikulasi graph widgets |
-| `assets/js/graf-bina-model.js`, `graf-persamaan.js`, `graf-imbang.js`, `graf-terang.js`, `graf-senario.js`, `graf-imbas.js`, `graf-bina.js` | `EKO.bina` curve model, `EKO.persamaan` equation parser, `EKO.keseimbangan` D/S equilibrium (`graf-imbang.js`), `EKO.jenisKeluk`/`EKO.terang` curve types and explanations, `EKO.senario` graph exercises, `EKO.imbas` photo tracing (pure parts Node-testable), and the *Bina graf* widget and `#bina-graf` view (ARCHITECTURE §3.4a). Add a curve type with `EKO.jenisKeluk.daftar({...})` in `graf-terang.js`, in textbook terms |
+| `assets/js/graf-bina-model.js`, `graf-persamaan.js`, `graf-imbang.js`, `graf-terang.js`, `graf-senario.js`, `graf-imbas.js`, `graf-bina.js` | `EKO.bina` curve model, `EKO.persamaan` equation parser, `EKO.keseimbangan` D/S equilibrium (`graf-imbang.js`), `EKO.jenisKeluk`/`EKO.terang` curve types and explanations, `EKO.senario` graph exercises, `EKO.imbas` photo tracing and AI detection hook (pure parts Node-testable), and the *Bina graf* widget and `#bina-graf` view (ARCHITECTURE §3.4a). Add a curve type with `EKO.jenisKeluk.daftar({...})` in `graf-terang.js`, in textbook terms |
 | `assets/js/kalkulator.js` | `EKO.kalkulator`: every syllabus formula as a calculator with worked steps, plus the `#kalkulator` view |
 | `assets/js/app.js` | Hash router and all views |
 | `assets/js/akaun.js` | Header account button: menu with "Hubungi cikgu" (WhatsApp) and sign-out |
@@ -65,7 +66,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 ### Login and server (`masuk.js`, `middleware.js`, `api/`, `lib/`)
 - Modern ES modules (`import`/`export`, `const`, async/await). `package.json` has `"type": "module"`.
 - Server code uses only Web platform APIs (`Request`, `Response`, `crypto.subtle`, `fetch`), with **no npm packages**.
-- Vercel handlers are the named exports `GET`/`POST`/`DELETE` in `api/sesi.js`. Testable logic sits in `kendaliPost` / `kendaliGet`, which accept an options object (`env`, `ambil`, `konfigurasi`, `sekarang`).
+- Vercel handlers are the named exports `GET`/`POST`/`DELETE` in `api/sesi.js` and `POST` in `api/kesan-graf.js`. Testable logic sits in `kendaliPost` / `kendaliGet`, which accept an options object (`env`, `ambil`, `konfigurasi`, `sekarang`).
 
 ### CSS
 - Everything lives in `assets/css/style.css`. Add rules in the matching section (look for the `/* ---------- name ---------- */` headers), or append a new clearly labelled section at the end.
@@ -145,6 +146,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Show the Terengganu paper** | Only when the owner confirms permission: (1) add its script tag after the Kelantan one; (2) remove its line from `.vercelignore`; (3) update the footer in `index.html`. The meta descriptions in `index.html` and `masuk.html` deliberately do not list trial papers (owner request), so leave them alone |
 | **Allow a student** | Vercel → project **econwebsite** → Settings → Environment Variables → `EMAIL_DIBENARKAN` (comma-separated; `@domain` for a whole domain) → Redeploy |
 | **Change the "Hubungi cikgu" WhatsApp** | The number lives in **two** files; change both. `assets/js/masuk.js`: `WHATSAPP_CIKGU` (international format, digits only, e.g. `601160757145`) and `MESEJ_AKSES` (ready message for the "Tiada akses" screen; the student's email is appended automatically). `assets/js/akaun.js`: `WHATSAPP_CIKGU` and `MESEJ_HUBUNGI` (ready message for the account menu; the student's name and email are appended) |
+| **Turn AI scanning on or off** | Vercel → project **econwebsite** → Settings → Environment Variables → `ANTHROPIC_API_KEY` (from the Claude Console) → Redeploy. Without the key the button shows "Imbasan AI tidak tersedia" and manual tracing still works. The daily limit is `HAD_SEHARI` in `lib/had-ai.js`; the model and prompt are in `api/kesan-graf.js`. Set a monthly spend limit in the Claude Console, because the cookie-based daily limit restarts if a student clears cookies |
 | **Sign everyone out** | Change `RAHSIA_SESI` (random, at least 32 characters) in Vercel → Redeploy |
 | **Update the Firebase SDK** | Bundle the exports used by `masuk.js` with esbuild into `assets/js/vendor/firebase-auth-<version>.js`, update the import path, and delete the old bundle (see the README) |
 | **New sign-in domain** | Add it in Firebase → Authentication → Settings → Authorized domains (owner action) |
@@ -227,4 +229,5 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | `data()`, `kemas()`, `dibaca`, `diingat`, `terbaik`, `akhir` | read storage, update storage, read (chapters), remembered (cards), best score, last opened |
 | `masuk`, `keluar`, `sesi`, `akaun`, `kuki`, `rahsia` | sign in, sign out, session, account, cookie, secret |
 | `EMAIL_DIBENARKAN`, `RAHSIA_SESI`, `TERBUKA` | allowlist env var, cookie-signing secret env var, public path list |
+| `kesan`, `pengecam`, `had`, `baki`, `ANTHROPIC_API_KEY` | detect (AI), recogniser hook, daily limit, scans left today, Claude API key env var |
 | `tema` `sistem`/`cerah`/`gelap` | theme: system / light / dark |

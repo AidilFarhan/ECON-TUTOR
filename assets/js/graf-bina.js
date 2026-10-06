@@ -106,7 +106,7 @@
       setLukis(!st.lukis);
     }, { tekan: false });
 
-    /* ---------- tekap gambar (EKO.imbas, tanpa AI) ---------- */
+    /* ---------- tekap gambar (EKO.imbas) ---------- */
     var btnImbas = G.butang(K.kawalan, E.ikon("kamera") + " Tekap gambar", function () {
       var buka = kotakImbas.hidden;
       kotakImbas.hidden = !buka;
@@ -251,7 +251,7 @@
           '<label class="btn btn-utama bina-fail">' + E.ikon("kamera") + ' Ambil gambar<input class="sr-only" type="file" accept="image/*" capture="environment" data-fail></label>' +
           '<label class="btn bina-fail">' + E.ikon("kertas") + ' Pilih gambar<input class="sr-only" type="file" accept="image/*" data-fail></label>' +
           "</div>" +
-          '<p class="medan-bantuan">Atau seret fail gambar ke dalam graf. Gambar hanya dipaparkan dalam peranti ini; ia tidak dimuat naik dan tidak disimpan.</p>';
+          '<p class="medan-bantuan">Atau seret fail gambar ke dalam graf. Gambar kekal dalam peranti ini dan tidak disimpan. Ia hanya dihantar keluar jika anda memilih <b>Kesan keluk dengan AI</b> dan bersetuju.</p>';
       } else if (im.langkah === "laras") {
         html =
           '<p><b>Langkah 1: Jajarkan paksi.</b> Seret penanda <b>O</b> ke asalan graf dalam gambar, dan penanda <b>T</b> ke hujung paksi (paras hujung paksi tegak dan hujung paksi datar).</p>' +
@@ -259,18 +259,48 @@
           '<button type="button" class="btn btn-utama" data-siap-laras>' + E.ikon("betul") + " Siap, mula tekap</button>" +
           '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
           "</div>";
+      } else if (im.ai === "izin") {
+        // tiada gambar dihantar sebelum pelajar menekan butang setuju
+        html =
+          "<p><b>Kesan keluk dengan AI.</b> Gambar ini akan dihantar kepada perkhidmatan AI (Claude oleh Anthropic) untuk dikesan. Laman ini tidak menyimpan gambar itu. Pastikan tiada nama, wajah atau maklumat peribadi dalam gambar.</p>" +
+          '<div class="bina-imbas-butang">' +
+          '<button type="button" class="btn btn-utama" data-ai-hantar>' + E.ikon("betul") + " Setuju, hantar gambar</button>" +
+          '<button type="button" class="btn" data-ai-batal>Batal</button>' +
+          "</div>";
+      } else if (im.ai === "tunggu") {
+        html = '<p role="status"><b>Sedang mengesan keluk…</b> Lazimnya kurang daripada setengah minit.</p>';
+      } else if (im.ai) {
+        var dikesan = im.ai.id.map(cari).filter(Boolean);
+        var paksiAI = [im.ai.paksi.y, im.ai.paksi.x].filter(Boolean);
+        html =
+          "<p><b>AI mengesan " + dikesan.length + " keluk.</b> Bandingkan dengan gambar di belakang graf: " +
+          dikesan
+            .map(function (k) {
+              var j = JK.dapat(im.ai.jenis[k.id]);
+              return "<b>" + esc(k.label) + "</b> (" + (j ? "cadangan: " + esc(j.nama) : "jenis belum ditetapkan") + ")";
+            })
+            .join(", ") +
+          "." + (paksiAI.length ? " Label paksi: " + esc(paksiAI.join(" dan ")) + "." : "") + "</p>" +
+          '<p class="teks-lemah"><b>Sahkan</b> menerima keluk bersama cadangan itu. <b>Sunting</b> menyimpan keluk sahaja; namakan dan tetapkan jenisnya sendiri.</p>' +
+          '<div class="bina-imbas-butang">' +
+          '<button type="button" class="btn btn-utama" data-ai-sah>' + E.ikon("betul") + " Sahkan</button>" +
+          '<button type="button" class="btn" data-ai-sunting>' + E.ikon("pensel") + " Sunting</button>" +
+          '<button type="button" class="cip" data-ai-buang>' + E.ikon("salah") + " Buang keluk AI</button>" +
+          "</div>";
       } else {
         html =
           (im.langkah === "tekap"
-            ? "<p><b>Langkah 2: Tekap keluk.</b> Surih setiap keluk dalam gambar dengan jari atau tetikus, satu demi satu. Kemudian namakan keluk dan tetapkan jenisnya dalam <b>Terangkan graf</b>.</p>"
+            ? "<p><b>Langkah 2: Tekap keluk.</b> Surih setiap keluk dalam gambar dengan jari atau tetikus, satu demi satu, atau minta AI mengesannya. Kemudian namakan keluk dan tetapkan jenisnya dalam <b>Terangkan graf</b>.</p>"
             : "<p><b>Tekapan selesai.</b> Keluk yang ditekap boleh dinamakan, dialih dan diterangkan seperti keluk lain.</p>") +
           '<div class="bina-imbas-butang">' +
           (im.langkah === "tekap"
             ? '<button type="button" class="btn btn-utama" data-selesai-tekap>' + E.ikon("betul") + " Selesai menekap</button>"
             : '<button type="button" class="btn" data-tekap-lagi>' + E.ikon("pensel") + " Tekap keluk lagi</button>") +
+          '<button type="button" class="btn" data-ai>' + E.ikon("bintang") + " Kesan keluk dengan AI</button>" +
           '<button type="button" class="cip" data-laras-semula>' + E.ikon("ulang") + " Laras semula</button>" +
           '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
-          "</div>";
+          "</div>" +
+          (im.baki != null ? '<p class="teks-lemah">Baki imbasan AI hari ini: ' + im.baki + " kali.</p>" : "");
       }
       isiImbas.innerHTML = html;
       if (im && im.langkah !== "laras") {
@@ -294,6 +324,65 @@
     function mesejImbas(teks) {
       ralatImbas.textContent = teks || "";
       ralatImbas.hidden = !teks;
+    }
+
+    /* ---------- kesan keluk dengan AI (EKO.imbas.pengecam) ---------- */
+    // st.imej.ai = null | "izin" | "tunggu" | { id: [id keluk], jenis: { id: jenis cadangan }, paksi: { x, y } }
+    function kesanAI() {
+      var im = st.imej;
+      im.ai = "tunggu";
+      binaImbas();
+      E.imbas.pengecam.analisis(im, function (ralat, d) {
+        if (st.imej !== im) return; // gambar sudah dibuang atau widget dimusnahkan
+        im.ai = null;
+        if (d && d.baki != null) im.baki = d.baki;
+        var id = [],
+          jenis = {};
+        if (!ralat) {
+          E.imbas.dariAI(im.rect, d.keluk).forEach(function (k) {
+            var n = st.graf.keluk.length;
+            st.graf = B.tambahKeluk(st.graf, { label: B.subskrip(k.label) || "K", titik: k.titik, sumber: "imbas" });
+            if (st.graf.keluk.length === n) return;
+            id.push(st.graf.keluk[n].id);
+            if (JK.dapat(k.jenis)) jenis[st.graf.keluk[n].id] = k.jenis;
+          });
+          if (!id.length) ralat = E.imbas.MESEJ_AI.tiada;
+        }
+        if (ralat) {
+          binaImbas();
+          mesejImbas(ralat);
+          return;
+        }
+        // jenis hanya cadangan: tidak ditetapkan sehingga pelajar menekan Sahkan
+        im.ai = { id: id, jenis: jenis, paksi: d.paksi || {} };
+        st.pilih = id[0];
+        st.baruDilukis = null;
+        binaPanel();
+        binaParam();
+        binaImbas();
+        lukis();
+      });
+    }
+
+    function selesaiAI(cara) {
+      var a = st.imej.ai;
+      st.imej.ai = null;
+      if (cara === "buang") {
+        a.id.forEach(function (id) {
+          st.graf = B.buangKeluk(st.graf, id);
+        });
+        if (!cari(st.pilih)) st.pilih = st.graf.keluk.length ? st.graf.keluk[0].id : null;
+      } else if (cara === "sah") {
+        a.id.forEach(function (id) {
+          if (a.jenis[id] && cari(id)) st.graf = T.tetapkan(st.graf, id, a.jenis[id]);
+        });
+        if (a.paksi.x) st.graf = B.labelPaksi(st.graf, "x", a.paksi.x);
+        if (a.paksi.y) st.graf = B.labelPaksi(st.graf, "y", a.paksi.y);
+      }
+      binaPanel();
+      binaParam();
+      binaImbas();
+      lukis();
     }
 
     function aspekKotak() {
@@ -362,6 +451,24 @@
         petunjuk.textContent = "Jajarkan paksi gambar";
         binaImbas();
         lukis();
+      } else if (b.hasAttribute("data-ai")) {
+        if (st.graf.keluk.length >= B.MAKS_KELUK) {
+          mesejImbas("Graf sudah mempunyai " + B.MAKS_KELUK + " keluk. Padam satu keluk dahulu.");
+          return;
+        }
+        st.imej.ai = "izin";
+        setLukis(false);
+      } else if (b.hasAttribute("data-ai-batal")) {
+        st.imej.ai = null;
+        binaImbas();
+      } else if (b.hasAttribute("data-ai-hantar")) {
+        kesanAI();
+      } else if (b.hasAttribute("data-ai-sah")) {
+        selesaiAI("sah");
+      } else if (b.hasAttribute("data-ai-sunting")) {
+        selesaiAI("sunting");
+      } else if (b.hasAttribute("data-ai-buang")) {
+        selesaiAI("buang");
       } else if (b.hasAttribute("data-buang-imej")) {
         E.imbas.buang(st.imej);
         st.imej = null;

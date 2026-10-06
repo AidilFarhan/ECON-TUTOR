@@ -1,15 +1,15 @@
 /* =========================================================
    Econ Tutor · tekap graf daripada gambar (EKO.imbas)
-   Tanpa AI: gambar dipaparkan di belakang graf, pelajar menjajarkan paksi
-   (penanda O dan T), kemudian menekap keluk dengan Lukis keluk.
+   Gambar dipaparkan di belakang graf, pelajar menjajarkan paksi (penanda O dan T),
+   kemudian menekap keluk dengan Lukis keluk, ATAU meminta AI mengesan keluk.
 
-   - Gambar hanya dalam peranti: dikecilkan (≤ 1600 px) dan dikod semula ke JPEG
-     (metadata EXIF/GPS terbuang), dipegang sebagai object URL, dan dibuang apabila
-     widget dimusnahkan. Gambar tidak masuk ke dalam model GrafBina dan tidak disimpan.
-   - Matematik penjajaran (IM.muatAwal, IM.padan) ialah fungsi tulen: boleh diuji dalam Node.
-   - IM.pengecam: titik sambungan untuk pengecam automatik (AI) kelak, contohnya
-     { analisis: function (fail, selesai) { … selesai(null, grafDikesan); } }.
-     Kosong sekarang; UI tidak bergantung padanya.
+   - Gambar dikecilkan (≤ 1600 px) dan dikod semula ke JPEG (metadata EXIF/GPS terbuang),
+     dipegang sebagai object URL, dan dibuang apabila widget dimusnahkan. Gambar tidak
+     masuk ke dalam model GrafBina dan tidak disimpan. Tekap sendiri: gambar kekal dalam peranti.
+   - Matematik penjajaran (IM.muatAwal, IM.padan) dan IM.dariAI ialah fungsi tulen: boleh diuji dalam Node.
+   - IM.pengecam: pengecam automatik (AI). analisis() menghantar JPEG itu ke /api/kesan-graf
+     (Claude API) dan hanya dipanggil selepas pelajar bersetuju dalam UI. Hasilnya ialah
+     cadangan yang mesti disahkan oleh pelajar ([Sahkan] / [Sunting]).
    ========================================================= */
 (function () {
   "use strict";
@@ -19,8 +19,6 @@
 
   var MAKS_PX = 1600;
   var MIN_PX = 120;
-
-  IM.pengecam = null;
 
   /* ---------- matematik penjajaran (ruang ternormal kotak paksi, y ke atas) ---------- */
   // Kedudukan awal gambar: muat di dalam kotak paksi, nisbah aspek gambar dikekalkan.
@@ -122,6 +120,70 @@
       selesai(MESEJ_GAGAL);
     };
     img.src = url;
+  };
+
+  /* ---------- pengecam automatik (AI, /api/kesan-graf) ---------- */
+  // Keluk daripada AI (pecahan gambar: u dari kiri, v dari bawah) → titik ternormal dalam kotak paksi,
+  // melalui segi empat gambar yang telah dijajarkan. Fungsi tulen. Keluk di luar kotak paksi dibuang.
+  IM.dariAI = function (r, senarai) {
+    var keluar = [];
+    (senarai || []).forEach(function (k) {
+      var pts = [];
+      (k.titik || []).forEach(function (p) {
+        var q = IM.keNormal(r, p[0], p[1]);
+        var x = Math.min(0.95, Math.max(0, q[0])),
+          y = Math.min(0.95, Math.max(0, q[1]));
+        var akhir = pts[pts.length - 1];
+        if (!akhir || Math.abs(akhir[0] - x) + Math.abs(akhir[1] - y) > 0.01) pts.push([x, y]);
+      });
+      if (pts.length < 2) return;
+      // susun kiri → kanan (bawah → atas jika hampir tegak), seperti keluk yang dilukis
+      var dx = pts[pts.length - 1][0] - pts[0][0],
+        dy = pts[pts.length - 1][1] - pts[0][1];
+      if (Math.abs(dx) > 0.02 ? dx < 0 : dy < 0) pts.reverse();
+      keluar.push({ label: k.label || "", jenis: k.jenis || null, titik: pts });
+    });
+    return keluar;
+  };
+
+  IM.MESEJ_AI = {
+    tiada: "Graf tidak dapat dikesan. Pastikan paksi dan keluk jelas dalam gambar, kemudian cuba lagi atau tekap sendiri.",
+    had: "Had imbasan AI untuk hari ini sudah habis. Cuba lagi esok, atau tekap keluk sendiri.",
+    sesi: "Sesi log masuk sudah tamat. Muat semula halaman, kemudian cuba lagi.",
+    tutup: "Imbasan AI tidak tersedia buat masa ini. Anda masih boleh menekap keluk sendiri.",
+    gagal: "Imbasan AI tidak berjaya. Sila cuba lagi, atau tekap keluk sendiri."
+  };
+
+  // Gambar dihantar ke pelayan HANYA apabila analisis() dipanggil (selepas pelajar bersetuju).
+  // hasil = { url } daripada IM.muat. selesai(mesejRalat) atau selesai(null, { keluk, paksi, baki }).
+  IM.pengecam = {
+    analisis: function (hasil, selesai) {
+      var M = IM.MESEJ_AI;
+      if (!window.fetch || location.protocol === "file:") {
+        selesai(M.tutup);
+        return;
+      }
+      fetch(hasil.url)
+        .then(function (r) {
+          return r.blob();
+        })
+        .then(function (blob) {
+          return fetch("/api/kesan-graf", { method: "POST", credentials: "same-origin", headers: { "content-type": "image/jpeg" }, body: blob });
+        })
+        .then(function (res) {
+          if (res.status === 429) return selesai(M.had, { baki: 0 });
+          if (res.status === 401) return selesai(M.sesi);
+          if (res.status === 404 || res.status === 503) return selesai(M.tutup);
+          if (!res.ok) return selesai(M.gagal);
+          return res.json().then(function (d) {
+            if (!d.keluk || !d.keluk.length) selesai(M.tiada, { baki: d.baki });
+            else selesai(null, d);
+          });
+        })
+        .catch(function () {
+          selesai(M.gagal);
+        });
+    }
   };
 
   IM.buang = function (hasil) {

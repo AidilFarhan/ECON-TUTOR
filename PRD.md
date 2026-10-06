@@ -37,7 +37,7 @@ The teacher wants **one place**, faithful to the textbook, where students can re
 ### Non-goals (v1)
 - Student accounts with synced progress across devices, and a teacher dashboard of student results.
 - Content authoring UI (content is edited in data files).
-- Chat, forums, AI tutoring or video.
+- Chat, forums, AI tutoring or video. (The one AI feature is detecting curves in a photographed graph, §5.2; explanations and answer checking stay rule-based.)
 - Subjects other than Economics, and languages other than Bahasa Melayu for student-facing content.
 - Publishing the source PDFs (textbooks, teacher notes, exam papers).
 
@@ -144,11 +144,15 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - feedback distinguishes a correct answer, moving along the curve instead of shifting it (and the reverse), the wrong direction, the wrong curve, and an incomplete answer when two curves should change.
     - 8 questions from T4 Bab 2 cover demand factors, supply factors, movement along the curve, market effects and two curves shifting together.
     - Questions live in a data file, so teachers can add more without code changes.
-  - **Tekap gambar** (phase 4, no AI by owner decision):
+  - **Tekap gambar** (phase 4):
     - the student photographs or uploads a graph (textbook, slide, handwriting), aligns it with markers O and T, and traces each curve with a finger;
     - the traced curves become normal curves (type, shift, explanation, equilibrium);
-    - the image never leaves the device and is not stored.
-  - Automatic recognition of a photo (5b) would need an AI service, so it waits for an owner decision on provider, cost and privacy.
+    - the image is not stored, and it never leaves the device unless the student chooses AI detection.
+  - **Kesan keluk dengan AI** (phase 5b; owner decisions of 2026-10-06: Claude API, consent notice, 10 scans a day per student):
+    - after aligning the photo, the student may ask AI to detect the curves instead of tracing them;
+    - a notice explains that the photo is sent to an AI service, and nothing is sent before the student agrees;
+    - detected curves appear over the photo as a suggestion, with **Sahkan** (accept curves, suggested types and axis labels), **Sunting** (keep the curves only) and **Buang keluk AI**;
+    - when detection fails or the daily limit is reached, the student sees one short message and can still trace by hand.
 
 **Acceptance.**
 - Every graph renders in light and dark mode without errors.
@@ -289,6 +293,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | *Bina graf* phase 6: market equilibrium E₀ → E₁ with P and Q changes (`EKO.keseimbangan`) |
 | 2026-10-01 | *Bina graf* phase 7: *Latihan graf* with *Semak Jawapan* (`EKO.senario`, 8 T4 Bab 2 questions) |
 | 2026-10-01 | *Bina graf* phase 4: *Tekap gambar*, which traces a graph from a photo on the device without AI (`EKO.imbas`) |
+| 2026-10-06 | *Bina graf* phase 5b: *Kesan keluk dengan AI* in *Tekap gambar* (Claude API through `/api/kesan-graf`, consent notice, 10 scans a day per student, result confirmed by the student) |
 | 2026-10-01 | *Bina graf*: curve type KKP (opportunity cost along the curve, economic growth as an outward shift from the origin) |
 | 2026-10-01 | Short-run cost graph: *MC = AC: AC minimum* state (button, reading, Keadaan column), following the Form 4 textbook |
 | 2026-10-01 | Short-run cost graph in Form 4 shows only AC and MC curves; STPM keeps AVC |
@@ -301,7 +306,6 @@ Measuring these automatically needs the planned progress sync (§10).
 | Priority | Item | Notes |
 | --- | --- | --- |
 | High | Confirm permission to publish the Terengganu paper | Enabling takes 3 steps (README) |
-| Medium | *Bina graf*, remaining phase | Phases 1–3, 4 (tracing a photo, no AI), 5a, 6 and 7 are done. Remaining: 5b, automatic recognition of a photographed graph. It needs an AI vision service behind the existing `EKO.imbas.pengecam` hook. It waits for the owner to decide on provider, API key, cost limits and a privacy note for students, since AI is a non-goal in §2. The ChatGPT/Gemini apps cannot be used directly; only their developer APIs can |
 | Medium | STPM quizzes | Deferred by the owner; module practice questions are available as a source |
 | Medium | Matrikulasi: replace *cadangan* sections (AE015 2.2–2.4, 6.5 Oligopoli) | Waiting for the owner to find the slides |
 | Medium | Matrikulasi quizzes | Kept empty for now by the owner's decision |

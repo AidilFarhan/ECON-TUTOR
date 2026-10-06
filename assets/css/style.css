@@ -4407,7 +4407,7 @@ ol.roman > li::before {
   background: linear-gradient(135deg, var(--bad-soft), transparent 60%), var(--glass-2);
 }
 
-/* bina graf: tekap graf daripada gambar (tanpa AI, gambar kekal dalam peranti) */
+/* bina graf: tekap graf daripada gambar (panel tekap dan kesan keluk dengan AI) */
 .bina-imbas p {
   margin: 0;
   font-size: 14px;
