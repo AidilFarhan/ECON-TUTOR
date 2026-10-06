@@ -1,4 +1,4 @@
-# Misi Karnival — Janji Kelas Kita
+# Misi Karnival — Misi Mengumpul Dana Buku Kelas
 
 Satu episod visual novel untuk pelajar SPM Ekonomi Tingkatan 4, dengan dialog santai Manglish. Kamu, Mira dan Hakim mengurus booth karnival untuk membeli buku sudut bacaan kelas.
 
@@ -22,6 +22,8 @@ Tekan **Dana Kelas** untuk membuka **PKK (Penyata Kedudukan Kewangan)**. Tunai, 
 
 `skrip-voice-over.md` mengandungi skrip penuh, semua cabang dialog, dialog penerokaan dan ending. Bahagian angka penutup ditandakan sebagai token. Rakaman suara belum dimasukkan dalam prototaip ini.
 
+Sound effect dan BGM sudah dipasang: titisan air untuk butang, cash register untuk duit masuk/keluar, suasana murid di kelas, pisau memotong dan blender di persediaan, hujan dan guruh, serta crowd karnival. Lima muzik latar berubah mengikut situasi. Buka **Menu → Bunyi & muzik** untuk mute atau melaras BGM, suasana dan kesan secara berasingan. Audio bermula selepas klik dan berhenti sementara apabila tab disembunyikan. Semua 14 MP3 berada dalam folder `assets/audio`; kekalkan folder ini apabila memindahkan game. Kredit dan panduan integrasi dalam `AUDIO-DAN-KREDIT.md`.
+
 ## Kaitan pembelajaran
 
 Cerita menumpukan kekurangan, pilihan, kos lepas, faktor pengeluaran, had pengeluaran, empat masalah asas ekonomi serta amanah. Nota tambahan turut merangkumi sistem ekonomi. Cerita berlangsung pada satu karnival dan bukan pengganti keseluruhan nota Bab 1.
@@ -35,3 +37,8 @@ Semua watak, dialog, harga, kapasiti dan kadar jualan ialah cadangan / nilai con
 324 kombinasi keputusan telah diperiksa hingga tamat: dana seimbang, tiada wang negatif, jualan dan bantuan tidak melebihi stok, serta semua empat ending dapat dicapai. Satu laluan dimainkan hingga ending dalam browser; simpan/sambung, nota, menu dan pilihan pada telefon turut diperiksa.
 
 Empat ilustrasi asal dan aset baharu dihasilkan menggunakan imagegen berdasarkan draf visual yang diluluskan. Versi animasi menggunakan empat helaian aksi watak dan satu atlas latar; prompt disimpan dalam `PROMPT-ANIMASI.md`. Aset eksperimen berdiri terdahulu disimpan sebagai rujukan. Pertukaran wajah, gerakan bercakap, respons bahan dan satu laluan hingga ending diperiksa dalam browser. Episod ini ialah prototaip tempatan; belum diterbitkan ke laman ECON-TUTOR.
+
+## Visual setiap baris Pencerita
+
+Close-up aksi kini muncul automatik bersama narasi. Poster sandwich dibulatkan dengan animasi pen merah. Buka skrip-bergambar.html untuk skrip VO dengan semua gambar dan arahan visual; lihat VISUAL-PENCERITA.md dan PROMPT-VISUAL-PENCERITA.md.
+

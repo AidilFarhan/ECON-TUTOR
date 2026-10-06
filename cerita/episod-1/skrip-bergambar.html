@@ -1,0 +1,486 @@
+<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Skrip bergambar · Dana Buku Kelas</title><style>body{margin:0;background:#f7f3eb;color:#243240;font:18px/1.75 Georgia,serif}main{max-width:850px;margin:auto;padding:45px 6vw 80px}h1{font-size:36px;line-height:1.2}h2{margin-top:65px;padding-top:20px;border-top:1px solid #cbc3b3}h3{margin-top:35px}p{margin:14px 0}.cue{font:600 14px/1.6 system-ui;color:#225d4f;margin-top:35px;scroll-margin-top:85px}.arah,figcaption{font:14px/1.7 system-ui;color:#52616e}figure{margin:20px 0 35px}img{display:block;width:100%;max-height:510px;object-fit:contain;object-position:left;background:#eee6d7}figcaption{margin-top:8px}.angka{font:12px/1.5 system-ui;margin:5px 0;overflow-wrap:anywhere}code{font:13px monospace}nav{position:sticky;top:0;padding:14px 6vw;background:#f7f3ebf5;border-bottom:1px solid #ded6c7;font:14px system-ui;z-index:1}a{color:#225d4f}nav a+a{margin-left:22px}@media print{nav{display:none}figure{break-inside:avoid}h2,.cue{break-after:avoid}}</style></head><body><nav><a href="#EP1-sepakat-04-02">Contoh: sandwich dibulatkan</a><a href="index.html">Main episod</a></nav><main><h1>Misi Karnival — Skrip penuh voice-over</h1>
+<p>Episod 1: Misi Mengumpul Dana Buku Kelas. Versi selepas kemasan aliran cerita, 6 Oktober 2026. Skrip ini mengikut dialog permainan yang terkini, termasuk semua cabang pilihan. Satu permainan hanya menggunakan satu versi bagi setiap baris bercabang.</p>
+<h2>Visual bersama Pencerita</h2>
+<p>Setiap baris Pencerita disertakan gambar aksi di bawah teks. Gambar muncul automatik dalam permainan, dengan gerakan kamera lembut. Close-up poster melukis bulatan pen merah beransur. Gambar skrip ialah pratonton aksi, bukan video. Arahan visual tidak perlu dibaca semasa rakaman.</p>
+<h2>Arahan rakaman</h2>
+<p>- Mira: ceria dan spontan; berubah risau apabila bajet atau keadaan menekan.</p>
+<p>- Hakim: tenang, teliti dan mesra; bercakap dengan kawan, bukan membaca buku teks.</p>
+<p>- Kamu: suara pemain yang membantu pasukan membuat keputusan.</p>
+<p>- Pencerita: ringkas, hangat; beri ruang antara aksi dan pertuturan.</p>
+<p>- Murid: cameo, segan ketika menyebut duit saku.</p>
+<p>- Kekalkan bahasa Manglish dalam teks. Baca RM sebagai “ringgit”; nombor disebut secara biasa.</p>
+<p>- Rakam setiap ID sebagai fail berasingan. Contoh: EP1-janji-01-01.wav. WAV 48 kHz / 24-bit boleh digunakan untuk fail asal.</p>
+<p>- Beri jeda pendek pada elipsis, dan sedikit ruang selepas baris; pilihan dimainkan mengikut rentak pelajar.</p>
+<p>- Teks pilihan, peralihan tempat dan PKK ialah teks skrin; rakam hanya jika mahu suara untuk UI.</p>
+<h2>Angka berubah pada penutup</h2>
+<p>Dua baris penutup menggunakan token kerana jumlah berubah mengikut keputusan. Rakam bahagian ayat dan nilai secara berasingan, atau rakam versi penuh selepas memilih satu laluan. Jangan baca nama token.</p>
+<p class="angka">| Token | Maksud | Contoh laluan campur + alat + pindah + harga murid + jujur |</p>
+<p class="angka">| --- | --- | --- |</p>
+<p class="angka">| {AIR_TERJUAL} | Cawan air terjual | 28 |</p>
+<p class="angka">| {SANDWICH_TERJUAL} | Pek sandwich terjual | 15 |</p>
+<p class="angka">| {JUMLAH_HASIL} | Kutipan jualan | RM101.00 |</p>
+<p class="angka">| {JUMLAH_BELANJA} | Semua bayaran booth | RM95.00 |</p>
+<p class="angka">| {DANA_AKHIR} | Tunai dibawa balik | RM106.00 |</p>
+<h2>Urutan cerita</h2>
+<p>Kelas: janji → sepakat → tenaga. Pagi: siap-alat atau siap-buruh → kuantiti → stok. Hujan: langit → dalam / luar / dibantu → pelanggan → agihan → amanah → jualan. Petang: penutup → ending.</p>
+<h2>janji — Kelas 4 Bestari · 3:10 petang</h2>
+<p class="cue" id="EP1-janji-01-01"><strong>EP1-janji-01-01 · Mira · ceria</strong></p>
+<p>OK Hakim, berapa bajet kita untuk booth kita esok?</p>
+<p class="cue" id="EP1-janji-02-01"><strong>EP1-janji-02-01 · Hakim · fokus</strong></p>
+<p>RM100. Aku dah semak duit kelas tadi.</p>
+<p class="cue" id="EP1-janji-03-01"><strong>EP1-janji-03-01 · Mira · ceria</strong></p>
+<p>Okay! Aku dah sketch ni. Kita jual sandwich dengan air sejuk, pastu letak banner besar dekat depan.</p>
+<p class="cue" id="EP1-janji-04-01"><strong>EP1-janji-04-01 · Hakim · fokus</strong></p>
+<p>Aku kira semua yang kau senaraikan tu… RM150. Lebih RM50 daripada bajet kita.</p>
+<p class="cue" id="EP1-janji-05-01"><strong>EP1-janji-05-01 · Mira · risau</strong></p>
+<p>Alamak. Banner kita lukis sendiri je lah. Tapi sandwich dengan air tu, aku nak buat juga.</p>
+<p class="cue" id="EP1-janji-06-01"><strong>EP1-janji-06-01 · Hakim · fokus</strong></p>
+<p>Kena tengok bahan dan masa juga. Kita nak kumpul duit beli buku kelas, kan? Target bawa balik RM120 lepas semua belanja.</p>
+<p class="cue" id="EP1-janji-07-01"><strong>EP1-janji-07-01 · Mira · fokus</strong></p>
+<p>Haah. Kalau buat semua sampai duit tak cukup, susah pula nanti.</p>
+<p class="cue" id="EP1-janji-08-01"><strong>EP1-janji-08-01 · Hakim · fokus</strong></p>
+<p>Aku cadang fokus air dulu. Lebih senang kita urus.</p>
+<p class="cue" id="EP1-janji-09-01"><strong>EP1-janji-09-01 · Mira · fokus</strong></p>
+<p>Aku rasa sandwich pun boleh laku. Kau rasa macam mana? Kita pilih satu menu, atau buat sikit dua-dua?</p>
+<h3>Pilihan pemain (teks skrin)</h3>
+<p>- Fokus air. Kita buat satu menu dulu. → <code>sepakat</code></p>
+<p>- Pilih sandwich. Kita fokus makanan. → <code>sepakat</code></p>
+<p>- Buat sikit dua-dua. Kita bahagi sumber. → <code>sepakat</code></p>
+<h2>sepakat — Kelas 4 Bestari · 3:20 petang</h2>
+<p class="cue" id="EP1-sepakat-01-01"><strong>EP1-sepakat-01-01 · Kamu · tenang, membantu</strong></p>
+<p>Cabang: Pelan air.</p>
+<p>Air dulu. Idea sandwich kita simpan untuk karnival lain.</p>
+<p class="cue" id="EP1-sepakat-01-02"><strong>EP1-sepakat-01-02 · Kamu · tenang, membantu</strong></p>
+<p>Cabang: Pelan sandwic.</p>
+<p>Kita pilih sandwich. Air kita lepaskan dulu supaya tak kelam-kabut.</p>
+<p class="cue" id="EP1-sepakat-01-03"><strong>EP1-sepakat-01-03 · Kamu · tenang, membantu</strong></p>
+<p>Cabang: Pelan campur.</p>
+<p>Kita buat sikit kedua-duanya. Tapi jumlah kena kecil supaya sempat siap.</p>
+<p class="cue" id="EP1-sepakat-02-01"><strong>EP1-sepakat-02-01 · Mira · fokus</strong></p>
+<p>Cabang: Pelan air.</p>
+<p>Sayang juga… tapi okay. Aku boleh buat label cawan. Biar menu sikit, booth tetap lawa.</p>
+<p class="cue" id="EP1-sepakat-02-02"><strong>EP1-sepakat-02-02 · Mira · ceria</strong></p>
+<p>Cabang: Pelan sandwic.</p>
+<p>Yes! Aku boleh tunjuk cara bungkus. Hakim, kau tolong kira bahan?</p>
+<p class="cue" id="EP1-sepakat-02-03"><strong>EP1-sepakat-02-03 · Mira · fokus</strong></p>
+<p>Cabang: Pelan campur.</p>
+<p>Okay! Ada makanan untuk yang lapar, ada air untuk yang haus.</p>
+<p class="cue" id="EP1-sepakat-03-01"><strong>EP1-sepakat-03-01 · Hakim · ceria</strong></p>
+<p>Cabang: Pelan air.</p>
+<p>Deal. Aku senaraikan bahan air; Mira urus label.</p>
+<p class="cue" id="EP1-sepakat-03-02"><strong>EP1-sepakat-03-02 · Hakim · fokus</strong></p>
+<p>Cabang: Pelan sandwic.</p>
+<p>Boleh. Aku padam senarai air dulu. Lepas ni kita semak berapa banyak mampu buat.</p>
+<p class="cue" id="EP1-sepakat-03-03"><strong>EP1-sepakat-03-03 · Hakim · fokus</strong></p>
+<p>Cabang: Pelan campur.</p>
+<p>Boleh, asalkan kita bahagi kerja. Aku kira kapasiti dulu sebelum janji jumlah.</p>
+<p class="cue" id="EP1-sepakat-04-01"><strong>EP1-sepakat-04-01 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Pelan air.</p>
+<p>Mira melukis cawan di tepi lakarannya. Hakim tarik buku kira-kira ke tengah meja.</p>
+<p class="arah">Visual: Mira melukis cawan di lakaran; Hakim menarik buku kira-kira ke tengah meja.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/cawan.jpg" alt="Mira melukis cawan di lakaran; Hakim menarik buku kira-kira ke tengah meja."><figcaption>Mira melukis cawan di lakaran; Hakim menarik buku kira-kira ke tengah meja.</figcaption></figure>
+<p class="cue" id="EP1-sepakat-04-02"><strong>EP1-sepakat-04-02 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Pelan sandwic.</p>
+<p>Mira membulatkan lukisan sandwich. Kali ini, mereka merancang menu yang sama.</p>
+<p class="arah">Visual: Close-up lakaran booth: Mira membulatkan sandwich dengan pen merah.</p>
+<p class="arah">Gerakan: bulatan pen merah dilukis beransur di sekeliling sandwich.</p>
+<figure><img loading="lazy" src="assets/narasi/poster-dibulatkan.png" alt="Close-up lakaran booth: Mira membulatkan sandwich dengan pen merah."><figcaption>Close-up lakaran booth: Mira membulatkan sandwich dengan pen merah.</figcaption></figure>
+<p class="cue" id="EP1-sepakat-04-03"><strong>EP1-sepakat-04-03 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Pelan campur.</p>
+<p>Mira menolak lakaran ke tengah. Tiga orang, dua menu—sekarang mereka perlukan cara bekerja.</p>
+<p class="arah">Visual: Tiga tangan menolak lakaran booth ke tengah meja.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/sepakat.jpg" alt="Tiga tangan menolak lakaran booth ke tengah meja."><figcaption>Tiga tangan menolak lakaran booth ke tengah meja.</figcaption></figure>
+<p>Sambungan: <code>tenaga</code>.</p>
+<h2>tenaga — Kelas 4 Bestari · 3:30 petang</h2>
+<p class="cue" id="EP1-tenaga-01-01"><strong>EP1-tenaga-01-01 · Hakim · fokus</strong></p>
+<p>Tapak booth dah ada. Jug dan papan pemotong sekolah boleh pinjam. Tapi esok kita cuma ada satu sesi untuk prepare.</p>
+<p class="cue" id="EP1-tenaga-02-01"><strong>EP1-tenaga-02-01 · Mira · fokus</strong></p>
+<p>Kalau sewa set peralatan RM25, kerja lebih laju. Kalau upah kawan bantu RM15, ada orang boleh urus bahan dan bekas.</p>
+<p class="cue" id="EP1-tenaga-03-01"><strong>EP1-tenaga-03-01 · Hakim · fokus</strong></p>
+<p>Dengan alat, kita mampu buat 60 unit kerja. Dengan pembantu, 40 unit. Aku tulis dua pilihan dekat sini.</p>
+<p class="cue" id="EP1-tenaga-04-01"><strong>EP1-tenaga-04-01 · Mira · fokus</strong></p>
+<p>Alat beri kapasiti lebih besar, tapi baki duit kurang. Pembantu lebih murah. Mana satu kita tempah?</p>
+<h3>Pilihan pemain (teks skrin)</h3>
+<p>- Sewa peralatan RM25 · 60 unit kerja. → <code>siap-alat</code></p>
+<p>- Upah pembantu RM15 · 40 unit kerja. → <code>siap-buruh</code></p>
+<h2>siap-alat — Bilik persediaan · Esok, 7:30 pagi</h2>
+<p>Peralihan di skrin (VO pilihan): Esok pagi. Pelan semalam mula jadi kerja sebenar.</p>
+<p class="cue" id="EP1-siap-alat-01-01"><strong>EP1-siap-alat-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Set peralatan yang kamu tempah sudah sampai. Mira susun bahan untuk contoh sandwich; Hakim semak senarai.</p>
+<p class="arah">Visual: Set peralatan tiba; Mira menyusun bahan sementara Hakim menyemak senarai.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/alat.jpg" alt="Set peralatan tiba; Mira menyusun bahan sementara Hakim menyemak senarai."><figcaption>Set peralatan tiba; Mira menyusun bahan sementara Hakim menyemak senarai.</figcaption></figure>
+<p class="cue" id="EP1-siap-alat-02-01"><strong>EP1-siap-alat-02-01 · Mira · fokus</strong></p>
+<p>Okay, semua ready. Aku buat satu contoh dulu supaya kita tahu langkahnya.</p>
+<p class="cue" id="EP1-siap-alat-03-01"><strong>EP1-siap-alat-03-01 · Hakim · fokus</strong></p>
+<p>Sewa RM25 dah bayar. Baki RM75.00. Dengan set ni, sesi kita cukup untuk 60 unit kerja.</p>
+<p>Sambungan: <code>kuantiti</code>.</p>
+<h2>siap-buruh — Bilik persediaan · Esok, 7:30 pagi</h2>
+<p>Peralihan di skrin (VO pilihan): Esok pagi. Pasukan berkumpul untuk mula menyediakan bahan.</p>
+<p class="cue" id="EP1-siap-buruh-01-01"><strong>EP1-siap-buruh-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Kawan yang kamu upah mengambil tugas bahan dan bekas di meja sebelah. Mira dan Hakim menyiapkan contoh di meja utama.</p>
+<p class="arah">Visual: Kawan mengurus bahan dan bekas di meja sebelah.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/pembantu.jpg" alt="Kawan mengurus bahan dan bekas di meja sebelah."><figcaption>Kawan mengurus bahan dan bekas di meja sebelah.</figcaption></figure>
+<p class="cue" id="EP1-siap-buruh-02-01"><strong>EP1-siap-buruh-02-01 · Mira · fokus</strong></p>
+<p>Best, ada orang bantu. Aku tunjuk contoh; lepas tu kita bahagi tugas ikut jumlah yang dipilih.</p>
+<p class="cue" id="EP1-siap-buruh-03-01"><strong>EP1-siap-buruh-03-01 · Hakim · fokus</strong></p>
+<p>Upah RM15 dah bayar. Baki RM85.00. Sesi kita cukup untuk 40 unit kerja.</p>
+<p>Sambungan: <code>kuantiti</code>.</p>
+<h2>kuantiti — Bilik persediaan · 7:45 pagi</h2>
+<p class="cue" id="EP1-kuantiti-01-01"><strong>EP1-kuantiti-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Mira letak salad atas roti contoh. Hakim tandakan dua lajur: air dan sandwich.</p>
+<p class="arah">Visual: Mira meletakkan salad atas roti contoh; buku dua lajur ada di sisi.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/salad.jpg" alt="Mira meletakkan salad atas roti contoh; buku dua lajur ada di sisi."><figcaption>Mira meletakkan salad atas roti contoh; buku dua lajur ada di sisi.</figcaption></figure>
+<p class="cue" id="EP1-kuantiti-02-01"><strong>EP1-kuantiti-02-01 · Hakim · fokus</strong></p>
+<p>Satu air guna 1 unit kerja dan bahan RM1. Satu sandwich guna 2 unit kerja dan bahan RM2.</p>
+<p class="cue" id="EP1-kuantiti-03-01"><strong>EP1-kuantiti-03-01 · Mira · fokus</strong></p>
+<p>Cabang: Kapasiti 60 unit kerja.</p>
+<p>Jadi kapasiti 60 tu cukup untuk 60 air, atau 30 sandwich. Kalau tambah satu sandwich, kena kurangkan dua air.</p>
+<p class="cue" id="EP1-kuantiti-03-02"><strong>EP1-kuantiti-03-02 · Mira · fokus</strong></p>
+<p>Cabang: Kapasiti 40 unit kerja.</p>
+<p>Jadi kapasiti 40 tu cukup untuk 40 air, atau 20 sandwich. Kalau tambah satu sandwich, kena kurangkan dua air.</p>
+<p class="cue" id="EP1-kuantiti-04-01"><strong>EP1-kuantiti-04-01 · Hakim · fokus</strong></p>
+<p>Cabang: Kapasiti 60 unit kerja.</p>
+<p>Kalau bahagi kerja sama rata: 30 air dan 15 sandwich. Semua pilihan ni guna bahan bernilai RM60.00.</p>
+<p class="cue" id="EP1-kuantiti-04-02"><strong>EP1-kuantiti-04-02 · Hakim · fokus</strong></p>
+<p>Cabang: Kapasiti 40 unit kerja.</p>
+<p>Kalau bahagi kerja sama rata: 20 air dan 10 sandwich. Semua pilihan ni guna bahan bernilai RM40.00.</p>
+<p class="cue" id="EP1-kuantiti-05-01"><strong>EP1-kuantiti-05-01 · Mira · fokus</strong></p>
+<p>Cabang: Pelan air.</p>
+<p>Semalam kita pilih fokus air. Bahan jualan belum dibeli—nak teruskan pelan tu atau ubah jumlah sekarang?</p>
+<p class="cue" id="EP1-kuantiti-05-02"><strong>EP1-kuantiti-05-02 · Mira · fokus</strong></p>
+<p>Cabang: Pelan sandwic.</p>
+<p>Semalam kita pilih fokus sandwich. Bahan jualan belum dibeli—nak teruskan pelan tu atau ubah jumlah sekarang?</p>
+<p class="cue" id="EP1-kuantiti-05-03"><strong>EP1-kuantiti-05-03 · Mira · fokus</strong></p>
+<p>Cabang: Pelan campur.</p>
+<p>Semalam kita pilih sedikit air dan sandwich. Bahan jualan belum dibeli—nak teruskan pelan tu atau ubah jumlah sekarang?</p>
+<h3>Pilihan pemain (teks skrin)</h3>
+<p>- Teruskan pelan: 40 air, 0 sandwich. → <code>stok</code></p>
+<p>- Bahagi kerja: 20 air, 10 sandwich. → <code>stok</code></p>
+<p>- Fokus sandwich: 0 air, 20 sandwich. → <code>stok</code></p>
+<p>- Teruskan pelan: 0 air, 20 sandwich. → <code>stok</code></p>
+<p>- Fokus air: 40 air, 0 sandwich. → <code>stok</code></p>
+<p>- Teruskan pelan: 20 air, 10 sandwich. → <code>stok</code></p>
+<p>- Teruskan pelan: 60 air, 0 sandwich. → <code>stok</code></p>
+<p>- Bahagi kerja: 30 air, 15 sandwich. → <code>stok</code></p>
+<p>- Fokus sandwich: 0 air, 30 sandwich. → <code>stok</code></p>
+<p>- Teruskan pelan: 0 air, 30 sandwich. → <code>stok</code></p>
+<p>- Fokus air: 60 air, 0 sandwich. → <code>stok</code></p>
+<p>- Teruskan pelan: 30 air, 15 sandwich. → <code>stok</code></p>
+<h2>stok — Bilik persediaan · 8:30 pagi</h2>
+<p class="cue" id="EP1-stok-01-01"><strong>EP1-stok-01-01 · Mira · fokus</strong></p>
+<p>Cabang: Pelan dikekalkan.</p>
+<p>Okay, ikut pelan. Aku susun kerja; kau tolong beli bahan ikut senarai ni.</p>
+<p class="cue" id="EP1-stok-01-02"><strong>EP1-stok-01-02 · Mira · fokus</strong></p>
+<p>Cabang: Pelan diubah.</p>
+<p>Okay, kita ubah sebelum beli bahan. Aku tukar susunan kerja dulu supaya semua orang ikut jumlah baru.</p>
+<p class="cue" id="EP1-stok-02-01"><strong>EP1-stok-02-01 · Pencerita · narasi tenang</strong></p>
+<p>Selepas bahan dibeli, mereka membahagi tugas. Sedikit demi sedikit, bekas yang kosong mula terisi.</p>
+<p class="arah">Visual: Bekas kosong diisi dengan produk satu demi satu.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/isi.jpg" alt="Bekas kosong diisi dengan produk satu demi satu."><figcaption>Bekas kosong diisi dengan produk satu demi satu.</figcaption></figure>
+<p class="cue" id="EP1-stok-03-01"><strong>EP1-stok-03-01 · Hakim · ceria</strong></p>
+<p>Cabang: Keluaran 60 air / 0 sandwich.</p>
+<p>Siap: 60 air dan 0 sandwich. Bahan RM60.00; baki RM15.00. Semua dah bertutup.</p>
+<p class="cue" id="EP1-stok-03-02"><strong>EP1-stok-03-02 · Hakim · ceria</strong></p>
+<p>Cabang: Keluaran 30 air / 15 sandwich.</p>
+<p>Siap: 30 air dan 15 sandwich. Bahan RM60.00; baki RM15.00. Semua dah bertutup.</p>
+<p class="cue" id="EP1-stok-03-03"><strong>EP1-stok-03-03 · Hakim · ceria</strong></p>
+<p>Cabang: Keluaran 0 air / 30 sandwich.</p>
+<p>Siap: 0 air dan 30 sandwich. Bahan RM60.00; baki RM15.00. Semua dah bertutup.</p>
+<p class="cue" id="EP1-stok-03-04"><strong>EP1-stok-03-04 · Hakim · ceria</strong></p>
+<p>Cabang: Keluaran 40 air / 0 sandwich.</p>
+<p>Siap: 40 air dan 0 sandwich. Bahan RM40.00; baki RM45.00. Semua dah bertutup.</p>
+<p class="cue" id="EP1-stok-03-05"><strong>EP1-stok-03-05 · Hakim · ceria</strong></p>
+<p>Cabang: Keluaran 20 air / 10 sandwich.</p>
+<p>Siap: 20 air dan 10 sandwich. Bahan RM40.00; baki RM45.00. Semua dah bertutup.</p>
+<p class="cue" id="EP1-stok-03-06"><strong>EP1-stok-03-06 · Hakim · ceria</strong></p>
+<p>Cabang: Keluaran 0 air / 20 sandwich.</p>
+<p>Siap: 0 air dan 20 sandwich. Bahan RM40.00; baki RM45.00. Semua dah bertutup.</p>
+<p class="cue" id="EP1-stok-04-01"><strong>EP1-stok-04-01 · Pencerita · narasi tenang</strong></p>
+<p>Mereka angkat bekas ke booth. Baru saja menu hendak digantung, titisan hujan jatuh atas kanopi.</p>
+<p class="arah">Visual: Mira dan Hakim membawa stok ke booth ketika titisan hujan mula jatuh.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/angkat.jpg" alt="Mira dan Hakim membawa stok ke booth ketika titisan hujan mula jatuh."><figcaption>Mira dan Hakim membawa stok ke booth ketika titisan hujan mula jatuh.</figcaption></figure>
+<p>Sambungan: <code>langit</code>.</p>
+<h2>langit — Tapak karnival · 9:00 pagi</h2>
+<p>Peralihan di skrin (VO pilihan): Dari bilik persediaan ke tapak karnival. Hujan semakin lebat.</p>
+<p class="cue" id="EP1-langit-01-01"><strong>EP1-langit-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Hakim rapatkan bekas makanan ke bawah bumbung. Mira memandang murid yang berlari menuju ke dewan.</p>
+<p class="arah">Visual: Hakim merapatkan bekas di bawah kanopi; Mira melihat ke arah dewan.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/lindung.jpg" alt="Hakim merapatkan bekas di bawah kanopi; Mira melihat ke arah dewan."><figcaption>Hakim merapatkan bekas di bawah kanopi; Mira melihat ke arah dewan.</figcaption></figure>
+<p class="cue" id="EP1-langit-02-01"><strong>EP1-langit-02-01 · Mira · risau</strong></p>
+<p>Weh… laluan kita makin kosong. Belum buka jualan pun hujan dah turun.</p>
+<p class="cue" id="EP1-langit-03-01"><strong>EP1-langit-03-01 · Hakim · risau</strong></p>
+<p>Cabang: Baki tunai RM15.00.</p>
+<p>Tunai tinggal RM15.00. Penganjur kata boleh pindah ke ruang berbumbung tepi dewan, tapi kena bayar RM10.</p>
+<p class="cue" id="EP1-langit-03-02"><strong>EP1-langit-03-02 · Hakim · risau</strong></p>
+<p>Cabang: Baki tunai RM45.00.</p>
+<p>Tunai tinggal RM45.00. Penganjur kata boleh pindah ke ruang berbumbung tepi dewan, tapi kena bayar RM10.</p>
+<p class="cue" id="EP1-langit-04-01"><strong>EP1-langit-04-01 · Mira · risau</strong></p>
+<p>Ada ruang bantuan percuma juga, cuma kena tunggu giliran. Kalau kekal sini, kita jimat duit tapi pembeli kurang.</p>
+<p class="cue" id="EP1-langit-05-01"><strong>EP1-langit-05-01 · Hakim · risau</strong></p>
+<p>Bekas dah selamat. Sekarang kita pilih tempat—pindah terus, kekal sini, atau tunggu bantuan?</p>
+<h3>Pilihan pemain (teks skrin)</h3>
+<p>- Bayar RM10. Pindah sekarang. → <code>dalam</code></p>
+<p>- Kekal bawah kanopi. Jimat tunai. → <code>luar</code></p>
+<p>- Tunggu ruang bantuan percuma. → <code>dibantu</code></p>
+<h2>dalam — Tepi dewan · 9:15 pagi</h2>
+<p class="cue" id="EP1-dalam-01-01"><strong>EP1-dalam-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Kamu bayar RM10. Mereka mengangkat stok ke ruang berbumbung tepi dewan; hujan masih kedengaran di luar.</p>
+<p class="arah">Visual: Pasukan membawa stok ke ruang berbumbung tepi dewan.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/pindah.jpg" alt="Pasukan membawa stok ke ruang berbumbung tepi dewan."><figcaption>Pasukan membawa stok ke ruang berbumbung tepi dewan.</figcaption></figure>
+<p class="cue" id="EP1-dalam-02-01"><strong>EP1-dalam-02-01 · Mira · ceria</strong></p>
+<p>Dekat sini orang lalu! Kau susun bekas, aku gantung menu.</p>
+<p class="cue" id="EP1-dalam-03-01"><strong>EP1-dalam-03-01 · Hakim · fokus</strong></p>
+<p>Cabang: Baki tunai RM5.00.</p>
+<p>Baki RM5.00. Kita dah belanja untuk dapat tempat ni. Jom sediakan jualan.</p>
+<p class="cue" id="EP1-dalam-03-02"><strong>EP1-dalam-03-02 · Hakim · fokus</strong></p>
+<p>Cabang: Baki tunai RM35.00.</p>
+<p>Baki RM35.00. Kita dah belanja untuk dapat tempat ni. Jom sediakan jualan.</p>
+<p>Sambungan: <code>pelanggan</code>.</p>
+<h2>luar — Tapak karnival · 9:15 pagi</h2>
+<p class="cue" id="EP1-luar-01-01"><strong>EP1-luar-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Mereka kekal di bawah kanopi. Beberapa murid lalu cepat-cepat tanpa berhenti.</p>
+<p class="arah">Visual: Murid berpayung melintasi booth luar tanpa berhenti.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/sunyi.jpg" alt="Murid berpayung melintasi booth luar tanpa berhenti."><figcaption>Murid berpayung melintasi booth luar tanpa berhenti.</figcaption></figure>
+<p class="cue" id="EP1-luar-02-01"><strong>EP1-luar-02-01 · Mira · risau</strong></p>
+<p>Cabang: Baki tunai RM15.00.</p>
+<p>Tunai RM15.00 tu kita simpan. Tapi… sunyi juga sini.</p>
+<p class="cue" id="EP1-luar-02-02"><strong>EP1-luar-02-02 · Mira · risau</strong></p>
+<p>Cabang: Baki tunai RM45.00.</p>
+<p>Tunai RM45.00 tu kita simpan. Tapi… sunyi juga sini.</p>
+<p class="cue" id="EP1-luar-03-01"><strong>EP1-luar-03-01 · Hakim · risau</strong></p>
+<p>Jom susun menu menghadap laluan. Kita cuba tarik orang yang masih lalu.</p>
+<p>Sambungan: <code>pelanggan</code>.</p>
+<h2>dibantu — Ruang bantuan · 9:35 pagi</h2>
+<p class="cue" id="EP1-dibantu-01-01"><strong>EP1-dibantu-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Selepas menunggu, penganjur memanggil mereka. Pasukan kamu dapat ruang berbumbung tanpa bayaran.</p>
+<p class="arah">Visual: Penganjur memanggil pasukan ke ruang berbumbung tanpa bayaran.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/bantuan.jpg" alt="Penganjur memanggil pasukan ke ruang berbumbung tanpa bayaran."><figcaption>Penganjur memanggil pasukan ke ruang berbumbung tanpa bayaran.</figcaption></figure>
+<p class="cue" id="EP1-dibantu-02-01"><strong>EP1-dibantu-02-01 · Mira · ceria</strong></p>
+<p>Akhirnya! Cepat, kita pindahkan bekas. Dah lambat sikit ni.</p>
+<p class="cue" id="EP1-dibantu-03-01"><strong>EP1-dibantu-03-01 · Hakim · fokus</strong></p>
+<p>Duit masih ada, tapi masa jualan makin pendek. Kita susun menu dulu.</p>
+<p>Sambungan: <code>pelanggan</code>.</p>
+<h2>pelanggan — Booth kelas · 10:00 pagi</h2>
+<p class="cue" id="EP1-pelanggan-01-01"><strong>EP1-pelanggan-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Ada air untuk jualan.</p>
+<p>Sebaik menu dipasang, seorang murid berhenti. Dia melihat harga air RM3, kemudian mengira duit di tangannya.</p>
+<p class="arah">Visual: Seorang murid mengira duit di tangannya di depan menu booth.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/syiling.jpg" alt="Seorang murid mengira duit di tangannya di depan menu booth."><figcaption>Seorang murid mengira duit di tangannya di depan menu booth.</figcaption></figure>
+<p class="cue" id="EP1-pelanggan-01-02"><strong>EP1-pelanggan-01-02 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Sandwich sahaja.</p>
+<p>Sebaik menu dipasang, seorang murid berhenti. Dia melihat harga sandwich RM4, kemudian mengira duit di tangannya.</p>
+<p class="arah">Visual: Seorang murid mengira duit di tangannya di depan menu booth.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/syiling.jpg" alt="Seorang murid mengira duit di tangannya di depan menu booth."><figcaption>Seorang murid mengira duit di tangannya di depan menu booth.</figcaption></figure>
+<p class="cue" id="EP1-pelanggan-02-01"><strong>EP1-pelanggan-02-01 · Murid · segan, lembut</strong></p>
+<p>Cabang: Ada air untuk jualan.</p>
+<p>Saya ada RM2 je. Tak apa… saya tengok dulu.</p>
+<p class="cue" id="EP1-pelanggan-02-02"><strong>EP1-pelanggan-02-02 · Murid · segan, lembut</strong></p>
+<p>Cabang: Sandwich sahaja.</p>
+<p>Saya ada RM3 je. Tak apa… saya tengok dulu.</p>
+<p class="cue" id="EP1-pelanggan-03-01"><strong>EP1-pelanggan-03-01 · Mira · risau</strong></p>
+<p>Sekejap, jangan pergi dulu. Guys, boleh kita bincang harga sebelum mula jual?</p>
+<p class="cue" id="EP1-pelanggan-04-01"><strong>EP1-pelanggan-04-01 · Hakim · fokus</strong></p>
+<p>Harga biasa bantu kumpul dana. Kita boleh turunkan harga, atau asingkan sedikit stok untuk bantuan—tapi duit yang masuk akan berubah.</p>
+<p class="cue" id="EP1-pelanggan-05-01"><strong>EP1-pelanggan-05-01 · Mira · risau</strong></p>
+<p>Aku nak dia boleh beli juga. Tapi buku kelas pun kita kena fikir. Kita buat macam mana?</p>
+<h3>Pilihan pemain (teks skrin)</h3>
+<p>- Kekalkan harga. Kumpul dana buku. → <code>agihan</code></p>
+<p>- Harga murid: air RM2, sandwich RM3. → <code>agihan</code></p>
+<p>- Asingkan hingga 4 unit setiap produk untuk bantuan. → <code>agihan</code></p>
+<h2>agihan — Booth kelas · 10:10 pagi</h2>
+<p class="cue" id="EP1-agihan-01-01"><strong>EP1-agihan-01-01 · Mira · fokus</strong></p>
+<p>Cabang: Agihan biasa.</p>
+<p>Okay, kita kekalkan harga. Aku jelaskan elok-elok—duit ni untuk buku kelas.</p>
+<p class="cue" id="EP1-agihan-01-02"><strong>EP1-agihan-01-02 · Mira · ceria</strong></p>
+<p>Cabang: Agihan murid · ada air.</p>
+<p>Aku tukar menu sekarang. Adik, air RM2 lepas ni. Tunggu kejap, kita nak buka.</p>
+<p class="cue" id="EP1-agihan-01-03"><strong>EP1-agihan-01-03 · Mira · ceria</strong></p>
+<p>Cabang: Agihan kongsi.</p>
+<p>Aku asingkan bekas bantuan dulu. Adik boleh ambil daripada bahagian ni bila kita buka.</p>
+<p class="cue" id="EP1-agihan-01-04"><strong>EP1-agihan-01-04 · Mira · ceria</strong></p>
+<p>Cabang: Agihan murid · sandwich sahaja.</p>
+<p>Aku tukar menu sekarang. Adik, sandwich RM3 lepas ni. Tunggu kejap, kita nak buka.</p>
+<p class="cue" id="EP1-agihan-02-01"><strong>EP1-agihan-02-01 · Hakim · fokus</strong></p>
+<p>Cabang: Agihan biasa; Agihan murid · ada air; Agihan murid · sandwich sahaja.</p>
+<p>Aku tulis harga yang kita setuju. Nanti kutipan jangan campur dengan baki duit bahan.</p>
+<p class="cue" id="EP1-agihan-02-02"><strong>EP1-agihan-02-02 · Hakim · fokus</strong></p>
+<p>Cabang: Agihan kongsi.</p>
+<p>Aku tanda stok bantuan supaya tak tercampur dengan kiraan jualan.</p>
+<p class="cue" id="EP1-agihan-03-01"><strong>EP1-agihan-03-01 · Pencerita · narasi tenang</strong></p>
+<p>Mira mengambil kad promosi yang disiapkan semalam. Hakim mengangkat tangan memberi isyarat supaya Mira tunggu dulu.</p>
+<p class="arah">Visual: Hakim memberi isyarat berhenti dengan tapak tangan terbuka, tanpa menyentuh Mira.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/kad-stop.png" alt="Hakim memberi isyarat berhenti dengan tapak tangan terbuka, tanpa menyentuh Mira."><figcaption>Hakim memberi isyarat berhenti dengan tapak tangan terbuka, tanpa menyentuh Mira.</figcaption></figure>
+<p>Sambungan: <code>amanah</code>.</p>
+<h2>amanah — Booth kelas · 10:20 pagi</h2>
+<p class="cue" id="EP1-amanah-01-01"><strong>EP1-amanah-01-01 · Hakim · risau</strong></p>
+<p>Eh, kad ni tulis setiap pembelian dapat hadiah. Hadiah kita cuma ada lima.</p>
+<p class="cue" id="EP1-amanah-02-01"><strong>EP1-amanah-02-01 · Mira · risau</strong></p>
+<p>Alamak. Aku buat sebelum kira bajet. Kalau tukar jadi lima pembeli pertama, okay tak?</p>
+<p class="cue" id="EP1-amanah-03-01"><strong>EP1-amanah-03-01 · Hakim · risau</strong></p>
+<p>Okay. Tapi kalau biarkan ayat lama, orang akan harapkan hadiah yang kita tak ada.</p>
+<p class="cue" id="EP1-amanah-04-01"><strong>EP1-amanah-04-01 · Mira · risau</strong></p>
+<p>Pen dah ada sini. Kita betulkan dulu, atau tetap gantung kad lama?</p>
+<h3>Pilihan pemain (teks skrin)</h3>
+<p>- Betulkan: hadiah untuk lima pembeli pertama. → <code>jualan</code></p>
+<p>- Gantung kad lama walaupun hadiah tak cukup. → <code>jualan</code></p>
+<h2>jualan — Booth kelas · Jualan bermula</h2>
+<p class="cue" id="EP1-jualan-01-01"><strong>EP1-jualan-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Mengikut versi dialog / keadaan pasukan.</p>
+<p>Mira membetulkan kad promosi. Hakim susun stok; kamu menjaga kutipan. Akhirnya, booth mereka dibuka.</p>
+<p class="arah">Visual: Mira membetulkan kad promosi; lima hadiah disusun di sebelahnya.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/betulkan.jpg" alt="Mira membetulkan kad promosi; lima hadiah disusun di sebelahnya."><figcaption>Mira membetulkan kad promosi; lima hadiah disusun di sebelahnya.</figcaption></figure>
+<p class="cue" id="EP1-jualan-01-02"><strong>EP1-jualan-01-02 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Mengikut versi dialog / keadaan pasukan.</p>
+<p>Kad lama digantung. Mira menyerahkan stok kepada pembeli pertama; kamu mula mengumpulkan bayaran.</p>
+<p class="arah">Visual: Produk diserahkan kepada pembeli dan bayaran diterima.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/jual.jpg" alt="Produk diserahkan kepada pembeli dan bayaran diterima."><figcaption>Produk diserahkan kepada pembeli dan bayaran diterima.</figcaption></figure>
+<p class="cue" id="EP1-jualan-02-01"><strong>EP1-jualan-02-01 · Mira · ceria</strong></p>
+<p>Cabang: Mengikut versi dialog / keadaan pasukan.</p>
+<p>Hadiah untuk lima pembeli pertama ya. Terima kasih singgah booth kita!</p>
+<p class="cue" id="EP1-jualan-02-02"><strong>EP1-jualan-02-02 · Mira · risau</strong></p>
+<p>Cabang: Mengikut versi dialog / keadaan pasukan.</p>
+<p>Hakim… ada orang tanya hadiah lagi. Lima hadiah tu dah habis.</p>
+<p class="cue" id="EP1-jualan-03-01"><strong>EP1-jualan-03-01 · Hakim · fokus</strong></p>
+<p>Cabang: Promosi jujur · lokasi dewan · agihan biasa; Promosi jujur · lokasi dewan · agihan murid; Promosi jujur · lokasi dewan · agihan kongsi.</p>
+<p>Dekat laluan ni ramai juga singgah. Kau urus bayaran, aku semak bekas yang keluar.</p>
+<p class="cue" id="EP1-jualan-03-02"><strong>EP1-jualan-03-02 · Hakim · risau</strong></p>
+<p>Cabang: Mengikut versi dialog / keadaan pasukan.</p>
+<p>Kita kena mengaku kad tu salah. Aku turunkan sekarang—tak boleh terus janji benda yang tak ada.</p>
+<p class="cue" id="EP1-jualan-03-03"><strong>EP1-jualan-03-03 · Hakim · fokus</strong></p>
+<p>Cabang: Promosi jujur · lokasi luar · agihan biasa; Promosi jujur · lokasi luar · agihan murid; Promosi jujur · lokasi luar · agihan kongsi.</p>
+<p>Ada yang berhenti, tapi ramai terus menuju ke dewan. Kita teruskan dengan pelanggan yang datang.</p>
+<p class="cue" id="EP1-jualan-03-04"><strong>EP1-jualan-03-04 · Hakim · fokus</strong></p>
+<p>Cabang: Promosi jujur · lokasi bantuan · agihan biasa; Promosi jujur · lokasi bantuan · agihan murid; Promosi jujur · lokasi bantuan · agihan kongsi.</p>
+<p>Orang dah mula singgah. Kita kena guna masa yang masih ada sebaik mungkin.</p>
+<p class="cue" id="EP1-jualan-04-01"><strong>EP1-jualan-04-01 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Promosi jujur · lokasi dewan · agihan biasa; Promosi jujur · lokasi luar · agihan biasa; Promosi jujur · lokasi bantuan · agihan biasa.</p>
+<p>Bayaran dikumpulkan, pesanan diserahkan. Hakim menandakan jualan dalam buku yang sama sejak semalam.</p>
+<p class="arah">Visual: Produk diserahkan kepada pembeli dan bayaran diterima.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/jual.jpg" alt="Produk diserahkan kepada pembeli dan bayaran diterima."><figcaption>Produk diserahkan kepada pembeli dan bayaran diterima.</figcaption></figure>
+<p class="cue" id="EP1-jualan-04-02"><strong>EP1-jualan-04-02 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Mengikut versi dialog / keadaan pasukan.</p>
+<p>Beberapa pelanggan berundur selepas mendengar penjelasan. Mereka meneruskan jualan dengan kad yang sudah diturunkan.</p>
+<p class="arah">Visual: Pelanggan berundur ketika kad promosi diturunkan.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/undur.jpg" alt="Pelanggan berundur ketika kad promosi diturunkan."><figcaption>Pelanggan berundur ketika kad promosi diturunkan.</figcaption></figure>
+<p class="cue" id="EP1-jualan-04-03"><strong>EP1-jualan-04-03 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Promosi jujur · lokasi dewan · agihan murid; Promosi jujur · lokasi luar · agihan murid; Promosi jujur · lokasi bantuan · agihan murid.</p>
+<p>Harga baharu membuat lebih ramai murid berhenti. Mira melayan pesanan sementara Hakim menanda setiap unit yang terjual.</p>
+<p class="arah">Visual: Mira melayan barisan murid; Hakim menandakan jualan dalam buku.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/ramai.jpg" alt="Mira melayan barisan murid; Hakim menandakan jualan dalam buku."><figcaption>Mira melayan barisan murid; Hakim menandakan jualan dalam buku.</figcaption></figure>
+<p class="cue" id="EP1-jualan-04-04"><strong>EP1-jualan-04-04 · Pencerita · narasi tenang</strong></p>
+<p>Cabang: Promosi jujur · lokasi dewan · agihan kongsi; Promosi jujur · lokasi luar · agihan kongsi; Promosi jujur · lokasi bantuan · agihan kongsi.</p>
+<p>Sebahagian stok diagihkan sebagai bantuan. Stok jualan dan bantuan dicatat berasingan, satu demi satu.</p>
+<p class="arah">Visual: Bekas bantuan diserahkan daripada bakul yang berasingan dengan stok jualan.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/agih.jpg" alt="Bekas bantuan diserahkan daripada bakul yang berasingan dengan stok jualan."><figcaption>Bekas bantuan diserahkan daripada bakul yang berasingan dengan stok jualan.</figcaption></figure>
+<p class="cue" id="EP1-jualan-05-01"><strong>EP1-jualan-05-01 · Pencerita · narasi tenang</strong></p>
+<p>Menjelang petang, hujan reda dan pengunjung mula pulang. Mira mengambil kotak kosong. Masa untuk kira baki dan kemas booth.</p>
+<p class="arah">Visual: Hujan reda, pengunjung pulang dan Mira mengambil kotak kosong.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/petang.jpg" alt="Hujan reda, pengunjung pulang dan Mira mengambil kotak kosong."><figcaption>Hujan reda, pengunjung pulang dan Mira mengambil kotak kosong.</figcaption></figure>
+<p>Sambungan: <code>penutup</code>.</p>
+<h2>penutup — Tapak karnival · 4:00 petang</h2>
+<p>Peralihan di skrin (VO pilihan): Karnival berakhir. Mereka mengemas sambil mengira kutipan.</p>
+<p class="cue" id="EP1-penutup-01-01"><strong>EP1-penutup-01-01 · Pencerita · narasi tenang</strong></p>
+<p>Mira menyusun bekas berbaki dalam kotak. Hakim duduk di sebelahnya, membuka semula buku kira-kira.</p>
+<p class="arah">Visual: Mira menyusun bekas berbaki ke dalam kotak; Hakim membuka buku.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/kemas.jpg" alt="Mira menyusun bekas berbaki ke dalam kotak; Hakim membuka buku."><figcaption>Mira menyusun bekas berbaki ke dalam kotak; Hakim membuka buku.</figcaption></figure>
+<p class="cue" id="EP1-penutup-02-01"><strong>EP1-penutup-02-01 · Hakim · ceria</strong></p>
+<p>Hari ni terjual {AIR_TERJUAL} air dan {SANDWICH_TERJUAL} sandwich. Kutipan {JUMLAH_HASIL}.</p>
+<p class="cue" id="EP1-penutup-03-01"><strong>EP1-penutup-03-01 · Mira · ceria</strong></p>
+<p>Belanja semua sekali {JUMLAH_BELANJA}. Jadi duit kelas yang kita bawa balik… {DANA_AKHIR}.</p>
+<p class="cue" id="EP1-penutup-04-01"><strong>EP1-penutup-04-01 · Kamu · tenang, membantu</strong></p>
+<p>Cabang: Sasaran tunai dicapai.</p>
+<p>Cukup untuk target buku! Semalam kita cuma ada lakaran. Hari ni kita dah buat jadi.</p>
+<p class="cue" id="EP1-penutup-04-02"><strong>EP1-penutup-04-02 · Kamu · tenang, membantu</strong></p>
+<p>Cabang: Sasaran tunai belum dicapai.</p>
+<p>Belum cukup RM120. Kita bawa balik dulu apa yang ada, kemudian fikir cara cukupkan baki.</p>
+<p class="cue" id="EP1-penutup-05-01"><strong>EP1-penutup-05-01 · Mira · ceria</strong></p>
+<p>Cabang: Promosi jujur.</p>
+<p>Penat, tapi lega. Kita tepati apa yang kita janji dekat pelanggan.</p>
+<p class="cue" id="EP1-penutup-05-02"><strong>EP1-penutup-05-02 · Mira · risau</strong></p>
+<p>Cabang: Promosi palsu.</p>
+<p>Pasal kad tadi… aku kena minta maaf. Lepas ni aku semak dulu sebelum janji apa-apa.</p>
+<p class="cue" id="EP1-penutup-06-01"><strong>EP1-penutup-06-01 · Hakim · ceria</strong></p>
+<p>Cabang: Promosi jujur.</p>
+<p>Aku simpan kiraan ni. Banyak yang kita boleh buat lebih baik untuk karnival seterusnya.</p>
+<p class="cue" id="EP1-penutup-06-02"><strong>EP1-penutup-06-02 · Hakim · risau</strong></p>
+<p>Cabang: Promosi palsu.</p>
+<p>Kita baiki sama-sama. Aku simpan kiraan ni supaya kita ingat apa yang jadi.</p>
+<p class="cue" id="EP1-penutup-07-01"><strong>EP1-penutup-07-01 · Pencerita · narasi tenang</strong></p>
+<p>Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim. Mereka mengangkat kotak terakhir bersama-sama.</p>
+<p class="arah">Visual: Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim.</p>
+<p class="arah">Gerakan: gambar masuk dan kamera mendekat perlahan.</p>
+<figure><img loading="lazy" src="assets/narasi/lipat.jpg" alt="Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim."><figcaption>Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim.</figcaption></figure>
+<p class="arah">Selepas 3.6 saat: Mira dan Hakim mengangkat kotak terakhir bersama-sama.</p>
+<figure><img loading="lazy" src="assets/narasi/terakhir.jpg" alt="Mira dan Hakim mengangkat kotak terakhir bersama-sama."><figcaption>Mira dan Hakim mengangkat kotak terakhir bersama-sama.</figcaption></figure>
+<p>Sambungan: <code>tamat</code>.</p>
+<h2>Dialog penerokaan scene</h2>
+<p>Dialog ini dimainkan apabila pelajar menekan objek semasa Jelajah scene.</p>
+<p class="cue" id="EP1-jelajah-kelas-lakaran"><strong>EP1-jelajah-kelas-lakaran · Mira · fokus</strong></p>
+<p>Objek: Lakaran booth.</p>
+<p>Ni idea booth kita! Air dan sandwich nampak best, tapi kita kena pilih ikut duit dan masa yang ada.</p>
+<p class="cue" id="EP1-jelajah-kelas-buku"><strong>EP1-jelajah-kelas-buku · Hakim · fokus</strong></p>
+<p>Objek: Buku kira-kira.</p>
+<p>Duit kelas RM100. Wishlist RM150. Beza RM50 tu sebab kita kena kecilkan pelan, bukan terus janji buat semua.</p>
+<p class="cue" id="EP1-jelajah-persediaan-salad"><strong>EP1-jelajah-persediaan-salad · Mira · ceria</strong></p>
+<p>Objek: Letak salad.</p>
+<p>Okay, salad atas roti dulu. Aku susun contoh sandwich ni; lepas pilih kuantiti, baru kita sediakan stok jualan.</p>
+<p class="cue" id="EP1-jelajah-persediaan-jug"><strong>EP1-jelajah-persediaan-jug · Hakim · fokus</strong></p>
+<p>Objek: Sediakan air.</p>
+<p>Jug dan bahan air dah ready. Setiap cawan guna bahan serta masa; banyak mana kita buat kena ikut kapasiti pasukan.</p>
+<p class="cue" id="EP1-jelajah-persediaan-kira"><strong>EP1-jelajah-persediaan-kira · Hakim · fokus</strong></p>
+<p>Objek: Semak kapasiti.</p>
+<p>Aku semak kiraan sambil Mira susun bahan. Satu air guna 1 unit kerja, satu sandwich guna 2. Kita tak boleh melebihi had sesi ni.</p>
+<p class="cue" id="EP1-jelajah-hujan-bekas"><strong>EP1-jelajah-hujan-bekas · Hakim · risau</strong></p>
+<p>Objek: Jaga bekas.</p>
+<p>Aku pegang bekas ni supaya makanan kekal bertutup. Stok dah siap; sekarang kita kena pilih lokasi yang sesuai untuk jual.</p>
+<p class="cue" id="EP1-jelajah-hujan-hujan"><strong>EP1-jelajah-hujan-hujan · Mira · risau</strong></p>
+<p>Objek: Tengok laluan.</p>
+<p>Laluan luar dah sunyi. Jimat bayaran tapak ada manfaat, tapi kita mungkin lepaskan peluang jumpa lebih ramai pembeli.</p>
+<p class="cue" id="EP1-jelajah-senja-kotak"><strong>EP1-jelajah-senja-kotak · Mira · ceria</strong></p>
+<p>Objek: Kemas booth.</p>
+<p>Kita susun bekas yang masih bertutup dalam kotak. Dah habis karnival, kita tetap kena kira baki dan kemas sama-sama.</p>
+<p class="cue" id="EP1-jelajah-senja-stok"><strong>EP1-jelajah-senja-stok · Hakim · fokus</strong></p>
+<p>Objek: Semak baki stok.</p>
+<p>Baki stok: {AIR_BAKI} air dan {SANDWICH_BAKI} sandwich. Jualan dan bantuan dikira berasingan.</p>
+<p>Token tambahan: {AIR_BAKI} dan {SANDWICH_BAKI} ialah jumlah stok tidak terjual selepas jualan dan bantuan. Contoh laluan dalam jadual di atas: 2 air dan 0 sandwich.</p>
+<h2>Ending (VO pilihan)</h2>
+<h3>target — Janji kelas, tertunai.</h3>
+<p>Dana buku mencapai sasaran. Pasukan kamu mengurus sumber, membuat pilihan dan menerima pengorbanannya. Strategi lain boleh membawa perjalanan yang berbeza.</p>
+<p class="arah">Visual: pasukan mengangkat kotak terakhir bersama-sama.</p>
+<figure><img loading="lazy" src="assets/narasi/terakhir.jpg" alt="Mira dan Hakim mengangkat kotak terakhir"><figcaption>Mira dan Hakim mengangkat kotak terakhir</figcaption></figure>
+<h3>amanah — Janji yang perlu diperbaiki.</h3>
+<p>Kamu sudah nampak kesan promosi yang tidak benar: pelanggan berundur dan kepercayaan hilang. Dana sahaja tidak menceritakan semuanya. Ada peluang memilih dengan lebih jujur apabila bermain semula.</p>
+<p class="arah">Visual: pasukan mengangkat kotak terakhir bersama-sama.</p>
+<figure><img loading="lazy" src="assets/narasi/terakhir.jpg" alt="Mira dan Hakim mengangkat kotak terakhir"><figcaption>Mira dan Hakim mengangkat kotak terakhir</figcaption></figure>
+<h3>kongsi — Ada yang kita kongsi.</h3>
+<p>Sasaran dana belum dicapai, tetapi pilihan agihan membuka ruang untuk lebih ramai murid. Bincangkan apa yang diperoleh dan apa yang dilepaskan—kemudian cuba laluan lain.</p>
+<p class="arah">Visual: pasukan mengangkat kotak terakhir bersama-sama.</p>
+<figure><img loading="lazy" src="assets/narasi/terakhir.jpg" alt="Mira dan Hakim mengangkat kotak terakhir"><figcaption>Mira dan Hakim mengangkat kotak terakhir</figcaption></figure>
+<h3>belajar — Belum cukup. Belum habis.</h3>
+<p>Dana belum mencapai sasaran. Pasukan kamu kini tahu bagaimana kapasiti, lokasi dan kuasa beli membentuk keputusan. Peluang belajar itu boleh dibawa ke percubaan seterusnya.</p>
+<p class="arah">Visual: pasukan mengangkat kotak terakhir bersama-sama.</p>
+<figure><img loading="lazy" src="assets/narasi/terakhir.jpg" alt="Mira dan Hakim mengangkat kotak terakhir"><figcaption>Mira dan Hakim mengangkat kotak terakhir</figcaption></figure>
+<h2>Semakan liputan</h2>
+<p>Semua 324 kombinasi pilihan telah dilalui ketika skrip dieksport. Semua varian dialog dicatat; angka penutup ditandakan sebagai token. Skrip mengandungi 125 cue rakaman.</p></main></body></html>

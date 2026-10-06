@@ -1,6 +1,10 @@
 # Misi Karnival — Skrip penuh voice-over
 
-Episod 1: Janji Kelas Kita. Versi selepas kemasan aliran cerita, 6 Oktober 2026. Skrip ini mengikut dialog permainan yang terkini, termasuk semua cabang pilihan. Satu permainan hanya menggunakan satu versi bagi setiap baris bercabang.
+Episod 1: Misi Mengumpul Dana Buku Kelas. Versi selepas kemasan aliran cerita, 6 Oktober 2026. Skrip ini mengikut dialog permainan yang terkini, termasuk semua cabang pilihan. Satu permainan hanya menggunakan satu versi bagi setiap baris bercabang.
+
+## Visual bersama Pencerita
+
+Setiap baris Pencerita disertakan gambar aksi di bawah teks. Gambar muncul automatik dalam permainan, dengan gerakan kamera lembut. Close-up poster melukis bulatan pen merah beransur. Gambar skrip ialah pratonton aksi, bukan video. Arahan visual tidak perlu dibaca semasa rakaman.
 
 ## Arahan rakaman
 
@@ -136,17 +140,35 @@ Cabang: Pelan air.
 
 Mira melukis cawan di tepi lakarannya. Hakim tarik buku kira-kira ke tengah meja.
 
+Visual: Mira melukis cawan di lakaran; Hakim menarik buku kira-kira ke tengah meja.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira melukis cawan di lakaran; Hakim menarik buku kira-kira ke tengah meja.](assets/narasi/cawan.jpg)
+
 **EP1-sepakat-04-02 · Pencerita · narasi tenang**
 
 Cabang: Pelan sandwic.
 
 Mira membulatkan lukisan sandwich. Kali ini, mereka merancang menu yang sama.
 
+Visual: Close-up lakaran booth: Mira membulatkan sandwich dengan pen merah.
+
+Gerakan: bulatan pen merah dilukis beransur di sekeliling sandwich.
+
+![Close-up lakaran booth: Mira membulatkan sandwich dengan pen merah.](assets/narasi/poster-dibulatkan.png)
+
 **EP1-sepakat-04-03 · Pencerita · narasi tenang**
 
 Cabang: Pelan campur.
 
 Mira menolak lakaran ke tengah. Tiga orang, dua menu—sekarang mereka perlukan cara bekerja.
+
+Visual: Tiga tangan menolak lakaran booth ke tengah meja.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Tiga tangan menolak lakaran booth ke tengah meja.](assets/narasi/sepakat.jpg)
 
 Sambungan: `tenaga`.
 
@@ -181,6 +203,12 @@ Peralihan di skrin (VO pilihan): Esok pagi. Pelan semalam mula jadi kerja sebena
 
 Set peralatan yang kamu tempah sudah sampai. Mira susun bahan untuk contoh sandwich; Hakim semak senarai.
 
+Visual: Set peralatan tiba; Mira menyusun bahan sementara Hakim menyemak senarai.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Set peralatan tiba; Mira menyusun bahan sementara Hakim menyemak senarai.](assets/narasi/alat.jpg)
+
 **EP1-siap-alat-02-01 · Mira · fokus**
 
 Okay, semua ready. Aku buat satu contoh dulu supaya kita tahu langkahnya.
@@ -199,6 +227,12 @@ Peralihan di skrin (VO pilihan): Esok pagi. Pasukan berkumpul untuk mula menyedi
 
 Kawan yang kamu upah mengambil tugas bahan dan bekas di meja sebelah. Mira dan Hakim menyiapkan contoh di meja utama.
 
+Visual: Kawan mengurus bahan dan bekas di meja sebelah.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Kawan mengurus bahan dan bekas di meja sebelah.](assets/narasi/pembantu.jpg)
+
 **EP1-siap-buruh-02-01 · Mira · fokus**
 
 Best, ada orang bantu. Aku tunjuk contoh; lepas tu kita bahagi tugas ikut jumlah yang dipilih.
@@ -214,6 +248,12 @@ Sambungan: `kuantiti`.
 **EP1-kuantiti-01-01 · Pencerita · narasi tenang**
 
 Mira letak salad atas roti contoh. Hakim tandakan dua lajur: air dan sandwich.
+
+Visual: Mira meletakkan salad atas roti contoh; buku dua lajur ada di sisi.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira meletakkan salad atas roti contoh; buku dua lajur ada di sisi.](assets/narasi/salad.jpg)
 
 **EP1-kuantiti-02-01 · Hakim · fokus**
 
@@ -294,6 +334,12 @@ Okay, kita ubah sebelum beli bahan. Aku tukar susunan kerja dulu supaya semua or
 
 Selepas bahan dibeli, mereka membahagi tugas. Sedikit demi sedikit, bekas yang kosong mula terisi.
 
+Visual: Bekas kosong diisi dengan produk satu demi satu.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Bekas kosong diisi dengan produk satu demi satu.](assets/narasi/isi.jpg)
+
 **EP1-stok-03-01 · Hakim · ceria**
 
 Cabang: Keluaran 60 air / 0 sandwich.
@@ -334,6 +380,12 @@ Siap: 0 air dan 20 sandwich. Bahan RM40.00; baki RM45.00. Semua dah bertutup.
 
 Mereka angkat bekas ke booth. Baru saja menu hendak digantung, titisan hujan jatuh atas kanopi.
 
+Visual: Mira dan Hakim membawa stok ke booth ketika titisan hujan mula jatuh.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira dan Hakim membawa stok ke booth ketika titisan hujan mula jatuh.](assets/narasi/angkat.jpg)
+
 Sambungan: `langit`.
 
 ## langit — Tapak karnival · 9:00 pagi
@@ -343,6 +395,12 @@ Peralihan di skrin (VO pilihan): Dari bilik persediaan ke tapak karnival. Hujan 
 **EP1-langit-01-01 · Pencerita · narasi tenang**
 
 Hakim rapatkan bekas makanan ke bawah bumbung. Mira memandang murid yang berlari menuju ke dewan.
+
+Visual: Hakim merapatkan bekas di bawah kanopi; Mira melihat ke arah dewan.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Hakim merapatkan bekas di bawah kanopi; Mira melihat ke arah dewan.](assets/narasi/lindung.jpg)
 
 **EP1-langit-02-01 · Mira · risau**
 
@@ -380,6 +438,12 @@ Bekas dah selamat. Sekarang kita pilih tempat—pindah terus, kekal sini, atau t
 
 Kamu bayar RM10. Mereka mengangkat stok ke ruang berbumbung tepi dewan; hujan masih kedengaran di luar.
 
+Visual: Pasukan membawa stok ke ruang berbumbung tepi dewan.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Pasukan membawa stok ke ruang berbumbung tepi dewan.](assets/narasi/pindah.jpg)
+
 **EP1-dalam-02-01 · Mira · ceria**
 
 Dekat sini orang lalu! Kau susun bekas, aku gantung menu.
@@ -403,6 +467,12 @@ Sambungan: `pelanggan`.
 **EP1-luar-01-01 · Pencerita · narasi tenang**
 
 Mereka kekal di bawah kanopi. Beberapa murid lalu cepat-cepat tanpa berhenti.
+
+Visual: Murid berpayung melintasi booth luar tanpa berhenti.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Murid berpayung melintasi booth luar tanpa berhenti.](assets/narasi/sunyi.jpg)
 
 **EP1-luar-02-01 · Mira · risau**
 
@@ -428,6 +498,12 @@ Sambungan: `pelanggan`.
 
 Selepas menunggu, penganjur memanggil mereka. Pasukan kamu dapat ruang berbumbung tanpa bayaran.
 
+Visual: Penganjur memanggil pasukan ke ruang berbumbung tanpa bayaran.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Penganjur memanggil pasukan ke ruang berbumbung tanpa bayaran.](assets/narasi/bantuan.jpg)
+
 **EP1-dibantu-02-01 · Mira · ceria**
 
 Akhirnya! Cepat, kita pindahkan bekas. Dah lambat sikit ni.
@@ -446,11 +522,23 @@ Cabang: Ada air untuk jualan.
 
 Sebaik menu dipasang, seorang murid berhenti. Dia melihat harga air RM3, kemudian mengira duit di tangannya.
 
+Visual: Seorang murid mengira duit di tangannya di depan menu booth.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Seorang murid mengira duit di tangannya di depan menu booth.](assets/narasi/syiling.jpg)
+
 **EP1-pelanggan-01-02 · Pencerita · narasi tenang**
 
 Cabang: Sandwich sahaja.
 
 Sebaik menu dipasang, seorang murid berhenti. Dia melihat harga sandwich RM4, kemudian mengira duit di tangannya.
+
+Visual: Seorang murid mengira duit di tangannya di depan menu booth.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Seorang murid mengira duit di tangannya di depan menu booth.](assets/narasi/syiling.jpg)
 
 **EP1-pelanggan-02-01 · Murid · segan, lembut**
 
@@ -522,7 +610,13 @@ Aku tanda stok bantuan supaya tak tercampur dengan kiraan jualan.
 
 **EP1-agihan-03-01 · Pencerita · narasi tenang**
 
-Mira mengambil kad promosi yang disiapkan semalam. Hakim menahan tangannya sebelum kad itu digantung.
+Mira mengambil kad promosi yang disiapkan semalam. Hakim mengangkat tangan memberi isyarat supaya Mira tunggu dulu.
+
+Visual: Hakim memberi isyarat berhenti dengan tapak tangan terbuka, tanpa menyentuh Mira.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Hakim memberi isyarat berhenti dengan tapak tangan terbuka, tanpa menyentuh Mira.](assets/narasi/kad-stop.png)
 
 Sambungan: `amanah`.
 
@@ -557,11 +651,23 @@ Cabang: Mengikut versi dialog / keadaan pasukan.
 
 Mira membetulkan kad promosi. Hakim susun stok; kamu menjaga kutipan. Akhirnya, booth mereka dibuka.
 
+Visual: Mira membetulkan kad promosi; lima hadiah disusun di sebelahnya.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira membetulkan kad promosi; lima hadiah disusun di sebelahnya.](assets/narasi/betulkan.jpg)
+
 **EP1-jualan-01-02 · Pencerita · narasi tenang**
 
 Cabang: Mengikut versi dialog / keadaan pasukan.
 
 Kad lama digantung. Mira menyerahkan stok kepada pembeli pertama; kamu mula mengumpulkan bayaran.
+
+Visual: Produk diserahkan kepada pembeli dan bayaran diterima.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Produk diserahkan kepada pembeli dan bayaran diterima.](assets/narasi/jual.jpg)
 
 **EP1-jualan-02-01 · Mira · ceria**
 
@@ -605,11 +711,23 @@ Cabang: Promosi jujur · lokasi dewan · agihan biasa; Promosi jujur · lokasi l
 
 Bayaran dikumpulkan, pesanan diserahkan. Hakim menandakan jualan dalam buku yang sama sejak semalam.
 
+Visual: Produk diserahkan kepada pembeli dan bayaran diterima.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Produk diserahkan kepada pembeli dan bayaran diterima.](assets/narasi/jual.jpg)
+
 **EP1-jualan-04-02 · Pencerita · narasi tenang**
 
 Cabang: Mengikut versi dialog / keadaan pasukan.
 
 Beberapa pelanggan berundur selepas mendengar penjelasan. Mereka meneruskan jualan dengan kad yang sudah diturunkan.
+
+Visual: Pelanggan berundur ketika kad promosi diturunkan.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Pelanggan berundur ketika kad promosi diturunkan.](assets/narasi/undur.jpg)
 
 **EP1-jualan-04-03 · Pencerita · narasi tenang**
 
@@ -617,15 +735,33 @@ Cabang: Promosi jujur · lokasi dewan · agihan murid; Promosi jujur · lokasi l
 
 Harga baharu membuat lebih ramai murid berhenti. Mira melayan pesanan sementara Hakim menanda setiap unit yang terjual.
 
+Visual: Mira melayan barisan murid; Hakim menandakan jualan dalam buku.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira melayan barisan murid; Hakim menandakan jualan dalam buku.](assets/narasi/ramai.jpg)
+
 **EP1-jualan-04-04 · Pencerita · narasi tenang**
 
 Cabang: Promosi jujur · lokasi dewan · agihan kongsi; Promosi jujur · lokasi luar · agihan kongsi; Promosi jujur · lokasi bantuan · agihan kongsi.
 
 Sebahagian stok diagihkan sebagai bantuan. Stok jualan dan bantuan dicatat berasingan, satu demi satu.
 
+Visual: Bekas bantuan diserahkan daripada bakul yang berasingan dengan stok jualan.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Bekas bantuan diserahkan daripada bakul yang berasingan dengan stok jualan.](assets/narasi/agih.jpg)
+
 **EP1-jualan-05-01 · Pencerita · narasi tenang**
 
 Menjelang petang, hujan reda dan pengunjung mula pulang. Mira mengambil kotak kosong. Masa untuk kira baki dan kemas booth.
+
+Visual: Hujan reda, pengunjung pulang dan Mira mengambil kotak kosong.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Hujan reda, pengunjung pulang dan Mira mengambil kotak kosong.](assets/narasi/petang.jpg)
 
 Sambungan: `penutup`.
 
@@ -636,6 +772,12 @@ Peralihan di skrin (VO pilihan): Karnival berakhir. Mereka mengemas sambil mengi
 **EP1-penutup-01-01 · Pencerita · narasi tenang**
 
 Mira menyusun bekas berbaki dalam kotak. Hakim duduk di sebelahnya, membuka semula buku kira-kira.
+
+Visual: Mira menyusun bekas berbaki ke dalam kotak; Hakim membuka buku.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira menyusun bekas berbaki ke dalam kotak; Hakim membuka buku.](assets/narasi/kemas.jpg)
 
 **EP1-penutup-02-01 · Hakim · ceria**
 
@@ -684,6 +826,16 @@ Kita baiki sama-sama. Aku simpan kiraan ni supaya kita ingat apa yang jadi.
 **EP1-penutup-07-01 · Pencerita · narasi tenang**
 
 Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim. Mereka mengangkat kotak terakhir bersama-sama.
+
+Visual: Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim.
+
+Gerakan: gambar masuk dan kamera mendekat perlahan.
+
+![Mira melipat lakaran booth dan menyelitkannya ke dalam buku Hakim.](assets/narasi/lipat.jpg)
+
+Selepas 3.6 saat: Mira dan Hakim mengangkat kotak terakhir bersama-sama.
+
+![Mira dan Hakim mengangkat kotak terakhir bersama-sama.](assets/narasi/terakhir.jpg)
 
 Sambungan: `tamat`.
 
@@ -753,17 +905,33 @@ Token tambahan: {AIR_BAKI} dan {SANDWICH_BAKI} ialah jumlah stok tidak terjual s
 
 Dana buku mencapai sasaran. Pasukan kamu mengurus sumber, membuat pilihan dan menerima pengorbanannya. Strategi lain boleh membawa perjalanan yang berbeza.
 
+Visual: pasukan mengangkat kotak terakhir bersama-sama.
+
+![Mira dan Hakim mengangkat kotak terakhir](assets/narasi/terakhir.jpg)
+
 ### amanah — Janji yang perlu diperbaiki.
 
 Kamu sudah nampak kesan promosi yang tidak benar: pelanggan berundur dan kepercayaan hilang. Dana sahaja tidak menceritakan semuanya. Ada peluang memilih dengan lebih jujur apabila bermain semula.
+
+Visual: pasukan mengangkat kotak terakhir bersama-sama.
+
+![Mira dan Hakim mengangkat kotak terakhir](assets/narasi/terakhir.jpg)
 
 ### kongsi — Ada yang kita kongsi.
 
 Sasaran dana belum dicapai, tetapi pilihan agihan membuka ruang untuk lebih ramai murid. Bincangkan apa yang diperoleh dan apa yang dilepaskan—kemudian cuba laluan lain.
 
+Visual: pasukan mengangkat kotak terakhir bersama-sama.
+
+![Mira dan Hakim mengangkat kotak terakhir](assets/narasi/terakhir.jpg)
+
 ### belajar — Belum cukup. Belum habis.
 
 Dana belum mencapai sasaran. Pasukan kamu kini tahu bagaimana kapasiti, lokasi dan kuasa beli membentuk keputusan. Peluang belajar itu boleh dibawa ke percubaan seterusnya.
+
+Visual: pasukan mengangkat kotak terakhir bersama-sama.
+
+![Mira dan Hakim mengangkat kotak terakhir](assets/narasi/terakhir.jpg)
 
 ## Semakan liputan
 

@@ -269,7 +269,7 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 
 ### 9.8 Story episode
 - **Entry link.** *Main cerita Bab 1* is an ordinary `.btn` with the `bintang` icon in the chapter header's action row, after *Kalkulator*. It follows the site theme (light and dark) like its neighbours; *Kad study* stays the only `.btn-utama`.
-- **Game page.** `cerita/episod-1/` keeps its own owner-approved look (dark navy glass, gold accent, serif dialogue over full-screen illustrations) and does not use the site tokens or follow the site theme. Its CSS stays in its own page. *Kembali ke nota Bab 1* is styled like the game's own buttons (`integrasi.css`): full text from 701 px, a 40 px arrow on phones with the text kept for screen readers.
+- **Game page.** `cerita/episod-1/` keeps its own owner-approved look (dark navy glass, gold accent, serif dialogue over full-screen illustrations) and does not use the site tokens or follow the site theme. *Pencerita* lines show a centred close-up picture over the dimmed, blurred scene; the Menu holds the sound controls (mute and three sliders). Its CSS stays in its own page. *Kembali ke nota Bab 1* is styled like the game's own buttons (`integrasi.css`): full text from 701 px, a 40 px arrow on phones with the text kept for screen readers.
 
 ---
 

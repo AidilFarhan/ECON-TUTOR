@@ -45,6 +45,7 @@
       b.onclick = function () {
         dilihat[namaScene + p.id] = true; b.classList.add("dilihat"); fokusBalik = b;
         el("suara-scene").textContent = p.nama; el("respons-scene").textContent = typeof p.teks === "function" ? p.teks(state) : p.teks;
+        window.KARNIVAL_BUNYI.objek(p.id);
         window.KARNIVAL_ANIMASI.respons(p.nama,p.id,el("respons-scene").textContent);
         el("reaksi-scene").hidden = false; el("novel").classList.add("ada-respons"); el("sambung-scene").focus({ preventScroll: true });
         el("latar").classList.remove("novel-sorot"); void el("latar").offsetWidth; el("latar").classList.add("novel-sorot");

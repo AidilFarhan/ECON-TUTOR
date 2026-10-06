@@ -2,6 +2,7 @@
   "use strict";
   var K = window.KARNIVAL, s = null, jam = null, penuh = "", sedang = false, segera = false, kunci = "econ-vn-episod1:v1", seni = "kelas", terkunci = false, jamKesan = null, gerakan = true, jamCakap = null, siapDialog = null, jamPeralihan = null;
   function el(id) { return document.getElementById(id); }
+  var tunaiBunyi = null;
   function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function simpan() { try { localStorage.setItem(kunci, JSON.stringify(s)); } catch (e) {} }
   function baca() { try { var v = JSON.parse(localStorage.getItem(kunci)); if (v && v.versi === 1 && (K.adegan[v.node] || v.node === "tamat") && Number.isInteger(v.baris) && v.baris >= 0 && Array.isArray(v.sejarah) && typeof v.wang === "number" && isFinite(v.wang)) { if (v.node !== "tamat") { v.baris = Math.min(v.baris, K.adegan[v.node].baris(v).length - 1); } return v; } } catch (e) {} return null; }
@@ -10,6 +11,7 @@
     el("cuaca").className = "cuaca " + (nama === "hujan" || nama === "senja" ? nama : "");
     var alt = { kelas: "Mira menunjukkan lakaran booth kepada Hakim yang memegang buku kira-kira.", persediaan: "Mira menyusun salad atas sandwich, Hakim menyemak buku kira-kira, bahan dan jug air di atas meja.", hujan: "Mira dan Hakim cemas di bawah kanopi, Hakim menjaga bekas makanan ketika hujan lebat.", senja: "Mira dan Hakim menyusun bekas makanan ke dalam kotak sambil mengemas booth pada waktu senja." };
     el("latar").setAttribute("aria-label", alt[nama]);
+    window.KARNIVAL_BUNYI.scene(nama,s);
   }
   function penutur(nama) {
     el("novel").dataset.penutur = nama;
@@ -17,7 +19,9 @@
   }
   function kemasHud() {
     el("hud").hidden = !s; if (!s) { return; }
-    el("dana").textContent = K.rm(K.kewangan(s).tunai);
+    var tunaiKini = K.kewangan(s).tunai;
+    if (tunaiBunyi !== null && tunaiKini !== tunaiBunyi) { window.KARNIVAL_BUNYI.cash(tunaiKini - tunaiBunyi); }
+    tunaiBunyi = tunaiKini; el("dana").textContent = K.rm(tunaiKini);
     el("langkah").setAttribute("aria-label", s.sejarah.length + " daripada 6 keputusan dibuat");
     Array.prototype.forEach.call(el("langkah").children, function (n, i) { n.classList.toggle("siap", i < s.sejarah.length); });
   }
@@ -28,18 +32,19 @@
     el("kesan").hidden = false; jamKesan = setTimeout(function () { el("kesan").hidden = true; }, 3200);
   }
   function selepasDialog() { var f = siapDialog; siapDialog = null; if (f) { f(); } }
-  function habisTaip() { if (jam) { clearInterval(jam); jam = null; } clearTimeout(jamCakap); window.KARNIVAL_ANIMASI.cakap(false); sedang = false; el("ayat").textContent = penuh; el("ayat").setAttribute("aria-busy", "false"); selepasDialog(); }
+  function habisTaip() { if (jam) { clearInterval(jam); jam = null; } clearTimeout(jamCakap); window.KARNIVAL_ANIMASI.cakap(false); window.KARNIVAL_BUNYI.typing(false); sedang = false; el("ayat").textContent = penuh; el("ayat").setAttribute("aria-busy", "false"); selepasDialog(); }
   function taip(teks, selepas) {
     siapDialog = null; habisTaip(); penuh = teks; el("ayat").textContent = teks; siapDialog = selepas;
     window.KARNIVAL_ANIMASI.cakap(true);
     if (segera || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { selepasDialog(); jamCakap=setTimeout(function(){window.KARNIVAL_ANIMASI.cakap(false);},Math.min(6500,Math.max(2000,teks.length*35))); return; }
     el("ayat").setAttribute("aria-busy", "true"); el("ayat").textContent = ""; var i = 0; sedang = true;
+    window.KARNIVAL_BUNYI.typing(true);
     jam = setInterval(function () { i += 3; el("ayat").textContent = teks.slice(0, i); if (i >= teks.length) { habisTaip(); } }, 18);
   }
   function papar() {
     terkunci = false; siapDialog = null; habisTaip(); el("pembukaan").hidden = true; el("pengakhiran").hidden = true; el("mainan").hidden = false;
     if (s.node === "tamat") { tamat(); return; }
-    var a = K.adegan[s.node], baris = a.baris(s), sceneBaru = a.seni !== seni; tukarSeni(a.seni); penutur(baris[s.baris].nama); kemasHud();
+    var a = K.adegan[s.node], baris = a.baris(s), sceneBaru = a.seni !== seni; tukarSeni(a.seni); penutur(baris[s.baris].nama); kemasHud(); window.KARNIVAL_NARASI.papar(s,baris[s.baris]);
     if (sceneBaru) { clearTimeout(jamPeralihan); el("lokasi-peralihan").textContent = a.lokasi; el("ayat-peralihan").textContent = a.peralihan || "Mereka meneruskan pelan yang sudah dipilih."; el("peralihan").hidden = false; el("novel").classList.remove("menukar-scene"); void el("novel").offsetWidth; el("novel").classList.add("menukar-scene"); jamPeralihan = setTimeout(function(){el("peralihan").hidden=true;el("novel").classList.remove("menukar-scene");},1800); }
     el("lokasi").textContent = "EPISOD 01 · " + a.lokasi; el("masa").textContent = a.lokasi; el("nama").textContent = baris[s.baris].nama;
     el("pilihan").replaceChildren(); el("seterusnya").hidden = false; el("petunjuk").textContent = "Klik atau tekan Space untuk sambung";
@@ -69,7 +74,7 @@
     else { s.node = a.lanjut; s.baris = 0; }
     simpan(); papar();
   }
-  function mulakan() { clearTimeout(jamKesan); clearTimeout(jamPeralihan); el("peralihan").hidden=true; el("kesan").hidden = true; s = K.awal(); simpan(); papar(); el("seterusnya").focus({ preventScroll: true }); }
+  function mulakan() { tunaiBunyi = null; clearTimeout(jamKesan); clearTimeout(jamPeralihan); el("peralihan").hidden=true; el("kesan").hidden = true; s = K.awal(); simpan(); papar(); el("seterusnya").focus({ preventScroll: true }); }
   el("mula").onclick = mulakan; el("sambung").hidden = !baca(); el("sambung").onclick = function () { s = baca(); if (!s) { mulakan(); } else { papar(); } };
   el("seterusnya").onclick = sambung;
   el("dialog").onclick = function (e) { if (!e.target.closest("button")) { sambung(); } };
@@ -79,6 +84,7 @@
   el("menu").onclick = function () {
     modal("Menu cerita", '<p>Kemajuan disimpan pada browser ini secara automatik. Setiap pilihan ada kesan; tiada markah untuk memilih nilai peribadi.</p><div class="opsyen-menu"><button id="cepat">Dialog: ' + (segera ? 'terus penuh' : 'muncul beransur') + '</button><button id="kembali">Kembali ke cerita</button><button id="ulang-menu">Mula semula</button><a class="balik" href="../../index.html#t4-b1"><span aria-hidden="true">←</span>Kembali ke nota Bab 1</a></div>');
     var gerakBtn = document.createElement("button"); gerakBtn.textContent = "Gerakan: " + (gerakan ? "hidup" : "dimatikan"); el("cepat").after(gerakBtn);
+    el("isi-buku").appendChild(window.KARNIVAL_BUNYI.panel());
     gerakBtn.onclick = function () { gerakan = !gerakan; el("novel").classList.toggle("tanpa-gerak", !gerakan); this.textContent = "Gerakan: " + (gerakan ? "hidup" : "dimatikan"); };
     el("cepat").onclick = function () { segera = !segera; this.textContent = "Dialog: " + (segera ? "terus penuh" : "muncul beransur"); };
     el("kembali").onclick = function () { el("buku").close(); };
@@ -125,7 +131,7 @@
     modal("Jejak keputusan kamu", h);
   }
   function tamat() {
-    habisTaip(); tukarSeni("senja"); penutur("Pencerita"); kemasHud(); el("hud").hidden = false; el("mainan").hidden = true; el("pengakhiran").hidden = false; el("lokasi").textContent = "EPISOD 01 · TAMAT"; var e = K.ending(s);
+    habisTaip(); window.KARNIVAL_NARASI.tutup(); tukarSeni("senja"); penutur("Pencerita"); kemasHud(); el("hud").hidden = false; el("mainan").hidden = true; el("pengakhiran").hidden = false; el("lokasi").textContent = "EPISOD 01 · TAMAT"; var e = K.ending(s);
     el("pengakhiran").innerHTML = '<span class="kecil">ENDING · ' + esc(e.id.toUpperCase()) + '</span><h2>' + esc(e.tajuk) + '</h2><p>' + esc(e.teks) + '</p><div class="rekod"><div><strong>' + K.rm(s.wang) + '</strong><small>Dana akhir · target RM120</small></div><div><strong>' + (s.jualAir + s.jualSandwic) + '</strong><small>Unit terjual</small></div></div><div class="butang-akhir"><button class="utama" id="jejak">Lihat jejak keputusan</button><button id="ulang">Cuba laluan lain</button><a class="balik" href="../../index.html#t4-b1"><span aria-hidden="true">←</span>Kembali ke nota Bab 1</a></div><p class="fine">Cerita dan angka ialah simulasi contoh. Konsep berdasarkan Bab 1 Ekonomi Tingkatan 4. Semua ending boleh digunakan untuk berbincang; ini bukan ujian bermarkah.</p>';
     el("jejak").onclick = jejak; el("ulang").onclick = mulakan; simpan(); el("jejak").focus({ preventScroll: true });
   }
