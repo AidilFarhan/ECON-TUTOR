@@ -1,6 +1,6 @@
 /* =========================================================
    Econ Tutor · /api/kesan-graf
-   POST  gambar JPEG (badan permintaan) → paksi, nombor dan keluk yang dikesan oleh AI
+   POST  gambar JPEG berlapis grid (badan permintaan; lihat EKO.imbas.denganGrid) → paksi, nombor dan keluk yang dikesan oleh AI
          { keluk: [{ label, jenis, titik: [[u, v], …] }],
            paksi: { x, y (label), O, hujungX, hujungY ([u, v] atau null), tandaX, tandaY ([[nilai, kedudukan], …]) }, baki }
          u = pecahan dari kiri gambar, v = pecahan dari BAWAH gambar (0..1).
@@ -16,21 +16,23 @@ const URL_LALAI = "https://api.mireld.my/v1";
 const MAKS_BAIT = 3 * 1024 * 1024;
 const MAKS_KELUK = 6; // sama dengan EKO.bina.MAKS_KELUK
 const MAKS_TITIK = 12;
+const GRID = 100; // gambar yang diterima berlapis grid 0..100 (EKO.imbas.denganGrid); model menjawab dalam unit grid
 const JENIS = ["permintaan", "penawaran", "kkp"];
 
 const ARAHAN = [
   "Anda mengesan keluk dalam gambar graf ekonomi (buku teks, slaid atau tulisan tangan) untuk pelajar SPM, STPM dan Matrikulasi di Malaysia.",
-  "Koordinat ialah pecahan gambar penuh: x = 0 di tepi kiri dan 1 di tepi kanan; y = 0 di tepi ATAS dan 1 di tepi BAWAH.",
+  "Gambar itu dilapisi GRID merah jambu bernombor untuk membantu anda: garis tegak pada x = 0, 10, 20 … 100 (nombor di tepi atas dan bawah) dan garis datar pada y = 0, 10, 20 … 100 (nombor di tepi kiri dan kanan; y = 0 di ATAS, y = 100 di BAWAH). Grid dan nombor merah jambu itu BUKAN sebahagian graf: jangan laporkannya sebagai keluk, paksi atau nombor paksi.",
+  "Semua koordinat dalam jawapan ialah unit grid itu (0 hingga 100, boleh perpuluhan). Baca setiap kedudukan dengan membandingkannya dengan garis grid yang terdekat di kiri, kanan, atas dan bawahnya, bukan dengan anggaran kasar.",
   "Bagi setiap keluk atau garis yang dilukis (bukan paksi, bukan garis panduan putus-putus ke paksi, bukan anak panah):",
   "- label: huruf pada keluk itu dalam gambar (contoh D, S, D1, KKP). Jika tiada label, beri rentetan kosong.",
   "- jenis: permintaan, penawaran atau kkp hanya jika label atau tajuk dalam gambar menunjukkannya dengan jelas; jika tidak, lain. Jangan teka daripada bentuk sahaja.",
-  "- titik: 2 titik (kedua-dua hujung) bagi garis lurus, atau 5 hingga 10 titik yang mengikut lengkung, disusun dari satu hujung ke hujung yang lain. Titik mesti terletak di atas dakwat keluk itu.",
+  "- titik: 2 titik (kedua-dua hujung) bagi garis lurus, atau 8 hingga 12 titik yang mengikut lengkung (termasuk kedua-dua hujungnya, contohnya tempat keluk menyentuh paksi), disusun dari satu hujung ke hujung yang lain. Setiap titik mesti terletak tepat di atas dakwat keluk itu; semak setiap titik dengan grid.",
   "paksi_x dan paksi_y: label paksi datar dan paksi tegak seperti yang tertulis, termasuk unitnya (contoh Kuantiti (unit), Harga (RM)); rentetan kosong jika tidak kelihatan.",
   "asalan: titik persilangan paksi tegak dengan paksi datar. hujung_x: hujung kanan garis paksi datar. hujung_y: hujung atas garis paksi tegak (hujung garis, bukan labelnya).",
   "tanda_x dan tanda_y: setiap NOMBOR yang tertulis di sepanjang paksi datar (tanda_x) dan paksi tegak (tanda_y), sama ada tanda skala atau nilai di hujung garis panduan putus-putus. nilai ialah nombor itu; x (bagi tanda_x) atau y (bagi tanda_y) ialah kedudukan tanda itu pada garis paksi, bukan kedudukan teksnya. Abaikan sifar di asalan dan label bukan nombor seperti P0, Q1 atau E. Senarai kosong jika paksi tiada nombor.",
   "Jika gambar bukan graf dengan dua paksi, atau keluknya tidak dapat dilihat dengan jelas, beri ada_graf = false dan senarai keluk kosong.",
   "Jawab dengan SATU objek JSON sahaja, tanpa teks lain, dalam bentuk ini:",
-  '{"ada_graf": true, "paksi_x": "", "paksi_y": "", "asalan": {"x": 0, "y": 0}, "hujung_x": {"x": 0, "y": 0}, "hujung_y": {"x": 0, "y": 0}, "tanda_x": [{"nilai": 0, "x": 0}], "tanda_y": [{"nilai": 0, "y": 0}], "keluk": [{"label": "", "jenis": "permintaan | penawaran | kkp | lain", "titik": [{"x": 0, "y": 0}]}]}'
+  '{"ada_graf": true, "paksi_x": "Kuantiti (unit)", "paksi_y": "Harga (RM)", "asalan": {"x": 12.5, "y": 88}, "hujung_x": {"x": 93, "y": 88}, "hujung_y": {"x": 12.5, "y": 7}, "tanda_x": [{"nilai": 50, "x": 52.5}], "tanda_y": [{"nilai": 5, "y": 47.5}], "keluk": [{"label": "D", "jenis": "permintaan | penawaran | kkp | lain", "titik": [{"x": 20, "y": 15.5}, {"x": 85, "y": 80}]}]}'
 ].join("\n");
 
 const TITIK = {
@@ -103,13 +105,14 @@ function teks(nilai, maks) {
   return typeof nilai === "string" ? nilai.replace(/\s+/g, " ").trim().slice(0, maks) : "";
 }
 
+// Unit grid (0..GRID) daripada model → pecahan gambar 0..1
 function pecahan(n) {
-  return +Math.min(1, Math.max(0, n)).toFixed(4);
+  return +Math.min(1, Math.max(0, n / GRID)).toFixed(4);
 }
 
 // { x, y } daripada model (y dari atas) → [u, v] (v dari bawah), atau null
 function titikUV(p) {
-  return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? [pecahan(p.x), pecahan(1 - p.y)] : null;
+  return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? [pecahan(p.x), +(1 - pecahan(p.y)).toFixed(4)] : null;
 }
 
 // Nombor pada paksi → [[nilai, kedudukan]], kedudukan = pecahan gambar di sepanjang paksi itu
@@ -118,7 +121,7 @@ function tandaPaksi(senarai, kunci) {
   for (const t of Array.isArray(senarai) ? senarai : []) {
     if (keluar.length >= MAKS_TITIK) break;
     if (!t || !Number.isFinite(t.nilai) || Math.abs(t.nilai) > 1e9 || !Number.isFinite(t[kunci])) continue;
-    keluar.push([t.nilai, pecahan(kunci === "y" ? 1 - t.y : t.x)]);
+    keluar.push([t.nilai, kunci === "y" ? +(1 - pecahan(t.y)).toFixed(4) : pecahan(t.x)]);
   }
   return keluar;
 }
@@ -134,10 +137,10 @@ export function kemasHasil(mentah) {
     let titik = [];
     for (const p of k.titik) {
       if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
-      const u = Math.min(1, Math.max(0, p.x));
-      const v = 1 - Math.min(1, Math.max(0, p.y));
+      const u = pecahan(p.x);
+      const v = +(1 - pecahan(p.y)).toFixed(4);
       const akhir = titik[titik.length - 1];
-      if (!akhir || Math.abs(akhir[0] - u) + Math.abs(akhir[1] - v) > 0.004) titik.push([+u.toFixed(4), +v.toFixed(4)]);
+      if (!akhir || Math.abs(akhir[0] - u) + Math.abs(akhir[1] - v) > 0.004) titik.push([u, v]);
     }
     if (titik.length < 2) continue;
     if (titik.length > MAKS_TITIK) {
@@ -253,7 +256,7 @@ export async function kendaliPost(req, pilihan = {}) {
   // panggilan ini dibilkan walaupun tiada graf dikesan, jadi ia dikira
   const kuki = kukiKiraan(await tandatanganKiraan({ email: sesi.email, hari, n: guna + 1 }, env.RAHSIA_SESI));
   const baki = HAD_SEHARI - guna - 1;
-  if (jawapan.usage) console.log("kesan-graf: token masuk " + jawapan.usage.prompt_tokens + ", keluar " + jawapan.usage.completion_tokens);
+  if (jawapan.usage) console.log("kesan-graf: model " + cfg.model + ", token masuk " + jawapan.usage.prompt_tokens + ", keluar " + jawapan.usage.completion_tokens);
 
   // jawapan bukan JSON (atau terpotong): dianggap tiada graf dikesan
   const pilihanAI = jawapan.choices && jawapan.choices[0];
