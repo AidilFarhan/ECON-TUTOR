@@ -88,7 +88,7 @@
     agihan: { seni: "hujan", lokasi: "Booth kelas · 10:10 pagi", baris: function (s) { return [
       ay("Mira", s.agihan === "biasa" ? "Okay, kita kekalkan harga. Aku jelaskan elok-elok—duit ni untuk buku kelas." : s.agihan === "murid" ? "Aku tukar menu sekarang. Adik, " + (s.air ? "air RM2" : "sandwich RM3") + " lepas ni. Tunggu kejap, kita nak buka." : "Aku asingkan bekas bantuan dulu. Adik boleh ambil daripada bahagian ni bila kita buka."),
       ay("Hakim", s.agihan === "kongsi" ? "Aku tanda stok bantuan supaya tak tercampur dengan kiraan jualan." : "Aku tulis harga yang kita setuju. Nanti kutipan jangan campur dengan baki duit bahan."),
-      ay("Pencerita", "Mira mengambil kad promosi yang disiapkan semalam. Hakim menahan tangannya sebelum kad itu digantung.")
+      ay("Pencerita", "Mira mengambil kad promosi yang disiapkan semalam. Hakim mengangkat tangan memberi isyarat supaya Mira tunggu dulu.")
     ]; }, lanjut: "amanah" },
     amanah: { seni: "hujan", lokasi: "Booth kelas · 10:20 pagi", baris: function () { return [
       ay("Hakim", "Eh, kad ni tulis setiap pembelian dapat hadiah. Hadiah kita cuma ada lima."),

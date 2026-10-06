@@ -1,0 +1,20 @@
+/* Close-up aksi muncul bersama baris Pencerita; dialog kekal boleh ditekan. */
+#narasi-visual{position:absolute;inset:163px 3vw calc(var(--tinggi-dialog,190px) + 32px);z-index:1;display:flex;align-items:center;justify-content:center;pointer-events:none;margin:0}
+#narasi-bingkai{position:relative;width:min(94vw,calc((100dvh - 195px - var(--tinggi-dialog,190px)) * var(--nisbah-narasi,1.5)));aspect-ratio:var(--nisbah-narasi,1.5);overflow:hidden;box-shadow:0 18px 70px #0008}
+#gambar-narasi{display:block;width:100%;height:100%;object-fit:contain}
+.ada-narasi #ilustrasi{filter:brightness(.5) blur(3px)}
+.menjelajah #narasi-visual{visibility:hidden}.menjelajah.ada-narasi #ilustrasi{filter:none}
+.mula-aksi{animation:narasi-masuk .45s ease-out}
+.mula-aksi #gambar-narasi{animation:narasi-sorot 7s ease-out forwards;transform-origin:center}
+#bulatan-narasi{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;overflow:visible}
+#bulatan-narasi path{fill:none;stroke:#ce2029;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;filter:drop-shadow(0 1px 1px #72181855)}
+.mula-aksi #bulatan-narasi path{animation:pen-merah 1.35s .45s ease-in-out forwards}
+[data-gerak="bulat"] #gambar-narasi{animation:none}
+#label-narasi{position:absolute;bottom:0;left:0;right:0;padding:9px 15px;background:#102536df;font:600 14px/1.4 system-ui;color:var(--putih);text-align:center}
+@keyframes narasi-masuk{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes narasi-sorot{from{transform:scale(1)}to{transform:scale(1.045)}}
+@keyframes pen-merah{to{stroke-dashoffset:0}}
+@media(max-width:700px){#narasi-visual{inset:185px 3vw calc(var(--tinggi-dialog,190px) + 24px)}#narasi-bingkai{width:min(94vw,calc((100dvh - 209px - var(--tinggi-dialog,190px)) * var(--nisbah-narasi,1.5)))}#label-narasi{font-size:12px;padding:7px 10px}}
+@media(max-height:600px){#narasi-visual{top:131px;bottom:calc(var(--tinggi-dialog,140px) + 18px)}#narasi-bingkai{width:min(94vw,calc((100dvh - 149px - var(--tinggi-dialog,140px)) * var(--nisbah-narasi,1.5)))}}
+.tanpa-gerak #narasi-bingkai,.tanpa-gerak #gambar-narasi{animation:none!important}.tanpa-gerak #bulatan-narasi path{animation:none!important;stroke-dashoffset:0}
+@media(prefers-reduced-motion:reduce){#narasi-bingkai,#gambar-narasi{animation:none!important}#bulatan-narasi path{animation:none!important;stroke-dashoffset:0}}

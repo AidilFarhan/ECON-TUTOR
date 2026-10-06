@@ -91,8 +91,10 @@ assets/js/masuk.js            Login page logic (ES module)
 assets/js/firebase-config.js  Public Firebase web config (ES module)
 assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bundle (ESM)
 
-cerita/episod-1/              Visual novel "Misi Karnival" for T4 Bab 1: standalone full page (own HTML, CSS, JS, PNG atlases)
+cerita/episod-1/              Visual novel "Misi Karnival · Misi Mengumpul Dana Buku Kelas" for T4 Bab 1: standalone full page (own HTML, CSS, JS, PNG atlases, narrator pictures, MP3 audio)
 cerita/semak-episod.cjs       Node check for the episode: walks all 324 decision paths (cash, stock, PKK, endings)
+cerita/semak-narasi.cjs       Node check: every Pencerita line on all 324 paths has a picture, and none shows on a character or player turn
+cerita/semak-bunyi.cjs        Node check for bunyi.js with fake audio elements: start on gesture, five sound profiles, cash direction, mute, stored settings, pause when hidden, 14 MP3
 
 *.pdf                         Source textbooks, teacher notes, exam papers (never deployed)
 ```
@@ -264,7 +266,7 @@ GrafBina {
   - The result is a suggestion. *Sahkan* applies the suggested curve types, axis labels and axis scale, *Sunting* keeps the curves only, and *Buang keluk AI* removes them. A curve type is never set without the student's confirmation.
   - Limit: 10 scans a day per student (`HAD_SEHARI`), counted in the signed HttpOnly cookie `econ_ai` (HMAC with `RAHSIA_SESI`, bound to the email and the Malaysian date). There is no database, so the count restarts if the cookie is deleted; the hard cap is the balance in the provider account.
   - Failures show one short sentence (not detected, limit reached, session expired, AI unavailable) and manual tracing always remains. Without `MIRELD_API_KEY` or `MIRELD_MODEL` the function answers `503` and the UI says AI is unavailable.
-- **State.** Kept in memory only and reset on navigation; nothing goes into `localStorage`. *Situasi asal* (`B.setSemula`) resets positions but keeps the curves and their names.
+- **State.** `localStorage["econ-vn-episod1:v1"]` for progress and `localStorage["econ-vn-audio:v1"]` for sound settings (mute and three volumes), both separate from `econtutor:v1`. The game never writes `dibaca` or quiz scores.
 - **Tests.** The model has no DOM, so it can be loaded into Node with `vm`, like the calculator check in AGENTS §4.
 
 ### 3.5 Economics calculator (`EKO.kalkulator`)
@@ -353,15 +355,16 @@ The story episode keeps its own save under `localStorage["econ-vn-episod1:v1"]` 
 
 ### 3.8 Story episode (`cerita/episod-1/`)
 
-*Misi Karnival · Episod 1* is a visual novel for T4 Bab 1. It is a **separate full page**, not a view in the SPA: its stylesheets contain global selectors (`body`, `header`, `button`, `svg`), so it must never be loaded into `index.html`.
+*Misi Karnival · Episod 1: Misi Mengumpul Dana Buku Kelas* is a visual novel for T4 Bab 1. It is a **separate full page**, not a view in the SPA: its stylesheets contain global selectors (`body`, `header`, `button`, `svg`), so it must never be loaded into `index.html`.
 
 - **Entry and exit.** `pBab` adds a **Main cerita Bab <no>** button for chapters listed in the `CERITA` map in `app.js` (now only `t4-b1`). The game links back with **Kembali ke nota Bab 1** (`../../index.html#t4-b1`) in its header, menu and ending. All paths are relative, so the page also works from `file://`.
-- **Files.** `index.html` loads `gaya.css`, `pentas.css`, `scene.css`, `animasi.css`, `aliran.css`, `integrasi.css`, then `cerita.js` (dialogue, choices, economics, PKK, endings), `emosi.js` (face per node and line), `animasi.js` (actors, action atlases, mouth, player gaze and dimming), `scene.js` (camera, *Jelajah scene* hotspots) and `main.js` (typewriter, choices, save, menu, notes, PKK, fullscreen), in that order with `defer`. `integrasi.css` holds only what the site integration added (the back link, phone header and ending sizing).
-- **Assets.** `assets/aksi-<scene>.png` and `aksi-<scene>-player.png` are RGBA 1024 × 1536 atlases with two columns (Mira, Hakim) and three rows (ceria, fokus, risau); size and order matter for the CSS cropping. `scene-lapisan.png` is the layered background. The standing sprites (`mira-*.png`, `hakim-*.png`) and `latar-atlas.png` are earlier experiments that the active compositor does not use.
+- **Files.** `index.html` loads `gaya.css`, `pentas.css`, `scene.css`, `animasi.css`, `aliran.css`, `bunyi.css`, `narasi.css`, `integrasi.css`, then `bunyi.js` (sound effects, five BGM tracks, ambience, cross-fade, volume and mute), `cerita.js` (dialogue, choices, economics, PKK, endings), `emosi.js` (face per node and line), `animasi.js` (actors, action atlases, mouth, player gaze and dimming), `scene.js` (camera, *Jelajah scene* hotspots), `narasi.js` (close-up picture for each *Pencerita* line) and `main.js` (typewriter, choices, save, menu, notes, PKK, fullscreen), in that order with `defer`. `integrasi.css` holds only what the site integration added (the back link, phone header, opening and ending sizing).
+- **Assets.** `assets/aksi-<scene>.png` and `aksi-<scene>-player.png` are RGBA 1024 × 1536 atlases with two columns (Mira, Hakim) and three rows (ceria, fokus, risau); size and order matter for the CSS cropping. `scene-lapisan.png` is the layered background. `assets/narasi/` holds the narrator pictures (`kad-stop.png` is the promo-card scene: Hakim's open palm, no contact with Mira; keep that limit in any new art), and `assets/audio/` the 14 MP3 files (credits and sources in `AUDIO-DAN-KREDIT.md` and `sumber-audio.json`). The standing sprites (`mira-*.png`, `hakim-*.png`) and `latar-atlas.png` are earlier experiments that the active compositor does not use.
 - **State.** `localStorage["econ-vn-episod1:v1"]`, separate from `econtutor:v1`. The game never writes `dibaca` or quiz scores.
-- **Access.** No middleware change: `/cerita/…` is not in `TERBUKA`, so the page gets `302 /masuk.html?ke=…` and its JS, CSS, PNG and voice-over files get `401` without a valid session.
-- **Voice-over.** `skrip-voice-over.md` and `senarai-rakaman-voice-over.csv` (125 cues, with branch variants and number tokens) are recording material only; there is no audio mapping at runtime yet.
-- **Check.** `node cerita/semak-episod.cjs` loads `cerita.js` and `emosi.js` with `vm` and walks every path.
+- **Access.** No middleware change: `/cerita/…` is not in `TERBUKA`, so the page gets `302 /masuk.html?ke=…` and its JS, CSS, images, MP3 and voice-over files get `401` without a valid session.
+- **Sound.** Audio uses plain `HTMLAudio` elements and starts only after a click or key press (`bunyi.js` listens on the document). `KARNIVAL_BUNYI.scene(scene, state)` picks one of five profiles (`kelas`, `persediaan`, `hujan`, `festival` when `state.tempat` is under cover, `senja`); `cash(delta)` plays when the cash shown in the HUD changes; `typing(bool)` lowers the background layers (use it for voice-over later); `panel()` builds the Menu controls. Everything pauses on `visibilitychange` and `pagehide`.
+- **Voice-over.** `skrip-voice-over.md`, `skrip-bergambar.html` and `senarai-rakaman-voice-over.csv` (125 cues, with branch variants and number tokens) are recording material only; there is no audio mapping at runtime yet.
+- **Check.** `node cerita/semak-episod.cjs` walks every path (cash, stock, PKK, endings), `node cerita/semak-narasi.cjs` checks the narrator pictures on every path, and `node cerita/semak-bunyi.cjs` runs `bunyi.js` against fake audio elements. All three load the game files with `vm` and need no packages.
 
 ---
 

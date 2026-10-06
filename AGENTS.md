@@ -28,7 +28,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 - Deploy source PDFs or the hidden Terengganu paper. Keep `.vercelignore` as it is unless the owner asks.
 - Add npm dependencies to browser code, a bundler, a framework or a CSS library.
 - Push directly to `main`. Changes go through a feature branch and a PR; `main` auto-deploys to production (§6).
-- Rename existing `localStorage` keys or ids (`t4-b1`, `kel25`, card and quiz ids). Students' saved progress depends on them. The story episode's save key `econ-vn-episod1:v1` is covered too.
+- Rename existing `localStorage` keys or ids (`t4-b1`, `kel25`, card and quiz ids). Students' saved progress depends on them. The story episode's save key `econ-vn-episod1:v1` and sound-settings key `econ-vn-audio:v1` are covered too.
 
 ---
 
@@ -51,7 +51,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `assets/js/data/*.js` | Content: one file per chapter, one per trial paper |
 | `assets/css/style.css` | The whole design system |
 | `assets/js/vendor/` | Self-hosted Firebase Auth bundle (generated, do not edit) |
-| `cerita/episod-1/`, `cerita/semak-episod.cjs` | Visual novel *Misi Karnival* for T4 Bab 1: a standalone full page with its own CSS and JS (owner-approved look; not ES5-restricted, never loaded into `index.html`), and its Node check. `pBab` links to it through the `CERITA` map in `app.js` (ARCHITECTURE §3.8) |
+| `cerita/episod-1/`, `cerita/semak-*.cjs` | Visual novel *Misi Karnival · Misi Mengumpul Dana Buku Kelas* for T4 Bab 1: a standalone full page with its own CSS, JS, pictures and MP3 audio (owner-approved look and sound; not ES5-restricted, never loaded into `index.html`), and its three Node checks (story paths, narrator pictures, sound). `pBab` links to it through the `CERITA` map in `app.js` (ARCHITECTURE §3.8). Mira and Hakim are Muslim students: no art or animation may show them touching |
 | `*.pdf` | Source textbooks and papers (reference only, never deployed) |
 
 ---
@@ -118,7 +118,7 @@ for (const k of ctx.EKO.kalkulator.senarai) (k.contoh || [0]).forEach((c, i) => 
 console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 ```
 
-**Story episode.** After touching anything under `cerita/`, run `node cerita/semak-episod.cjs` (expects 324 paths and 4 endings), then play one path in the browser: both characters look at the player and dim on a *Kamu* line or when choices show, colour returns when they speak, the PKK opens from *Dana Kelas*, and reload → *Sambung cerita* resumes on the same line.
+**Story episode.** After touching anything under `cerita/`, run `node cerita/semak-episod.cjs` (expects 324 paths and 4 endings), `node cerita/semak-narasi.cjs` and `node cerita/semak-bunyi.cjs`, then play one path in the browser: both characters look at the player and dim on a *Kamu* line or when choices show, colour returns when they speak, the PKK opens from *Dana Kelas*, and reload → *Sambung cerita* resumes on the same line. Also check that a picture shows on every *Pencerita* line and disappears on a character's or the player's turn, that sound starts only after the first tap and follows the scene, and that the Menu mute and volume sliders work.
 
 **Browser check (manual or Playwright):**
 - The changed view renders with **no console errors**.

@@ -1,0 +1,10 @@
+.kawalan-bunyi{margin:22px 0 5px;padding:16px;border:1px solid #bac6c6;border-radius:12px}
+.kawalan-bunyi legend{font-weight:700;padding:0 7px;color:var(--hijau)}
+.kawalan-bunyi button{width:100%;color:var(--dakwat);background:transparent;border-color:#bac6c6;margin-bottom:15px}
+.kawalan-bunyi label{display:grid;grid-template-columns:1fr 48px;gap:3px 10px;margin:13px 0;align-items:center}
+.kawalan-bunyi label span{grid-column:1/-1;font-size:14px}
+.kawalan-bunyi input{width:100%;min-height:44px;margin:0;accent-color:var(--hijau);cursor:pointer}
+.kawalan-bunyi output{text-align:right;font:600 13px system-ui;color:var(--hijau)}
+.kawalan-bunyi p{font-size:12px;color:var(--pudar)}
+.kawalan-bunyi input:focus-visible{outline:3px solid #225d4f;outline-offset:3px;border-radius:5px}
+#novel audio{display:none}
