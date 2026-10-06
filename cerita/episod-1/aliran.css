@@ -1,0 +1,18 @@
+.hud .dana{color:var(--putih);cursor:pointer;text-align:left;font-family:inherit;padding:8px 14px;min-height:55px;pointer-events:auto}
+.hud .dana:hover{background:#162d40f2;border-color:var(--emas)}
+.peralihan{position:absolute;z-index:9;top:28%;left:50%;transform:translateX(-50%);width:min(580px,90%);padding:22px 26px;background:linear-gradient(100deg,#102536ed,#102536cc);border-left:3px solid var(--emas);box-shadow:0 8px 30px #0003;pointer-events:none;animation:masuk-kad .45s ease-out}
+.peralihan small{font:600 10px system-ui;letter-spacing:.16em;color:var(--emas)}
+.peralihan strong{display:block;font:600 20px/1.4 system-ui;margin-top:8px}
+.peralihan p{font:18px/1.5 Georgia;margin:8px 0 0}
+.menukar-scene #ilustrasi{animation:masuk-scene .75s ease-out}
+#ilustrasi{transition:left 1.05s cubic-bezier(.22,.61,.36,1),top 1.05s ease}
+.jadual-pkk{width:100%;border-collapse:collapse;margin:20px 0;font:14px/1.5 system-ui}
+.jadual-pkk caption{text-align:left;font-weight:700;margin-bottom:12px;color:var(--hijau)}
+.jadual-pkk th,.jadual-pkk td{padding:10px 12px;border-bottom:1px solid #d5dcd5;text-align:left}
+.jadual-pkk tbody th{font-weight:400}.jadual-pkk td,.jadual-pkk thead th:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.jadual-pkk .kumpulan-pkk th{background:#e5ece5;color:var(--hijau);font-weight:700}.jadual-pkk .jumlah-pkk th,.jadual-pkk .jumlah-pkk td{font-weight:700;border-bottom:2px solid var(--hijau)}
+.tarikh-pkk{color:var(--pudar);font-size:12px!important}
+@keyframes masuk-kad{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+@keyframes masuk-scene{from{opacity:.3;filter:brightness(.65)}to{opacity:1;filter:brightness(1)}}
+@media(max-width:700px){.peralihan{top:23%;padding:18px 21px}.peralihan strong{font-size:17px}.peralihan p{font-size:16px}.jadual-pkk th,.jadual-pkk td{padding:9px 7px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){#ilustrasi,.peralihan{animation:none!important;transition:none!important}}

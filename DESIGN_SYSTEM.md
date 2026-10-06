@@ -267,6 +267,10 @@ The anatomy is title (`.graf-tajuk`, with a pulsing hint `.graf-petunjuk`), then
 ### 9.7 Account menu
 `.akaun-btn` opens `.akaun-menu`, a near-opaque glass popover showing the name and email, a full-width `.btn-wa` "Hubungi cikgu" link (same WhatsApp green as the login page, 42 px here) that opens WhatsApp in a new tab, and a *Log keluar* button below it. It closes on outside click or `Escape`.
 
+### 9.8 Story episode
+- **Entry link.** *Main cerita Bab 1* is an ordinary `.btn` with the `bintang` icon in the chapter header's action row, after *Kalkulator*. It follows the site theme (light and dark) like its neighbours; *Kad study* stays the only `.btn-utama`.
+- **Game page.** `cerita/episod-1/` keeps its own owner-approved look (dark navy glass, gold accent, serif dialogue over full-screen illustrations) and does not use the site tokens or follow the site theme. Its CSS stays in its own page. *Kembali ke nota Bab 1* is styled like the game's own buttons (`integrasi.css`): full text from 701 px, a 40 px arrow on phones with the text kept for screen readers.
+
 ---
 
 ## 10. Graph design language

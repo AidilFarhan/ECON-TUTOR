@@ -365,6 +365,9 @@
   }
 
   /* ---------- BAB ---------- */
+  // Cerita interaktif (visual novel) bagi sesuatu bab: halaman penuh berasingan di bawah cerita/.
+  var CERITA = { "t4-b1": "cerita/episod-1/index.html" };
+
   function pBab(b) {
     E.kemas(function (d) {
       d.akhir = b.id;
@@ -388,6 +391,7 @@
       '<a class="btn btn-utama" href="#kad-' + b.id + '">' + E.ikon("kad") + " Kad study (" + b.kad.length + ")</a>" +
       (nKuiz ? '<a class="btn" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz bab (" + nKuiz + ")</a>" : "") +
       (nKalk ? '<a class="btn" href="#kalkulator-' + b.id + '">' + E.ikon("kalkulator") + " Kalkulator (" + nKalk + ")</a>" : "") +
+      (CERITA[b.id] ? '<a class="btn" href="' + CERITA[b.id] + '">' + E.ikon("bintang") + " Main cerita Bab " + b.no + "</a>" : "") +
       "</div></header>" +
       '<div class="bab-susun">' +
       '<aside class="isi-kandungan kaca" id="toc"></aside>' +

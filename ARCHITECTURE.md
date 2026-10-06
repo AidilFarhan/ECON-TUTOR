@@ -91,6 +91,9 @@ assets/js/masuk.js            Login page logic (ES module)
 assets/js/firebase-config.js  Public Firebase web config (ES module)
 assets/js/vendor/firebase-auth-12.19.0.js     Self-hosted Firebase Auth SDK bundle (ESM)
 
+cerita/episod-1/              Visual novel "Misi Karnival" for T4 Bab 1: standalone full page (own HTML, CSS, JS, PNG atlases)
+cerita/semak-episod.cjs       Node check for the episode: walks all 324 decision paths (cash, stock, PKK, endings)
+
 *.pdf                         Source textbooks, teacher notes, exam papers (never deployed)
 ```
 
@@ -346,6 +349,20 @@ All learning progress is **per browser** in `localStorage["econtutor:v1"]`:
 
 `E.data()` falls back to in-memory state when storage is blocked (private mode), so the app never crashes on storage errors. `tanda` holds the indexes of the scheme points the student ticked. The Kelantan paper keeps its legacy key format `k2-<no>-<i>` (`kunciLama: true`) so earlier answers survive.
 
+The story episode keeps its own save under `localStorage["econ-vn-episod1:v1"]` (§3.8).
+
+### 3.8 Story episode (`cerita/episod-1/`)
+
+*Misi Karnival · Episod 1* is a visual novel for T4 Bab 1. It is a **separate full page**, not a view in the SPA: its stylesheets contain global selectors (`body`, `header`, `button`, `svg`), so it must never be loaded into `index.html`.
+
+- **Entry and exit.** `pBab` adds a **Main cerita Bab <no>** button for chapters listed in the `CERITA` map in `app.js` (now only `t4-b1`). The game links back with **Kembali ke nota Bab 1** (`../../index.html#t4-b1`) in its header, menu and ending. All paths are relative, so the page also works from `file://`.
+- **Files.** `index.html` loads `gaya.css`, `pentas.css`, `scene.css`, `animasi.css`, `aliran.css`, `integrasi.css`, then `cerita.js` (dialogue, choices, economics, PKK, endings), `emosi.js` (face per node and line), `animasi.js` (actors, action atlases, mouth, player gaze and dimming), `scene.js` (camera, *Jelajah scene* hotspots) and `main.js` (typewriter, choices, save, menu, notes, PKK, fullscreen), in that order with `defer`. `integrasi.css` holds only what the site integration added (the back link, phone header and ending sizing).
+- **Assets.** `assets/aksi-<scene>.png` and `aksi-<scene>-player.png` are RGBA 1024 × 1536 atlases with two columns (Mira, Hakim) and three rows (ceria, fokus, risau); size and order matter for the CSS cropping. `scene-lapisan.png` is the layered background. The standing sprites (`mira-*.png`, `hakim-*.png`) and `latar-atlas.png` are earlier experiments that the active compositor does not use.
+- **State.** `localStorage["econ-vn-episod1:v1"]`, separate from `econtutor:v1`. The game never writes `dibaca` or quiz scores.
+- **Access.** No middleware change: `/cerita/…` is not in `TERBUKA`, so the page gets `302 /masuk.html?ke=…` and its JS, CSS, PNG and voice-over files get `401` without a valid session.
+- **Voice-over.** `skrip-voice-over.md` and `senarai-rakaman-voice-over.csv` (125 cues, with branch variants and number tokens) are recording material only; there is no audio mapping at runtime yet.
+- **Check.** `node cerita/semak-episod.cjs` loads `cerita.js` and `emosi.js` with `vm` and walks every path.
+
 ---
 
 ## 4. Access control
@@ -459,4 +476,5 @@ The content app runs fully and without a gate. `masuk.html` loads, but `/api/ses
 | New graph | `G.daftar("name", fn, {tajuk, bab})` in the relevant `graf*.js`, then `<figure data-graf="name">` in notes |
 | New trial paper | Data file with `daftarSet` (K1) and `daftarK2` (K2) plus a script tag; the home page, Percubaan and Kuiz list it automatically |
 | New calculator | `tambah({...})` in `assets/js/kalkulator.js` under the chapter's heading (see §3.5); page, search, chapter button and home count update automatically |
+| New story episode | New folder `cerita/episod-<n>/` (standalone page), plus an entry in the `CERITA` map in `app.js` for the chapter's button (§3.8) |
 | Central progress / teacher dashboard (future) | Firestore in the same Firebase project, keyed by the verified email from `/api/sesi` |

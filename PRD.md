@@ -214,6 +214,12 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-38** Table calculators (market, equilibrium, TP/AP/MP, cost, CPI) allow editing cells and adding or removing rows; tapping a row shows that row's working. Every column fits on screen from 360 px up, with no horizontal scrolling and no clipped values; each value sits directly under its header.
 - **FR-39** Filter by form or chapter and search by keyword. Deep links: `#kalkulator-<chapterId>` and `#kalkulator-<calculatorId>`. Each chapter page has a "Kalkulator (n)" button.
 
+### 5.10 Story episode (Cerita interaktif): ✅
+- **FR-40** The T4 Bab 1 notes header has a **Main cerita Bab 1** button that opens the visual novel *Misi Karnival · Episod 1* as a full page in the same tab (`cerita/episod-1/index.html`). The game shows **Kembali ke nota Bab 1** in its header (arrow only on phones), its menu and its ending, linking to `index.html#t4-b1`.
+- **FR-41** The approved game is kept as delivered: four action scenes, separate Mira/Hakim motion, face emotions, props in hand, six branching decisions (324 paths, four endings), scene transitions, *Jelajah scene*, the PKK statement on *Dana Kelas*, and save/resume. On the player's turn (a *Kamu* line or visible choices) both characters look at the player and dim slightly; colour and gaze return when a character speaks. The opening line is Mira's "OK Hakim, berapa bajet kita untuk booth kita esok?".
+- **FR-42** The story sits behind the same sign-in as the notes (no public path). It never marks the chapter as read and never changes quiz scores. Its progress is saved per browser under its own key `econ-vn-episod1:v1`.
+- **FR-43** The voice-over script and the 125-cue recording list are kept with the episode for a later audio release; no audio plays yet.
+
 ## 6. Non-functional requirements
 
 | Area | Requirement |
@@ -301,6 +307,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | T4 Bab 4: when a firm should shut down, written as the textbook table (P > AVC, P = AVC, P < AVC) |
 | 2026-10-01 | T4 Bab 4: Jadual 4.8 tidied (centred columns, one Tahap cell per group, hovering a labour row highlights its stage) |
 | 2026-10-01 | Profit and economic profit calculator made universal: free lists of explicit and implicit costs, TR given or P × Q, examples Puan Surayati and Encik Semang (textbook) |
+| 2026-10-06 | Story episode *Misi Karnival · Episod 1* (visual novel) for T4 Bab 1: **Main cerita Bab 1** button in the notes, full-page game with **Kembali ke nota Bab 1**, behind the same sign-in |
 
 ## 10. Roadmap and open questions
 
