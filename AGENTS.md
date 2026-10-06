@@ -229,5 +229,5 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | `data()`, `kemas()`, `dibaca`, `diingat`, `terbaik`, `akhir` | read storage, update storage, read (chapters), remembered (cards), best score, last opened |
 | `masuk`, `keluar`, `sesi`, `akaun`, `kuki`, `rahsia` | sign in, sign out, session, account, cookie, secret |
 | `EMAIL_DIBENARKAN`, `RAHSIA_SESI`, `TERBUKA` | allowlist env var, cookie-signing secret env var, public path list |
-| `kesan`, `pengecam`, `had`, `baki`, `ANTHROPIC_API_KEY` | detect (AI), recogniser hook, daily limit, scans left today, Claude API key env var |
+| `kesan`, `pengecam`, `had`, `baki`, `tanda`, `skala`, `ANTHROPIC_API_KEY` | detect (AI), recogniser hook, daily limit, scans left today, number on an axis, axis scale of a photo curve, Claude API key env var |
 | `tema` `sistem`/`cerah`/`gelap` | theme: system / light / dark |

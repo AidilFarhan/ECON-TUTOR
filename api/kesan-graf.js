@@ -1,7 +1,8 @@
 /* =========================================================
    Econ Tutor · /api/kesan-graf
    POST  gambar JPEG (badan permintaan) → keluk yang dikesan oleh AI (Claude API)
-         { keluk: [{ label, jenis, titik: [[u, v], …] }], paksi: { x, y }, baki }
+         { keluk: [{ label, jenis, titik: [[u, v], …] }],
+           paksi: { x, y (label), O, hujungX, hujungY ([u, v] atau null), tandaX, tandaY ([[nilai, kedudukan], …]) }, baki }
          u = pecahan dari kiri gambar, v = pecahan dari BAWAH gambar (0..1).
    Hanya untuk pelajar yang sudah log masuk; had HAD_SEHARI imbasan sehari.
    Gambar tidak disimpan: ia dihantar terus kepada Claude API dan dibuang.
@@ -24,18 +25,38 @@ const ARAHAN = [
   "- label: huruf pada keluk itu dalam gambar (contoh D, S, D1, KKP). Jika tiada label, beri rentetan kosong.",
   "- jenis: permintaan, penawaran atau kkp hanya jika label atau tajuk dalam gambar menunjukkannya dengan jelas; jika tidak, lain. Jangan teka daripada bentuk sahaja.",
   "- titik: 2 titik (kedua-dua hujung) bagi garis lurus, atau 5 hingga 10 titik yang mengikut lengkung, disusun dari satu hujung ke hujung yang lain. Titik mesti terletak di atas dakwat keluk itu.",
-  "paksi_x dan paksi_y: label paksi datar dan paksi tegak seperti yang tertulis (contoh Kuantiti (unit), Harga (RM)); rentetan kosong jika tidak kelihatan.",
+  "paksi_x dan paksi_y: label paksi datar dan paksi tegak seperti yang tertulis, termasuk unitnya (contoh Kuantiti (unit), Harga (RM)); rentetan kosong jika tidak kelihatan.",
+  "asalan: titik persilangan paksi tegak dengan paksi datar. hujung_x: hujung kanan garis paksi datar. hujung_y: hujung atas garis paksi tegak (hujung garis, bukan labelnya).",
+  "tanda_x dan tanda_y: setiap NOMBOR yang tertulis di sepanjang paksi datar (tanda_x) dan paksi tegak (tanda_y), sama ada tanda skala atau nilai di hujung garis panduan putus-putus. nilai ialah nombor itu; x (bagi tanda_x) atau y (bagi tanda_y) ialah kedudukan tanda itu pada garis paksi, bukan kedudukan teksnya. Abaikan sifar di asalan dan label bukan nombor seperti P0, Q1 atau E. Senarai kosong jika paksi tiada nombor.",
   "Jika gambar bukan graf dengan dua paksi, atau keluknya tidak dapat dilihat dengan jelas, beri ada_graf = false dan senarai keluk kosong."
 ].join("\n");
+
+const TITIK = {
+  type: "object",
+  additionalProperties: false,
+  required: ["x", "y"],
+  properties: { x: { type: "number" }, y: { type: "number" } }
+};
 
 const SKEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["ada_graf", "paksi_x", "paksi_y", "keluk"],
+  required: ["ada_graf", "paksi_x", "paksi_y", "asalan", "hujung_x", "hujung_y", "tanda_x", "tanda_y", "keluk"],
   properties: {
     ada_graf: { type: "boolean" },
     paksi_x: { type: "string" },
     paksi_y: { type: "string" },
+    asalan: TITIK,
+    hujung_x: TITIK,
+    hujung_y: TITIK,
+    tanda_x: {
+      type: "array",
+      items: { type: "object", additionalProperties: false, required: ["nilai", "x"], properties: { nilai: { type: "number" }, x: { type: "number" } } }
+    },
+    tanda_y: {
+      type: "array",
+      items: { type: "object", additionalProperties: false, required: ["nilai", "y"], properties: { nilai: { type: "number" }, y: { type: "number" } } }
+    },
     keluk: {
       type: "array",
       items: {
@@ -45,15 +66,7 @@ const SKEMA = {
         properties: {
           label: { type: "string" },
           jenis: { type: "string", enum: ["permintaan", "penawaran", "kkp", "lain"] },
-          titik: {
-            type: "array",
-            items: {
-              type: "object",
-              additionalProperties: false,
-              required: ["x", "y"],
-              properties: { x: { type: "number" }, y: { type: "number" } }
-            }
-          }
+          titik: { type: "array", items: TITIK }
         }
       }
     }
@@ -88,9 +101,29 @@ function teks(nilai, maks) {
   return typeof nilai === "string" ? nilai.replace(/\s+/g, " ").trim().slice(0, maks) : "";
 }
 
+function pecahan(n) {
+  return +Math.min(1, Math.max(0, n)).toFixed(4);
+}
+
+// { x, y } daripada model (y dari atas) → [u, v] (v dari bawah), atau null
+function titikUV(p) {
+  return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? [pecahan(p.x), pecahan(1 - p.y)] : null;
+}
+
+// Nombor pada paksi → [[nilai, kedudukan]], kedudukan = pecahan gambar di sepanjang paksi itu
+function tandaPaksi(senarai, kunci) {
+  const keluar = [];
+  for (const t of Array.isArray(senarai) ? senarai : []) {
+    if (keluar.length >= MAKS_TITIK) break;
+    if (!t || !Number.isFinite(t.nilai) || Math.abs(t.nilai) > 1e9 || !Number.isFinite(t[kunci])) continue;
+    keluar.push([t.nilai, pecahan(kunci === "y" ? 1 - t.y : t.x)]);
+  }
+  return keluar;
+}
+
 // Jawapan model → bentuk yang selamat untuk pelayar: nombor terhad 0..1, bilangan terhad, y dibalikkan (dari bawah).
 export function kemasHasil(mentah) {
-  const kosong = { keluk: [], paksi: { x: "", y: "" } };
+  const kosong = { keluk: [], paksi: { x: "", y: "", O: null, hujungX: null, hujungY: null, tandaX: [], tandaY: [] } };
   if (!mentah || mentah.ada_graf !== true || !Array.isArray(mentah.keluk)) return kosong;
   const keluk = [];
   for (const k of mentah.keluk) {
@@ -115,7 +148,18 @@ export function kemasHasil(mentah) {
       titik
     });
   }
-  return { keluk, paksi: { x: teks(mentah.paksi_x, 40), y: teks(mentah.paksi_y, 40) } };
+  return {
+    keluk,
+    paksi: {
+      x: teks(mentah.paksi_x, 40),
+      y: teks(mentah.paksi_y, 40),
+      O: titikUV(mentah.asalan),
+      hujungX: titikUV(mentah.hujung_x),
+      hujungY: titikUV(mentah.hujung_y),
+      tandaX: tandaPaksi(mentah.tanda_x, "x"),
+      tandaY: tandaPaksi(mentah.tanda_y, "y")
+    }
+  };
 }
 
 async function tanyaClaude(b64, kunci, ambil) {
@@ -139,7 +183,7 @@ async function tanyaClaude(b64, kunci, ambil) {
           role: "user",
           content: [
             { type: "image", source: { type: "base64", media_type: "image/jpeg", data: b64 } },
-            { type: "text", text: "Kesan keluk dalam gambar graf ini." }
+            { type: "text", text: "Kesan paksi, nombor pada paksi dan keluk dalam gambar graf ini." }
           ]
         }
       ]

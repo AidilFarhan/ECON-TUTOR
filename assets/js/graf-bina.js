@@ -251,24 +251,17 @@
           '<label class="btn btn-utama bina-fail">' + E.ikon("kamera") + ' Ambil gambar<input class="sr-only" type="file" accept="image/*" capture="environment" data-fail></label>' +
           '<label class="btn bina-fail">' + E.ikon("kertas") + ' Pilih gambar<input class="sr-only" type="file" accept="image/*" data-fail></label>' +
           "</div>" +
-          '<p class="medan-bantuan">Atau seret fail gambar ke dalam graf. Gambar kekal dalam peranti ini dan tidak disimpan. Ia hanya dihantar keluar jika anda memilih <b>Kesan keluk dengan AI</b> dan bersetuju.</p>';
-      } else if (im.langkah === "laras") {
-        html =
-          '<p><b>Langkah 1: Jajarkan paksi.</b> Seret penanda <b>O</b> ke asalan graf dalam gambar, dan penanda <b>T</b> ke hujung paksi (paras hujung paksi tegak dan hujung paksi datar).</p>' +
-          '<div class="bina-imbas-butang">' +
-          '<button type="button" class="btn btn-utama" data-siap-laras>' + E.ikon("betul") + " Siap, mula tekap</button>" +
-          '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
-          "</div>";
+          '<p class="medan-bantuan">Atau seret fail gambar ke dalam graf. Gambar kekal dalam peranti ini dan tidak disimpan. Ia hanya dihantar keluar jika anda memilih <b>Kesan graf dengan AI</b> dan bersetuju.</p>';
       } else if (im.ai === "izin") {
         // tiada gambar dihantar sebelum pelajar menekan butang setuju
         html =
-          "<p><b>Kesan keluk dengan AI.</b> Gambar ini akan dihantar kepada perkhidmatan AI (Claude oleh Anthropic) untuk dikesan. Laman ini tidak menyimpan gambar itu. Pastikan tiada nama, wajah atau maklumat peribadi dalam gambar.</p>" +
+          "<p><b>Kesan graf dengan AI.</b> Gambar ini akan dihantar kepada perkhidmatan AI (Claude oleh Anthropic) untuk dikesan. Laman ini tidak menyimpan gambar itu. Pastikan tiada nama, wajah atau maklumat peribadi dalam gambar.</p>" +
           '<div class="bina-imbas-butang">' +
           '<button type="button" class="btn btn-utama" data-ai-hantar>' + E.ikon("betul") + " Setuju, hantar gambar</button>" +
           '<button type="button" class="btn" data-ai-batal>Batal</button>' +
           "</div>";
       } else if (im.ai === "tunggu") {
-        html = '<p role="status"><b>Sedang mengesan keluk…</b> Lazimnya kurang daripada setengah minit.</p>';
+        html = '<p role="status"><b>Sedang mengesan paksi, nombor dan keluk…</b> Lazimnya kurang daripada setengah minit.</p>';
       } else if (im.ai) {
         var dikesan = im.ai.id.map(cari).filter(Boolean);
         var paksiAI = [im.ai.paksi.y, im.ai.paksi.x].filter(Boolean);
@@ -280,13 +273,26 @@
               return "<b>" + esc(k.label) + "</b> (" + (j ? "cadangan: " + esc(j.nama) : "jenis belum ditetapkan") + ")";
             })
             .join(", ") +
-          "." + (paksiAI.length ? " Label paksi: " + esc(paksiAI.join(" dan ")) + "." : "") + "</p>" +
-          '<p class="teks-lemah"><b>Sahkan</b> menerima keluk bersama cadangan itu. <b>Sunting</b> menyimpan keluk sahaja; namakan dan tetapkan jenisnya sendiri.</p>' +
+          "." + (paksiAI.length ? " Label paksi: " + esc(paksiAI.join(" dan ")) + "." : "") +
+          (im.ai.maks
+            ? " Skala paksi (anggaran daripada nombor dalam gambar): paksi tegak 0 hingga " + E.fmt(im.ai.maks.y, 2) + ", paksi datar 0 hingga " + E.fmt(im.ai.maks.x, 2) + "."
+            : " Tiada nombor paksi dikesan, jadi graf kekal tanpa nilai.") +
+          "</p>" +
+          '<p class="teks-lemah"><b>Sahkan</b> menerima keluk bersama cadangan jenis, label dan skala paksi itu. <b>Sunting</b> menyimpan keluk sahaja; namakan dan tetapkan jenisnya sendiri.</p>' +
           '<div class="bina-imbas-butang">' +
           '<button type="button" class="btn btn-utama" data-ai-sah>' + E.ikon("betul") + " Sahkan</button>" +
           '<button type="button" class="btn" data-ai-sunting>' + E.ikon("pensel") + " Sunting</button>" +
           '<button type="button" class="cip" data-ai-buang>' + E.ikon("salah") + " Buang keluk AI</button>" +
           "</div>";
+      } else if (im.langkah === "laras") {
+        html =
+          '<p><b>Kesan graf dengan AI</b> mengesan paksi, nombor pada paksi dan keluk terus daripada gambar. Atau tekap sendiri: seret penanda <b>O</b> ke asalan graf dalam gambar dan penanda <b>T</b> ke hujung paksi (paras hujung paksi tegak dan hujung paksi datar), kemudian tekan <b>Siap, mula tekap</b>.</p>' +
+          '<div class="bina-imbas-butang">' +
+          '<button type="button" class="btn btn-utama" data-ai>' + E.ikon("bintang") + " Kesan graf dengan AI</button>" +
+          '<button type="button" class="btn" data-siap-laras>' + E.ikon("pensel") + " Siap, mula tekap</button>" +
+          '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
+          "</div>" +
+          (im.baki != null ? '<p class="teks-lemah">Baki imbasan AI hari ini: ' + im.baki + " kali.</p>" : "");
       } else {
         html =
           (im.langkah === "tekap"
@@ -296,7 +302,7 @@
           (im.langkah === "tekap"
             ? '<button type="button" class="btn btn-utama" data-selesai-tekap>' + E.ikon("betul") + " Selesai menekap</button>"
             : '<button type="button" class="btn" data-tekap-lagi>' + E.ikon("pensel") + " Tekap keluk lagi</button>") +
-          '<button type="button" class="btn" data-ai>' + E.ikon("bintang") + " Kesan keluk dengan AI</button>" +
+          '<button type="button" class="btn" data-ai>' + E.ikon("bintang") + " Kesan graf dengan AI</button>" +
           '<button type="button" class="cip" data-laras-semula>' + E.ikon("ulang") + " Laras semula</button>" +
           '<button type="button" class="cip" data-buang-imej>' + E.ikon("salah") + " Buang gambar</button>" +
           "</div>" +
@@ -327,7 +333,8 @@
     }
 
     /* ---------- kesan keluk dengan AI (EKO.imbas.pengecam) ---------- */
-    // st.imej.ai = null | "izin" | "tunggu" | { id: [id keluk], jenis: { id: jenis cadangan }, paksi: { x, y } }
+    // st.imej.ai = null | "izin" | "tunggu" | { id: [id keluk], jenis: { id: jenis cadangan }, paksi: { x, y }, maks: { x, y } | null }
+    // Diminta semasa langkah laras: gambar dijajarkan mengikut paksi yang dikesan AI (jika tiada, penanda O/T semasa).
     function kesanAI() {
       var im = st.imej;
       im.ai = "tunggu";
@@ -338,8 +345,13 @@
         if (d && d.baki != null) im.baki = d.baki;
         var id = [],
           jenis = {};
+        var rect = im.rect;
         if (!ralat) {
-          E.imbas.dariAI(im.rect, d.keluk).forEach(function (k) {
+          if (im.langkah === "laras") {
+            var pk = E.imbas.paksiAI(rect, d.paksi);
+            rect = E.imbas.padan(rect, pk ? pk.O : im.O, pk ? pk.T : im.T) || rect;
+          }
+          E.imbas.dariAI(rect, d.keluk).forEach(function (k) {
             var n = st.graf.keluk.length;
             st.graf = B.tambahKeluk(st.graf, { label: B.subskrip(k.label) || "K", titik: k.titik, sumber: "imbas" });
             if (st.graf.keluk.length === n) return;
@@ -353,8 +365,19 @@
           mesejImbas(ralat);
           return;
         }
-        // jenis hanya cadangan: tidak ditetapkan sehingga pelajar menekan Sahkan
-        im.ai = { id: id, jenis: jenis, paksi: d.paksi || {} };
+        if (im.langkah === "laras") {
+          im.rect = rect;
+          im.O = [0, 0];
+          im.T = [1, 1];
+          im.langkah = "siap";
+          petunjuk.textContent = PETUNJUK[st.mod];
+        }
+        // jenis, label dan skala paksi hanya cadangan: tidak ditetapkan sehingga pelajar menekan Sahkan.
+        // Graf yang sudah ada keluk persamaan mengekalkan paksinya sendiri.
+        var adaPers = st.graf.keluk.some(function (k) {
+          return !!k.persamaan;
+        });
+        im.ai = { id: id, jenis: jenis, paksi: d.paksi || {}, maks: adaPers ? null : E.imbas.maksPaksi(rect, d.paksi) };
         st.pilih = id[0];
         st.baruDilukis = null;
         binaPanel();
@@ -378,6 +401,7 @@
         });
         if (a.paksi.x) st.graf = B.labelPaksi(st.graf, "x", a.paksi.x);
         if (a.paksi.y) st.graf = B.labelPaksi(st.graf, "y", a.paksi.y);
+        if (a.maks) st.graf = B.tetapSkala(st.graf, a.maks, a.id);
       }
       binaPanel();
       binaParam();
@@ -460,6 +484,7 @@
         setLukis(false);
       } else if (b.hasAttribute("data-ai-batal")) {
         st.imej.ai = null;
+        if (st.imej.langkah === "laras") petunjuk.textContent = "Jajarkan paksi gambar";
         binaImbas();
       } else if (b.hasAttribute("data-ai-hantar")) {
         kesanAI();
@@ -672,6 +697,7 @@
     // Nilai titik pada keluk persamaan: pemboleh ubah bebas dibundarkan kepada 1 unit kemas,
     // pemboleh ubah bersandar dikira terus daripada persamaan (P = 20 → Qd = 60, bukan 59.98)
     function nilaiTitik(k, p) {
+      if (!k.persamaan) return B.nilaiKemas(st.graf, p); // keluk daripada gambar bernombor
       var w = dunia(p);
       var eq = k.persamaan;
       var bebas = eq.dep === "x" ? 1 : 0;
@@ -979,8 +1005,8 @@
       var pA = B.titikPadaS(poli, t.sAwal),
         pB = B.titikPadaS(poli, s);
       var bergerak = Math.abs(s - t.sAwal) > 0.004 && dalamKotak(pA);
-      // nilai pada paksi hanya bagi keluk persamaan (keluk konsep tiada nilai sebenar)
-      var bernilai = !!k.persamaan && PS.paksiNombor(st.graf);
+      // nilai pada paksi hanya bagi keluk persamaan atau keluk gambar bernombor (keluk konsep tiada nilai sebenar)
+      var bernilai = B.adaNilai(st.graf, k);
       function cipPaksi(p) {
         if (!bernilai) return {};
         var w = nilaiTitik(k, p);
@@ -1055,10 +1081,10 @@
       var asas = esc(B.asasLabel(k.label));
       var eq = k.persamaan;
       var jenis = JK.dapat(k.jenis); // daftar jenis keluk (graf-terang.js), null jika belum ditetapkan
-      var bernilai = !!eq && PS.paksiNombor(st.graf);
+      var bernilai = B.adaNilai(st.graf, k);
       // nama pemboleh ubah: daripada persamaan (P, Qd…) atau label paksi
-      var X = bernilai ? esc(eq.nama.x) : esc(st.graf.paksi.x.label || "paksi datar"),
-        Y = bernilai ? esc(eq.nama.y) : esc(st.graf.paksi.y.label || "paksi tegak");
+      var X = bernilai && eq ? esc(eq.nama.x) : esc(st.graf.paksi.x.label || "paksi datar"),
+        Y = bernilai && eq ? esc(eq.nama.y) : esc(st.graf.paksi.y.label || "paksi tegak");
       var chipPers = eq ? ["Persamaan", esc(eq.teks)] : null;
       // keluk berparameter: tunjuk juga persamaan dengan nilai semasa (garis lurus sahaja)
       var semasa = eq && Object.keys(eq.param).length ? PS.bentukLurus(eq, 0, 0) : null;
@@ -1085,7 +1111,7 @@
             dy = k.anjak.y * st.graf.paksi.y.maks;
           if (Math.abs(dx) > 1e-9) ayat += " Pada setiap nilai " + Y + ", " + X + " berubah sebanyak <b>" + (dx > 0 ? "+" : "") + E.fmt(dx, 2) + "</b>.";
           if (Math.abs(dy) > 1e-9) ayat += " Pada setiap nilai " + X + ", " + Y + " berubah sebanyak <b>" + (dy > 0 ? "+" : "") + E.fmt(dy, 2) + "</b>.";
-          var baharu = PS.bentukLurus(eq, dx, dy);
+          var baharu = eq ? PS.bentukLurus(eq, dx, dy) : null;
           if (baharu) {
             chipBaharu = ["Setara bagi " + asas + "₁", esc(baharu), k.warna];
             ayat += " Persamaan setara bagi " + asas + "₁: <b>" + esc(baharu) + "</b> (persamaan asal tidak diubah).";
@@ -1131,7 +1157,7 @@
           ubahX = arahPaksi(pB[0] - pA[0], "meningkat", "menurun");
         var teksY = "<b>" + Y + "</b> " + ubahY + (ubahY === "tidak berubah" ? "" : " daripada " + E.fmt(wA[1], 2) + " kepada " + E.fmt(wB[1], 2)),
           teksX = "<b>" + X + "</b> " + ubahX + (ubahX === "tidak berubah" ? "" : " daripada " + E.fmt(wA[0], 2) + " kepada " + E.fmt(wB[0], 2));
-        perubahan = eq.sistem === "PQ" && ubahY !== "tidak berubah" ? "Apabila " + teksY + ", " + teksX + "." : teksY + " dan " + teksX + ".";
+        perubahan = eq && eq.sistem === "PQ" && ubahY !== "tidak berubah" ? "Apabila " + teksY + ", " + teksX + "." : teksY + " dan " + teksX + ".";
       } else {
         perubahan = "<b>" + Y + "</b> " + arahPaksi(pB[1] - pA[1], "meningkat", "menurun") + " dan <b>" + X + "</b> " + arahPaksi(pB[0] - pA[0], "meningkat", "menurun") + ".";
       }

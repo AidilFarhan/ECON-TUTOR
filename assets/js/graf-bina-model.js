@@ -235,6 +235,39 @@
     return g;
   };
 
+  /* ---------- skala paksi daripada gambar ---------- */
+  // Keluk yang dikesan daripada gambar bernombor membawa meta.skala = { x, y }: nilai di hujung paksi
+  // semasa ia dikesan. Paksi graf menjadi bernombor (maks), dan titik keluk tidak ditulis semula.
+  B.tetapSkala = function (graf, maks, ids) {
+    var g = klon(graf);
+    if (!maks || !(maks.x > 0) || !(maks.y > 0)) return g;
+    g.paksi.x.maks = maks.x;
+    g.paksi.y.maks = maks.y;
+    (ids || []).forEach(function (id) {
+      var k = B.cari(g, id);
+      if (k) k.meta.skala = { x: maks.x, y: maks.y };
+    });
+    return g;
+  };
+
+  // Keluk bernilai pada paksi bernombor: keluk persamaan, atau keluk gambar selagi paksi masih pada skalanya.
+  // Keluk konsep (templat, lukisan) tiada nilai sebenar.
+  B.adaNilai = function (graf, k) {
+    var p = graf.paksi;
+    if (!k || !(p.x.maks > 0) || !(p.y.maks > 0)) return false;
+    var s = k.meta && k.meta.skala;
+    return !!k.persamaan || !!(s && s.x === p.x.maks && s.y === p.y.maks);
+  };
+
+  // Titik ternormal → nilai pada paksi, dibundarkan kepada unit kemas (1% julat, kuasa 10: 120 → 1, 12 → 0.1)
+  B.nilaiKemas = function (graf, p) {
+    function kemas(v, maks) {
+      var u = Math.pow(10, Math.floor(Math.log(maks / 100) / Math.LN10));
+      return +(Math.round((v * maks) / u) * u).toFixed(6);
+    }
+    return [kemas(p[0], graf.paksi.x.maks), kemas(p[1], graf.paksi.y.maks)];
+  };
+
   /* ---------- geometri ---------- */
   // Catmull-Rom sentripetal (alpha 0.5): licin tanpa gelung, melalui setiap titik kawalan,
   // dan sah untuk keluk tegak atau keluk yang bukan fungsi y = f(x).

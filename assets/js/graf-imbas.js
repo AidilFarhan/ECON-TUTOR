@@ -1,12 +1,12 @@
 /* =========================================================
    Econ Tutor · tekap graf daripada gambar (EKO.imbas)
    Gambar dipaparkan di belakang graf, pelajar menjajarkan paksi (penanda O dan T),
-   kemudian menekap keluk dengan Lukis keluk, ATAU meminta AI mengesan keluk.
+   kemudian menekap keluk dengan Lukis keluk, ATAU meminta AI mengesan paksi, nombor pada paksi dan keluk.
 
    - Gambar dikecilkan (≤ 1600 px) dan dikod semula ke JPEG (metadata EXIF/GPS terbuang),
      dipegang sebagai object URL, dan dibuang apabila widget dimusnahkan. Gambar tidak
      masuk ke dalam model GrafBina dan tidak disimpan. Tekap sendiri: gambar kekal dalam peranti.
-   - Matematik penjajaran (IM.muatAwal, IM.padan) dan IM.dariAI ialah fungsi tulen: boleh diuji dalam Node.
+   - Matematik penjajaran (IM.muatAwal, IM.padan) dan petaan hasil AI (IM.dariAI, IM.paksiAI, IM.maksPaksi) ialah fungsi tulen: boleh diuji dalam Node.
    - IM.pengecam: pengecam automatik (AI). analisis() menghantar JPEG itu ke /api/kesan-graf
      (Claude API) dan hanya dipanggil selepas pelajar bersetuju dalam UI. Hasilnya ialah
      cadangan yang mesti disahkan oleh pelajar ([Sahkan] / [Sunting]).
@@ -146,6 +146,58 @@
     return keluar;
   };
 
+  // Paksi yang dikesan AI → penanda O dan T (ruang ternormal) untuk IM.padan; null jika paksi tidak dikesan.
+  IM.paksiAI = function (r, paksi) {
+    if (!paksi || !paksi.O || !paksi.hujungX || !paksi.hujungY) return null;
+    var O = IM.keNormal(r, paksi.O[0], paksi.O[1]);
+    var T = IM.keNormal(r, paksi.hujungX[0], paksi.hujungY[1]);
+    return IM.padan(r, O, T) ? { O: O, T: T } : null;
+  };
+
+  // Nombor pada satu paksi ([[nilai, kedudukan ternormal]]) → nilai di hujung paksi (kedudukan 1).
+  // Paksi graf bermula dari 0, jadi garis nilai mesti melalui asalan; jika tidak (paksi terputus), null.
+  function maksDari(pts) {
+    pts = pts.filter(function (p) {
+      return p[1] > 0 && isFinite(p[1]) && p[0] > 0.03 && p[0] < 1.6;
+    });
+    var m = pts.length;
+    if (!m) return null;
+    var sx = 0,
+      sy = 0,
+      sxx = 0,
+      sxy = 0;
+    pts.forEach(function (p) {
+      sx += p[0];
+      sy += p[1];
+      sxx += p[0] * p[0];
+      sxy += p[0] * p[1];
+    });
+    var den = m * sxx - sx * sx;
+    if (m >= 2 && den > 1e-6) {
+      var a = (m * sxy - sx * sy) / den,
+        b = (sy - a * sx) / m;
+      if (!(a > 0) || Math.abs(b) > 0.08 * a) return null;
+    }
+    return +(sxy / sxx).toPrecision(3);
+  }
+
+  // Skala paksi daripada nombor yang dikesan AI: { x, y } (nilai di hujung setiap paksi) atau null.
+  // r = segi empat gambar selepas dijajarkan. Anggaran sahaja: bergantung pada kedudukan yang dikesan.
+  IM.maksPaksi = function (r, paksi) {
+    if (!paksi) return null;
+    var mx = maksDari(
+      (paksi.tandaX || []).map(function (t) {
+        return [IM.keNormal(r, t[1], 0)[0], t[0]];
+      })
+    );
+    var my = maksDari(
+      (paksi.tandaY || []).map(function (t) {
+        return [IM.keNormal(r, 0, t[1])[1], t[0]];
+      })
+    );
+    return mx && my ? { x: mx, y: my } : null;
+  };
+
   IM.MESEJ_AI = {
     tiada: "Graf tidak dapat dikesan. Pastikan paksi dan keluk jelas dalam gambar, kemudian cuba lagi atau tekap sendiri.",
     had: "Had imbasan AI untuk hari ini sudah habis. Cuba lagi esok, atau tekap keluk sendiri.",
@@ -155,7 +207,7 @@
   };
 
   // Gambar dihantar ke pelayan HANYA apabila analisis() dipanggil (selepas pelajar bersetuju).
-  // hasil = { url } daripada IM.muat. selesai(mesejRalat) atau selesai(null, { keluk, paksi, baki }).
+  // hasil = { url } daripada IM.muat. selesai(mesejRalat) atau selesai(null, { keluk, paksi, baki }) (bentuk: api/kesan-graf.js).
   IM.pengecam = {
     analisis: function (hasil, selesai) {
       var M = IM.MESEJ_AI;

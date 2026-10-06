@@ -110,6 +110,9 @@
         hasil.w = w;
         hasil.n = [w[0] / graf.paksi.x.maks, w[1] / graf.paksi.y.maks];
       }
+    } else if (B.adaNilai(graf, kD) && B.adaNilai(graf, kS)) {
+      // keluk daripada gambar bernombor: nilai dibaca daripada persilangan geometri
+      hasil.w = B.nilaiKemas(graf, n);
     }
     return hasil;
   }

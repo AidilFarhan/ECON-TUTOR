@@ -148,10 +148,11 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
     - the student photographs or uploads a graph (textbook, slide, handwriting), aligns it with markers O and T, and traces each curve with a finger;
     - the traced curves become normal curves (type, shift, explanation, equilibrium);
     - the image is not stored, and it never leaves the device unless the student chooses AI detection.
-  - **Kesan keluk dengan AI** (phase 5b; owner decisions of 2026-10-06: Claude API, consent notice, 10 scans a day per student):
-    - after aligning the photo, the student may ask AI to detect the curves instead of tracing them;
+  - **Kesan graf dengan AI** (phase 5b; owner decisions of 2026-10-06: Claude API, consent notice, 10 scans a day per student):
+    - after choosing a photo, the student may ask AI to detect the axes, the numbers and units on them, and the curves, with no manual alignment or tracing;
+    - when the photo has numbers on both axes, the graph gets numeric axes, so point readings and the equilibrium price and quantity show values (estimates read from the photo);
     - a notice explains that the photo is sent to an AI service, and nothing is sent before the student agrees;
-    - detected curves appear over the photo as a suggestion, with **Sahkan** (accept curves, suggested types and axis labels), **Sunting** (keep the curves only) and **Buang keluk AI**;
+    - detected curves appear over the photo as a suggestion, with **Sahkan** (accept curves, suggested types, axis labels and axis scale), **Sunting** (keep the curves only) and **Buang keluk AI**;
     - when detection fails or the daily limit is reached, the student sees one short message and can still trace by hand.
 
 **Acceptance.**
@@ -293,7 +294,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-01 | *Bina graf* phase 6: market equilibrium E₀ → E₁ with P and Q changes (`EKO.keseimbangan`) |
 | 2026-10-01 | *Bina graf* phase 7: *Latihan graf* with *Semak Jawapan* (`EKO.senario`, 8 T4 Bab 2 questions) |
 | 2026-10-01 | *Bina graf* phase 4: *Tekap gambar*, which traces a graph from a photo on the device without AI (`EKO.imbas`) |
-| 2026-10-06 | *Bina graf* phase 5b: *Kesan keluk dengan AI* in *Tekap gambar* (Claude API through `/api/kesan-graf`, consent notice, 10 scans a day per student, result confirmed by the student) |
+| 2026-10-06 | *Bina graf* phase 5b: *Kesan graf dengan AI* in *Tekap gambar* (Claude API through `/api/kesan-graf`; detects axes, numbers on the axes and curves; consent notice, 10 scans a day per student, result confirmed by the student) |
 | 2026-10-01 | *Bina graf*: curve type KKP (opportunity cost along the curve, economic growth as an outward shift from the origin) |
 | 2026-10-01 | Short-run cost graph: *MC = AC: AC minimum* state (button, reading, Keadaan column), following the Form 4 textbook |
 | 2026-10-01 | Short-run cost graph in Form 4 shows only AC and MC curves; STPM keeps AVC |
