@@ -266,22 +266,26 @@
         var dikesan = im.ai.id.map(cari).filter(Boolean);
         var paksiAI = [im.ai.paksi.y, im.ai.paksi.x].filter(Boolean);
         html =
-          "<p><b>AI mengesan " + dikesan.length + " keluk.</b> Bandingkan dengan gambar di belakang graf: " +
+          "<p><b>AI mengesan " + dikesan.length + " keluk:</b> " +
           dikesan
             .map(function (k) {
-              var j = JK.dapat(im.ai.jenis[k.id]);
-              return "<b>" + esc(k.label) + "</b> (" + (j ? "cadangan: " + esc(j.nama) : "jenis belum ditetapkan") + ")";
+              var j = JK.dapat(k.jenis);
+              var arah = im.ai.beralih.indexOf(k.id) !== -1 ? B.arahAlih(k) : [];
+              var asas = esc(B.asasLabel(k.label));
+              return (
+                "<b>" + (arah.length ? asas + "₀ → " + asas + "₁" : esc(k.label)) + "</b> (" + (j ? esc(j.nama) : "jenis belum ditetapkan") +
+                (arah.length ? ", beralih ke " + arah.join(" dan ") : "") + ")"
+              );
             })
             .join(", ") +
-          "." + (paksiAI.length ? " Label paksi: " + esc(paksiAI.join(" dan ")) + "." : "") +
+          "." + (paksiAI.length ? " Label paksi daripada gambar: " + esc(paksiAI.join(" dan ")) + "." : " Gambar tiada label paksi, jadi label lalai digunakan.") +
           (im.ai.maks
             ? " Skala paksi (anggaran daripada nombor dalam gambar): paksi tegak 0 hingga " + E.fmt(im.ai.maks.y, 2) + ", paksi datar 0 hingga " + E.fmt(im.ai.maks.x, 2) + "."
-            : " Tiada nombor paksi dikesan, jadi graf kekal tanpa nilai.") +
+            : " Paksi tiada nombor, jadi harga dan kuantiti ditanda P₀, P₁, Q₀ dan Q₁.") +
           "</p>" +
-          '<p class="teks-lemah"><b>Sahkan</b> menerima keluk bersama cadangan jenis, label dan skala paksi itu. <b>Sunting</b> menyimpan keluk sahaja; namakan dan tetapkan jenisnya sendiri.</p>' +
+          '<p class="teks-lemah">Bandingkan dengan gambar di belakang graf. Jika ada yang salah, tukar nama keluk dalam senarai di bawah graf atau jenisnya dalam <b>Terangkan graf</b>.</p>' +
           '<div class="bina-imbas-butang">' +
-          '<button type="button" class="btn btn-utama" data-ai-sah>' + E.ikon("betul") + " Sahkan</button>" +
-          '<button type="button" class="btn" data-ai-sunting>' + E.ikon("pensel") + " Sunting</button>" +
+          '<button type="button" class="btn btn-utama" data-ai-sah>' + E.ikon("betul") + " Selesai</button>" +
           '<button type="button" class="cip" data-ai-buang>' + E.ikon("salah") + " Buang keluk AI</button>" +
           "</div>";
       } else if (im.langkah === "laras") {
@@ -344,23 +348,36 @@
         im.ai = null;
         if (d && d.baki != null) im.baki = d.baki;
         var id = [],
-          jenis = {};
+          beralih = [];
         var rect = im.rect;
+        var asal = { graf: st.graf, pilih: st.pilih }; // untuk "Buang keluk AI"
         if (!ralat) {
           if (im.langkah === "laras") {
             var pk = E.imbas.paksiAI(rect, d.paksi);
             rect = E.imbas.padan(rect, pk ? pk.O : im.O, pk ? pk.T : im.T) || rect;
           }
-          E.imbas.dariAI(rect, d.keluk).forEach(function (k) {
+          // keluk asal + keluk selepas beralih (S0, S1) digabung menjadi satu keluk yang beralih
+          E.imbas.gabungAlih(E.imbas.dariAI(rect, d.keluk)).forEach(function (k) {
             var n = st.graf.keluk.length;
             st.graf = B.tambahKeluk(st.graf, { label: B.subskrip(k.label) || "K", titik: k.titik, sumber: "imbas" });
             if (st.graf.keluk.length === n) return;
-            id.push(st.graf.keluk[n].id);
-            if (JK.dapat(k.jenis)) jenis[st.graf.keluk[n].id] = k.jenis;
+            var kid = st.graf.keluk[n].id;
+            id.push(kid);
+            // jenis dikesan terus (permintaan pemilik); pelajar masih boleh menukarnya dalam Terangkan graf
+            if (JK.dapat(k.jenis)) st.graf = T.tetapkan(st.graf, kid, k.jenis);
+            if (!k.alih) return;
+            var k0 = cari(kid);
+            if (k.alih.skala) st.graf = B.skalaKeluk(st.graf, kid, k.alih.skala);
+            else st.graf = B.anjakTerus(st.graf, kid, k.alih.x, k.alih.y);
+            var k1 = cari(kid);
+            if (!B.dianjak(k1)) return;
+            st.graf = B.catat(st.graf, { jenis: "anjak", keluk: kid, dari: k.alih.skala ? { skala: k0.skala || 1 } : B.klon(k0.anjak), ke: k.alih.skala ? { skala: k1.skala } : B.klon(k1.anjak) });
+            beralih.push(kid);
           });
           if (!id.length) ralat = E.imbas.MESEJ_AI.tiada;
         }
         if (ralat) {
+          st.graf = asal.graf;
           binaImbas();
           mesejImbas(ralat);
           return;
@@ -370,20 +387,33 @@
           im.O = [0, 0];
           im.T = [1, 1];
           im.langkah = "siap";
-          petunjuk.textContent = PETUNJUK[st.mod];
         }
-        // jenis, label dan skala paksi hanya cadangan: tidak ditetapkan sehingga pelajar menekan Sahkan.
-        // Graf yang sudah ada keluk persamaan mengekalkan paksinya sendiri.
+        // label paksi mengikut gambar; jika tiada, label lalai kekal (Harga (RM), Kuantiti (unit))
+        var p = d.paksi || {};
+        if (p.x) st.graf = B.labelPaksi(st.graf, "x", p.x);
+        if (p.y) st.graf = B.labelPaksi(st.graf, "y", p.y);
+        // skala paksi daripada nombor dalam gambar; graf yang sudah ada keluk persamaan mengekalkan paksinya sendiri
         var adaPers = st.graf.keluk.some(function (k) {
           return !!k.persamaan;
         });
-        im.ai = { id: id, jenis: jenis, paksi: d.paksi || {}, maks: adaPers ? null : E.imbas.maksPaksi(rect, d.paksi) };
-        st.pilih = id[0];
+        var maks = adaPers ? null : E.imbas.maksPaksi(rect, p);
+        if (maks) st.graf = B.tetapSkala(st.graf, maks, id);
+        im.ai = { id: id, beralih: beralih, paksi: p, maks: maks, asal: asal };
+        st.pilih = beralih[0] || id[0];
         st.baruDilukis = null;
+        // terus terangkan: mod peralihan jika gambar menunjukkan keluk beralih, dan panel penerangan dibuka
+        st.mod = beralih.length ? "alih" : st.mod;
+        segMod.set(st.mod);
+        host.setAttribute("data-mod", st.mod);
+        petunjuk.textContent = PETUNJUK[st.mod];
+        kotakTerang.hidden = false;
+        btnTerang.setAttribute("aria-pressed", "true");
+        btnTerang.setAttribute("aria-expanded", "true");
         binaPanel();
         binaParam();
         binaImbas();
         lukis();
+        binaTerang();
       });
     }
 
@@ -391,17 +421,9 @@
       var a = st.imej.ai;
       st.imej.ai = null;
       if (cara === "buang") {
-        a.id.forEach(function (id) {
-          st.graf = B.buangKeluk(st.graf, id);
-        });
-        if (!cari(st.pilih)) st.pilih = st.graf.keluk.length ? st.graf.keluk[0].id : null;
-      } else if (cara === "sah") {
-        a.id.forEach(function (id) {
-          if (a.jenis[id] && cari(id)) st.graf = T.tetapkan(st.graf, id, a.jenis[id]);
-        });
-        if (a.paksi.x) st.graf = B.labelPaksi(st.graf, "x", a.paksi.x);
-        if (a.paksi.y) st.graf = B.labelPaksi(st.graf, "y", a.paksi.y);
-        if (a.maks) st.graf = B.tetapSkala(st.graf, a.maks, a.id);
+        // kembali kepada graf sebelum imbasan (keluk, jenis, label dan skala paksi)
+        st.graf = a.asal.graf;
+        st.pilih = cari(a.asal.pilih) ? a.asal.pilih : st.graf.keluk.length ? st.graf.keluk[0].id : null;
       }
       binaPanel();
       binaParam();
@@ -490,8 +512,6 @@
         kesanAI();
       } else if (b.hasAttribute("data-ai-sah")) {
         selesaiAI("sah");
-      } else if (b.hasAttribute("data-ai-sunting")) {
-        selesaiAI("sunting");
       } else if (b.hasAttribute("data-ai-buang")) {
         selesaiAI("buang");
       } else if (b.hasAttribute("data-buang-imej")) {

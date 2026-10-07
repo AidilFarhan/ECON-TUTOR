@@ -198,6 +198,104 @@
     return mx && my ? { x: mx, y: my } : null;
   };
 
+  // Nilai x pada ketinggian y (atau y pada x jika paksi = 1) di sepanjang poligaris; null jika di luar julat
+  function pada(pts, v, paksi) {
+    var a = paksi ? 0 : 1,
+      b = paksi ? 1 : 0;
+    for (var i = 1; i < pts.length; i++) {
+      var p = pts[i - 1],
+        q = pts[i];
+      if ((p[a] - v) * (q[a] - v) <= 0 && p[a] !== q[a]) return p[b] + ((v - p[a]) / (q[a] - p[a])) * (q[b] - p[b]);
+    }
+    return null;
+  }
+
+  function julat(pts, a) {
+    var lo = Infinity,
+      hi = -Infinity;
+    pts.forEach(function (p) {
+      lo = Math.min(lo, p[a]);
+      hi = Math.max(hi, p[a]);
+    });
+    return [lo, hi];
+  }
+
+  // "S₁" / "S1" / "D'" → { asas: "S", indeks: 1 }. Tanpa nombor: indeks −1 ("S" lebih awal daripada "S1").
+  IM.pecahLabel = function (label) {
+    var t = String(label || "").replace(/\s+/g, "").replace(/[₀-₉]/g, function (c) {
+      return String("₀₁₂₃₄₅₆₇₈₉".indexOf(c));
+    });
+    var m = /^([A-Za-z]+)(\d*)(['′]*)$/.exec(t);
+    if (!m) return null;
+    return { asas: m[1].toUpperCase(), indeks: m[2] ? +m[2] : m[3] ? m[3].length - 0.5 : -1 };
+  };
+
+  // Keluk asal dan keluk selepas beralih dalam gambar (S0 dan S1, D dan D1) ialah SATU keluk yang beralih.
+  // Senarai daripada IM.dariAI → senarai yang sama, tetapi setiap pasangan digabung menjadi satu keluk
+  // dengan titik keluk asal dan alih = { x, y } (translasi) atau { skala } (KKP). Fungsi tulen.
+  // Hanya pasangan yang jelas digabung: tepat dua keluk, jenis sama, huruf label sama, nombor berbeza.
+  IM.gabungAlih = function (senarai) {
+    var kumpulan = {};
+    (senarai || []).forEach(function (k, i) {
+      var l = IM.pecahLabel(k.label);
+      if (!l) return;
+      var kunci = (k.jenis || "") + "|" + l.asas;
+      (kumpulan[kunci] = kumpulan[kunci] || []).push({ i: i, indeks: l.indeks, asas: l.asas });
+    });
+    var buang = {},
+      alih = {};
+    Object.keys(kumpulan).forEach(function (kunci) {
+      var g = kumpulan[kunci];
+      if (g.length !== 2 || g[0].indeks === g[1].indeks) return;
+      g.sort(function (a, b) {
+        return a.indeks - b.indeks;
+      });
+      var A = senarai[g[0].i],
+        Bk = senarai[g[1].i];
+      var h;
+      if (A.jenis === "kkp") {
+        var ax = julat(A.titik, 0)[1],
+          ay = julat(A.titik, 1)[1],
+          bx = julat(Bk.titik, 0)[1],
+          by = julat(Bk.titik, 1)[1];
+        if (!(ax > 0.05 && ay > 0.05)) return;
+        h = { skala: (bx / ax + by / ay) / 2 };
+      } else {
+        // translasi mendatar pada ketinggian tengah yang dikongsi; keluk hampir mendatar: translasi tegak
+        var ya = julat(A.titik, 1),
+          yb = julat(Bk.titik, 1);
+        var lo = Math.max(ya[0], yb[0]),
+          hi = Math.min(ya[1], yb[1]);
+        if (ya[1] - ya[0] >= 0.05 && hi - lo > 0.02) {
+          var xa = pada(A.titik, (lo + hi) / 2, 0),
+            xb = pada(Bk.titik, (lo + hi) / 2, 0);
+          if (xa == null || xb == null) return;
+          h = { x: xb - xa, y: 0 };
+        } else {
+          var xr = julat(A.titik, 0),
+            xs = julat(Bk.titik, 0);
+          var l2 = Math.max(xr[0], xs[0]),
+            h2 = Math.min(xr[1], xs[1]);
+          if (h2 - l2 <= 0.02) return;
+          var y1 = pada(A.titik, (l2 + h2) / 2, 1),
+            y2 = pada(Bk.titik, (l2 + h2) / 2, 1);
+          if (y1 == null || y2 == null) return;
+          h = { x: 0, y: y2 - y1 };
+        }
+        if (Math.abs(h.x) + Math.abs(h.y) < 0.02) return;
+      }
+      buang[g[1].i] = true;
+      alih[g[0].i] = { alih: h, asas: g[0].asas };
+    });
+    var keluar = [];
+    (senarai || []).forEach(function (k, i) {
+      if (buang[i]) return;
+      var a = alih[i];
+      keluar.push({ label: a ? a.asas : k.label, jenis: k.jenis, titik: k.titik, alih: a ? a.alih : null });
+    });
+    return keluar;
+  };
+
   IM.MESEJ_AI = {
     tiada: "Graf tidak dapat dikesan. Pastikan paksi dan keluk jelas dalam gambar, kemudian cuba lagi atau tekap sendiri.",
     had: "Had imbasan AI untuk hari ini sudah habis. Cuba lagi esok, atau tekap keluk sendiri.",

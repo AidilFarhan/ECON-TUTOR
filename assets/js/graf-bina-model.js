@@ -525,6 +525,15 @@
   };
 
   // Catat peristiwa. Peristiwa berturut-turut yang sama jenis dan keluk digabung (dari kekal, ke dikemas kini).
+  // Anjakan yang dibaca daripada gambar (S₀ → S₁): diset terus, tanpa had seretan, supaya kedudukan dalam gambar dikekalkan.
+  B.anjakTerus = function (graf, id, ax, ay) {
+    var g = klon(graf);
+    var k = B.cari(g, id);
+    if (!k || k.arahSeret === "tiada" || k.arahSeret === "skala" || !isFinite(ax) || !isFinite(ay)) return g;
+    k.anjak = { x: k.arahSeret === "y" ? 0 : Math.round(E.clamp(ax, -1, 1) * 1e6) / 1e6, y: k.arahSeret === "x" ? 0 : Math.round(E.clamp(ay, -1, 1) * 1e6) / 1e6 };
+    return g;
+  };
+
   B.catat = function (graf, p) {
     var g = klon(graf);
     var akhir = g.peristiwa[g.peristiwa.length - 1];

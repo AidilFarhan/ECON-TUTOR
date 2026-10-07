@@ -326,6 +326,58 @@
     return { jenis: "contoh", konsep: "alih", tajuk: "Kesan terhadap keseimbangan pasaran", html: html };
   };
 
+  // Keanjalan harga yang ditunjukkan oleh peralihan satu keluk: apabila penawaran beralih, keseimbangan
+  // bergerak di sepanjang keluk permintaan (Ed); apabila permintaan beralih, di sepanjang keluk penawaran (Es).
+  // Dikira daripada E₀ dan E₁: nilai paksi jika ada, jika tidak kedudukan dalam rajah (paksi dari 0, jadi
+  // peratus perubahan tidak bergantung pada unit). Pulang { e, jenis, pP, pQ, … } atau null.
+  T.kiraKeanjalan = function (graf, id) {
+    var KS = E.keseimbangan;
+    var r = KS && KS.kira(graf, id);
+    if (!r || !r.E0 || !r.E1 || !r.berubah || !r.kes || r.kes === "DS") return null;
+    var a = r.bernilai ? r.E0.w : r.E0.n,
+      b = r.bernilai ? r.E1.w : r.E1.n;
+    if (!(a[0] > 0) || !(a[1] > 0)) return null;
+    var pQ = ((b[0] - a[0]) / a[0]) * 100,
+      pP = ((b[1] - a[1]) / a[1]) * 100;
+    if (Math.abs(pQ) < 0.5 && Math.abs(pP) < 0.5) return null;
+    var e = Math.abs(pP) < 0.5 ? Infinity : Math.abs(pQ) < 0.5 ? 0 : Math.abs(pQ / pP);
+    var jenis = e === Infinity ? "anjal sempurna" : e === 0 ? "tak anjal sempurna" : Math.abs(e - 1) < 0.05 ? "anjal uniti" : e > 1 ? "anjal" : "tak anjal";
+    return { sepanjang: r.kes.charAt(0) === "S" ? "permintaan" : "penawaran", e: e, jenis: jenis, pP: pP, pQ: pQ, bernilai: r.bernilai, P0: a[1], P1: b[1], Q0: a[0], Q1: b[0] };
+  };
+
+  T.keanjalan = function (graf, id) {
+    var k = T.kiraKeanjalan(graf, id);
+    if (!k) return null;
+    var D = k.sepanjang === "permintaan";
+    var simbol = D ? "Ed" : "Es",
+      nama = D ? "keanjalan harga permintaan" : "keanjalan harga penawaran",
+      kuantiti = D ? "kuantiti diminta" : "kuantiti ditawarkan",
+      keluk = D ? "permintaan" : "penawaran";
+    function pc(v) {
+      return (v > 0 ? "+" : v < 0 ? "−" : "") + E.fmt(Math.abs(v), 1) + "%";
+    }
+    function beza(v0, v1) {
+      var d = v1 - v0;
+      return fmtW(v0) + " → " + fmtW(v1) + " (" + (d > 0 ? "+" : d < 0 ? "−" : "") + fmtW(Math.abs(d)) + ", " + pc(((v1 - v0) / v0) * 100) + ")";
+    }
+    var html =
+      "<p>Keluk " + (D ? "penawaran" : "permintaan") + " beralih, jadi keseimbangan bergerak dari E₀ ke E₁ <b>di sepanjang keluk " + keluk + "</b>. Pergerakan itu menunjukkan <b>" + nama + " (" + simbol + ")</b>.</p>" +
+      "<ul><li>Harga: " + (k.bernilai ? "P₀ → P₁ = " + beza(k.P0, k.P1) : "P₀ → P₁, perubahan kira-kira <b>" + pc(k.pP) + "</b>") + "</li>" +
+      "<li>" + kuantiti.charAt(0).toUpperCase() + kuantiti.slice(1) + ": " + (k.bernilai ? "Q₀ → Q₁ = " + beza(k.Q0, k.Q1) : "Q₀ → Q₁, perubahan kira-kira <b>" + pc(k.pQ) + "</b>") + "</li></ul>" +
+      "<p>" + simbol + " = %ΔQ ÷ %ΔP" +
+      (isFinite(k.e) && k.e > 0 ? " = " + E.fmt(Math.abs(k.pQ), 1) + "% ÷ " + E.fmt(Math.abs(k.pP), 1) + "% ≈ <b>" + E.fmt(k.e, 2) + "</b> (nilai mutlak)" : "") + ".</p>";
+    var sebab = {
+      anjal: simbol + " &gt; 1: peratus perubahan " + kuantiti + " <b>lebih besar</b> daripada peratus perubahan harga.",
+      "tak anjal": simbol + " &lt; 1: peratus perubahan " + kuantiti + " <b>lebih kecil</b> daripada peratus perubahan harga.",
+      "anjal uniti": simbol + " = 1: peratus perubahan " + kuantiti + " <b>sama</b> dengan peratus perubahan harga.",
+      "anjal sempurna": simbol + " = ∞: " + kuantiti + " berubah walaupun harga tidak berubah (keluk mendatar).",
+      "tak anjal sempurna": simbol + " = 0: " + kuantiti + " tidak berubah walaupun harga berubah (keluk tegak)."
+    };
+    html += "<p><b>" + keluk.charAt(0).toUpperCase() + keluk.slice(1) + " " + k.jenis + "</b> di antara E₀ dan E₁. " + sebab[k.jenis] + "</p>";
+    html += "<p class=\"teks-lemah\">" + (k.bernilai ? "Nilai dibaca daripada skala paksi graf ini." : "Anggaran daripada kedudukan E₀ dan E₁ dalam rajah (paksi bermula dari 0), kerana paksi tiada nombor.") + "</p>";
+    return { jenis: "rumus", konsep: "alih", tajuk: "Keanjalan (" + simbol + ") daripada graf ini", html: html };
+  };
+
   /* ---------- penerangan ---------- */
   function senarai(items) {
     return "<ul>" + items.map(function (s) {
@@ -448,6 +500,8 @@
     // kesan terhadap keseimbangan pasaran (hanya jika keluk ini sebahagian pasangan D/S)
     var imbang = T.keseimbangan(graf, k.id);
     if (imbang) blok.push(imbang);
+    var anjal = T.keanjalan(graf, k.id);
+    if (anjal) blok.push(anjal);
 
     return { tajuk: j.nama + " (" + nama + ")", jenis: j.id, blok: tapis(blok, mod), cadangan: [] };
   };
