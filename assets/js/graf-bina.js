@@ -280,7 +280,7 @@
             .join(", ") +
           "." + (paksiAI.length ? " Label paksi daripada gambar: " + esc(paksiAI.join(" dan ")) + "." : " Gambar tiada label paksi, jadi label lalai digunakan.") +
           (im.ai.maks
-            ? " Skala paksi (anggaran daripada nombor dalam gambar): paksi tegak 0 hingga " + E.fmt(im.ai.maks.y, 2) + ", paksi datar 0 hingga " + E.fmt(im.ai.maks.x, 2) + "."
+            ? " Nombor paksi daripada gambar: paksi tegak " + senaraiTanda(im.ai.maks.tandaY) + "; paksi datar " + senaraiTanda(im.ai.maks.tandaX) + ". Nilai di antara nombor itu ialah anggaran."
             : " Paksi tiada nombor, jadi harga dan kuantiti ditanda P₀, P₁, Q₀ dan Q₁.") +
           "</p>" +
           '<p class="teks-lemah">Bandingkan dengan gambar di belakang graf. Jika ada yang salah, tukar nama keluk dalam senarai di bawah graf atau jenisnya dalam <b>Terangkan graf</b>.</p>' +
@@ -339,6 +339,14 @@
     /* ---------- kesan keluk dengan AI (EKO.imbas.pengecam) ---------- */
     // st.imej.ai = null | "izin" | "tunggu" | { id: [id keluk], jenis: { id: jenis cadangan }, paksi: { x, y }, maks: { x, y } | null }
     // Diminta semasa langkah laras: gambar dijajarkan mengikut paksi yang dikesan AI (jika tiada, penanda O/T semasa).
+    function senaraiTanda(t) {
+      return (t || [])
+        .map(function (p) {
+          return E.fmt(p[1], 2);
+        })
+        .join(", ");
+    }
+
     function kesanAI() {
       var im = st.imej;
       im.ai = "tunggu";
@@ -753,14 +761,25 @@
       if (PS.paksiNombor(st.graf)) {
         var mx = st.graf.paksi.x.maks,
           my = st.graf.paksi.y.maks;
-        plot.cfg.tikX = tik(mx);
-        plot.cfg.tikY = tik(my);
-        plot.cfg.fmtTikX = function (n) {
-          return E.fmt(n * mx, 2);
+        // nombor paksi daripada gambar dipaparkan di kedudukan asalnya; jika tiada, tik kemas pada skala lurus
+        var tx = B.tandaPaksi(st.graf, "x"),
+          ty = B.tandaPaksi(st.graf, "y");
+        var labelTanda = function (t, maks) {
+          return function (n) {
+            if (!t) return E.fmt(n * maks, 2);
+            for (var i = 0; i < t.length; i++) if (Math.abs(t[i][0] - n) < 1e-9) return E.fmt(t[i][1], 2);
+            return "";
+          };
         };
-        plot.cfg.fmtTikY = function (n) {
-          return E.fmt(n * my, 2);
+        var kedudukan = function (t) {
+          return t.map(function (p) {
+            return p[0];
+          });
         };
+        plot.cfg.tikX = tx ? kedudukan(tx) : tik(mx);
+        plot.cfg.tikY = ty ? kedudukan(ty) : tik(my);
+        plot.cfg.fmtTikX = labelTanda(tx, mx);
+        plot.cfg.fmtTikY = labelTanda(ty, my);
         plot.cfg.grid = true;
       } else {
         plot.cfg.tikX = [];
@@ -1129,6 +1148,9 @@
         if (bernilai) {
           var dx = k.anjak.x * st.graf.paksi.x.maks,
             dy = k.anjak.y * st.graf.paksi.y.maks;
+          // paksi bernombor ikut gambar tidak berskala lurus, jadi saiz peralihan dalam unit tidak dinyatakan
+          if (B.tandaPaksi(st.graf, "x")) dx = 0;
+          if (B.tandaPaksi(st.graf, "y")) dy = 0;
           if (Math.abs(dx) > 1e-9) ayat += " Pada setiap nilai " + Y + ", " + X + " berubah sebanyak <b>" + (dx > 0 ? "+" : "") + E.fmt(dx, 2) + "</b>.";
           if (Math.abs(dy) > 1e-9) ayat += " Pada setiap nilai " + X + ", " + Y + " berubah sebanyak <b>" + (dy > 0 ? "+" : "") + E.fmt(dy, 2) + "</b>.";
           var baharu = eq ? PS.bentukLurus(eq, dx, dy) : null;

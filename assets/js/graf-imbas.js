@@ -154,35 +154,34 @@
     return IM.padan(r, O, T) ? { O: O, T: T } : null;
   };
 
-  // Nombor pada satu paksi ([[nilai, kedudukan ternormal]]) → nilai di hujung paksi (kedudukan 1).
-  // Paksi graf bermula dari 0, jadi garis nilai mesti melalui asalan; jika tidak (paksi terputus), null.
+  // Nombor pada satu paksi ([[kedudukan ternormal, nilai]]) → { maks, tanda }.
+  // Rajah buku teks selalunya tidak berskala (contoh 8, 13, 18 pada jarak yang tidak berkadar dengan 0), jadi
+  // nombor itu tidak dipaksa menjadi satu skala lurus: tanda = [[kedudukan, nilai], …] disimpan seperti dalam gambar
+  // dan nilai di antara dua tanda diinterpolasi (asalan = 0). maks = nilai di hujung paksi (ekstrapolasi tanda terakhir).
   function maksDari(pts) {
-    pts = pts.filter(function (p) {
-      return p[1] > 0 && isFinite(p[1]) && p[0] > 0.03 && p[0] < 1.6;
-    });
-    var m = pts.length;
-    if (!m) return null;
-    var sx = 0,
-      sy = 0,
-      sxx = 0,
-      sxy = 0;
+    pts = pts
+      .filter(function (p) {
+        return p[1] > 0 && isFinite(p[1]) && p[0] > 0.03 && p[0] <= 1.05;
+      })
+      .sort(function (a, b) {
+        return a[0] - b[0];
+      });
+    // nilai mesti bertambah di sepanjang paksi; bacaan yang melanggar susunan dibuang
+    var tanda = [];
     pts.forEach(function (p) {
-      sx += p[0];
-      sy += p[1];
-      sxx += p[0] * p[0];
-      sxy += p[0] * p[1];
+      var akhir = tanda[tanda.length - 1] || [0, 0];
+      if (p[0] - akhir[0] > 0.02 && p[1] > akhir[1]) tanda.push([Math.round(Math.min(1, p[0]) * 1e4) / 1e4, p[1]]);
     });
-    var den = m * sxx - sx * sx;
-    if (m >= 2 && den > 1e-6) {
-      var a = (m * sxy - sx * sy) / den,
-        b = (sy - a * sx) / m;
-      if (!(a > 0) || Math.abs(b) > 0.08 * a) return null;
-    }
-    return +(sxy / sxx).toPrecision(3);
+    if (!tanda.length) return null;
+    var b = tanda[tanda.length - 1],
+      a = tanda[tanda.length - 2] || [0, 0];
+    var maks = b[1] + ((1 - b[0]) * (b[1] - a[1])) / (b[0] - a[0]);
+    return { maks: +maks.toPrecision(4), tanda: tanda };
   }
 
-  // Skala paksi daripada nombor yang dikesan AI: { x, y } (nilai di hujung setiap paksi) atau null.
-  // r = segi empat gambar selepas dijajarkan. Anggaran sahaja: bergantung pada kedudukan yang dikesan.
+  // Skala paksi daripada nombor yang dikesan AI: { x, y (nilai di hujung paksi), tandaX, tandaY } atau null
+  // (kedua-dua paksi mesti ada sekurang-kurangnya satu nombor). r = segi empat gambar selepas dijajarkan.
+  // Anggaran sahaja: bergantung pada kedudukan yang dikesan.
   IM.maksPaksi = function (r, paksi) {
     if (!paksi) return null;
     var mx = maksDari(
@@ -195,7 +194,7 @@
         return [IM.keNormal(r, 0, t[1])[1], t[0]];
       })
     );
-    return mx && my ? { x: mx, y: my } : null;
+    return mx && my ? { x: mx.maks, y: my.maks, tandaX: mx.tanda, tandaY: my.tanda } : null;
   };
 
   // Nilai x pada ketinggian y (atau y pada x jika paksi = 1) di sepanjang poligaris; null jika di luar julat

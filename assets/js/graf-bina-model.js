@@ -241,13 +241,43 @@
   B.tetapSkala = function (graf, maks, ids) {
     var g = klon(graf);
     if (!maks || !(maks.x > 0) || !(maks.y > 0)) return g;
-    g.paksi.x.maks = maks.x;
-    g.paksi.y.maks = maks.y;
+    [["x", maks.tandaX], ["y", maks.tandaY]].forEach(function (a) {
+      var p = g.paksi[a[0]];
+      p.maks = maks[a[0]];
+      // nombor paksi seperti dalam gambar: [[kedudukan 0..1, nilai], …]; sah hanya selagi maks tidak berubah
+      if (a[1] && a[1].length) {
+        p.tanda = klon(a[1]);
+        p.tandaMaks = p.maks;
+      } else {
+        delete p.tanda;
+        delete p.tandaMaks;
+      }
+    });
     (ids || []).forEach(function (id) {
       var k = B.cari(g, id);
       if (k) k.meta.skala = { x: maks.x, y: maks.y };
     });
     return g;
+  };
+
+  // Nombor paksi daripada gambar ([[kedudukan, nilai], …]) jika masih sah bagi skala semasa; jika tidak, null
+  B.tandaPaksi = function (graf, a) {
+    var p = graf.paksi[a];
+    return p && p.tanda && p.tanda.length && p.tandaMaks === p.maks ? p.tanda : null;
+  };
+
+  // Kedudukan ternormal n pada paksi a → nilai. Dengan tanda gambar: interpolasi antara tanda (asalan = 0),
+  // kerana rajah buku teks selalunya tidak berskala. Tanpa tanda: skala lurus 0..maks.
+  B.nilaiPaksi = function (graf, a, n) {
+    var t = B.tandaPaksi(graf, a);
+    if (!t) return n * graf.paksi[a].maks;
+    var pts = [[0, 0]].concat(t);
+    if (pts.length < 3 && n > pts[pts.length - 1][0]) return (n / pts[1][0]) * pts[1][1];
+    var i = 1;
+    while (i < pts.length - 1 && n > pts[i][0]) i++;
+    var p = pts[i - 1],
+      q = pts[i];
+    return p[1] + ((n - p[0]) / (q[0] - p[0])) * (q[1] - p[1]);
   };
 
   // Keluk bernilai pada paksi bernombor: keluk persamaan, atau keluk gambar selagi paksi masih pada skalanya.
@@ -261,11 +291,11 @@
 
   // Titik ternormal → nilai pada paksi, dibundarkan kepada unit kemas (1% julat, kuasa 10: 120 → 1, 12 → 0.1)
   B.nilaiKemas = function (graf, p) {
-    function kemas(v, maks) {
-      var u = Math.pow(10, Math.floor(Math.log(maks / 100) / Math.LN10));
-      return +(Math.round((v * maks) / u) * u).toFixed(6);
+    function kemas(a, n) {
+      var u = Math.pow(10, Math.floor(Math.log(graf.paksi[a].maks / 100) / Math.LN10));
+      return +(Math.round(B.nilaiPaksi(graf, a, n) / u) * u).toFixed(6);
     }
-    return [kemas(p[0], graf.paksi.x.maks), kemas(p[1], graf.paksi.y.maks)];
+    return [kemas("x", p[0]), kemas("y", p[1])];
   };
 
   /* ---------- geometri ---------- */
