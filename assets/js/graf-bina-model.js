@@ -31,8 +31,8 @@
   var BAHAGIAN = 16; // segmen licin antara dua titik kawalan
   // Had peralihan seminimum mungkin (permintaan pemilik): keluk boleh diseret hingga hampir keluar dari kotak paksi;
   // hanya 3% daripadanya mesti kekal di dalam supaya ia masih boleh dicapai. Bahagian di luar kotak dipotong.
-  var TEPI = 0.97; // hujung dekat keluk boleh sampai 97% paksi
-  var NAMPAK_MIN = 0.03; // hujung jauh keluk kekal sekurang-kurangnya 3% dari paksi
+  var TEPI = 0.99; // hujung dekat keluk boleh sampai 97% paksi
+  var NAMPAK_MIN = 0.01; // hujung jauh keluk kekal sekurang-kurangnya 3% dari paksi
   var S_MIN = 0.04;
   var S_MAKS = 0.96;
 

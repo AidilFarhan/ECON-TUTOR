@@ -345,6 +345,12 @@
     return { sepanjang: r.kes.charAt(0) === "S" ? "permintaan" : "penawaran", e: e, jenis: jenis, pP: pP, pQ: pQ, bernilai: r.bernilai, P0: a[1], P1: b[1], Q0: a[0], Q1: b[0] };
   };
 
+  function imbasan(graf) {
+    return graf.keluk.some(function (k) {
+      return k.meta && k.meta.sumber === "imbas";
+    });
+  }
+
   T.keanjalan = function (graf, id) {
     var k = T.kiraKeanjalan(graf, id);
     if (!k) return null;
@@ -374,7 +380,7 @@
       "tak anjal sempurna": simbol + " = 0: " + kuantiti + " tidak berubah walaupun harga berubah (keluk tegak)."
     };
     html += "<p><b>" + keluk.charAt(0).toUpperCase() + keluk.slice(1) + " " + k.jenis + "</b> di antara E₀ dan E₁. " + sebab[k.jenis] + "</p>";
-    html += "<p class=\"teks-lemah\">" + (k.bernilai ? "Nilai dibaca daripada skala paksi graf ini." : "Anggaran daripada kedudukan E₀ dan E₁ dalam rajah (paksi bermula dari 0), kerana paksi tiada nombor.") + "</p>";
+    html += "<p class=\"teks-lemah\">" + (k.bernilai ? "Nilai dibaca daripada skala paksi graf ini" + (imbasan(graf) ? "; bagi graf yang diimbas, nilai itu boleh lari sedikit daripada gambar, jadi kira semula dengan nilai sebenar jika perlu." : ".") : "Anggaran daripada kedudukan E₀ dan E₁ dalam rajah (paksi bermula dari 0), kerana paksi tiada nombor.") + "</p>";
     return { jenis: "rumus", konsep: "alih", tajuk: "Keanjalan (" + simbol + ") daripada graf ini", html: html };
   };
 

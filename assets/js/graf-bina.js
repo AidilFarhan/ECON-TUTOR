@@ -285,6 +285,7 @@
               ? " Tanda pada paksi mengikut gambar: paksi tegak " + (senaraiNama(im.ai.nama.y) || "tiada") + "; paksi datar " + (senaraiNama(im.ai.nama.x) || "tiada") + "."
               : " Paksi tiada nombor atau tanda, jadi harga dan kuantiti ditanda P₀, P₁, Q₀ dan Q₁.") +
           "</p>" +
+          PENAFIAN_AI +
           '<p class="teks-lemah">Bandingkan dengan gambar di belakang graf. Jika ada yang salah, tukar nama keluk dalam senarai di bawah graf atau jenisnya dalam <b>Terangkan graf</b>.</p>' +
           '<div class="bina-imbas-butang">' +
           '<button type="button" class="btn btn-utama" data-ai-sah>' + E.ikon("betul") + " Selesai</button>" +
@@ -303,7 +304,7 @@
         html =
           (im.langkah === "tekap"
             ? "<p><b>Langkah 2: Tekap keluk.</b> Surih setiap keluk dalam gambar dengan jari atau tetikus, satu demi satu, atau minta AI mengesannya. Kemudian namakan keluk dan tetapkan jenisnya dalam <b>Terangkan graf</b>.</p>"
-            : "<p><b>Tekapan selesai.</b> Keluk yang ditekap boleh dinamakan, dialih dan diterangkan seperti keluk lain.</p>") +
+            : "<p><b>Tekapan selesai.</b> Keluk yang ditekap boleh dinamakan, dialih dan diterangkan seperti keluk lain.</p>" + (adaImbasan() ? PENAFIAN_AI : "")) +
           '<div class="bina-imbas-butang">' +
           (im.langkah === "tekap"
             ? '<button type="button" class="btn btn-utama" data-selesai-tekap>' + E.ikon("betul") + " Selesai menekap</button>"
@@ -341,6 +342,16 @@
     /* ---------- kesan keluk dengan AI (EKO.imbas.pengecam) ---------- */
     // st.imej.ai = null | "izin" | "tunggu" | { id: [id keluk], jenis: { id: jenis cadangan }, paksi: { x, y }, maks: { x, y } | null }
     // Diminta semasa langkah laras: gambar dijajarkan mengikut paksi yang dikesan AI (jika tiada, penanda O/T semasa).
+    // Penafian imbasan AI (permintaan pemilik): kedudukan dan nilai boleh lari sedikit, tetapi konsep dan jalan kira terpakai
+    var PENAFIAN_AI =
+      "<p class=\"bina-penafian\"><b>Nota:</b> Imbasan AI mungkin tidak tepat sepenuhnya; kedudukan keluk dan nilai pada paksi boleh lari sedikit daripada gambar. Konsep yang diterangkan tetap terpakai, dan jalan kira ditunjukkan supaya anda boleh mengira semula dengan nilai sebenar.</p>";
+
+    function adaImbasan() {
+      return st.graf.keluk.some(function (k) {
+        return k.meta && k.meta.sumber === "imbas";
+      });
+    }
+
     function senaraiTanda(t) {
       return (t || [])
         .map(function (p) {

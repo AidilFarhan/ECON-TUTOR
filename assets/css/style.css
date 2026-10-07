@@ -4526,6 +4526,14 @@ ol.roman > li::before {
   color: var(--ink-2);
 }
 
+.bina-imbas p.bina-penafian {
+  padding: 8px 12px;
+  border-left: 3px solid var(--warn);
+  border-radius: 8px;
+  background: var(--warn-soft);
+  color: var(--ink);
+}
+
 .bina-imbas-isi {
   display: grid;
   gap: 10px;
