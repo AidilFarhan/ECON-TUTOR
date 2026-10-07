@@ -197,6 +197,38 @@
     return mx && my ? { x: mx.maks, y: my.maks, tandaX: mx.tanda, tandaY: my.tanda } : null;
   };
 
+  // Label paksi seperti tertulis dalam gambar (P0, Q1, 8 …) → { x: [[kedudukan ternormal, teks]], y: […] }.
+  // Dipaparkan pada paksi apabila graf tidak bernombor (contohnya paksi berlabel P0 dan Q0, atau hanya satu paksi bernombor).
+  IM.namaPaksi = function (r, paksi) {
+    function kemas(senarai, ke) {
+      var keluar = [];
+      (senarai || [])
+        .map(function (t) {
+          return [Math.round(ke(t[1]) * 1e4) / 1e4, String(t[0])];
+        })
+        .filter(function (t) {
+          return t[0] > 0.03 && t[0] <= 1 && t[1];
+        })
+        .sort(function (a, b) {
+          return a[0] - b[0];
+        })
+        .forEach(function (t) {
+          var akhir = keluar[keluar.length - 1];
+          if (!akhir || t[0] - akhir[0] > 0.03) keluar.push(t);
+        });
+      return keluar;
+    }
+    if (!paksi) return { x: [], y: [] };
+    return {
+      x: kemas(paksi.labelX, function (u) {
+        return IM.keNormal(r, u, 0)[0];
+      }),
+      y: kemas(paksi.labelY, function (v) {
+        return IM.keNormal(r, 0, v)[1];
+      })
+    };
+  };
+
   // Nilai x pada ketinggian y (atau y pada x jika paksi = 1) di sepanjang poligaris; null jika di luar julat
   function pada(pts, v, paksi) {
     var a = paksi ? 0 : 1,

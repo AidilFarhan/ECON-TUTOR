@@ -2,7 +2,8 @@
    Econ Tutor · /api/kesan-graf
    POST  gambar JPEG berlapis grid (badan permintaan; lihat EKO.imbas.denganGrid) → paksi, nombor dan keluk yang dikesan oleh AI
          { keluk: [{ label, jenis, titik: [[u, v], …] }],
-           paksi: { x, y (label), O, hujungX, hujungY ([u, v] atau null), tandaX, tandaY ([[nilai, kedudukan], …]) }, baki }
+           paksi: { x, y (label), O, hujungX, hujungY ([u, v] atau null), tandaX, tandaY ([[nilai, kedudukan], …]: nombor sahaja),
+                    labelX, labelY ([[teks, kedudukan], …]: semua label paksi seperti tertulis) }, baki }
          u = pecahan dari kiri gambar, v = pecahan dari BAWAH gambar (0..1).
    Hanya untuk pelajar yang sudah log masuk; had HAD_SEHARI imbasan sehari.
    Gambar tidak disimpan: ia dihantar kepada pembekal AI (API gaya OpenAI, lalai mireld.my) dan dibuang.
@@ -30,10 +31,10 @@ const ARAHAN = [
   "- titik: 2 titik (kedua-dua hujung) bagi garis lurus, atau 8 hingga 12 titik yang mengikut lengkung (termasuk kedua-dua hujungnya, contohnya tempat keluk menyentuh paksi), disusun dari satu hujung ke hujung yang lain. Setiap titik mesti terletak tepat di atas dakwat keluk itu; semak setiap titik dengan grid.",
   "paksi_x dan paksi_y: label paksi datar dan paksi tegak seperti yang tertulis, termasuk unitnya (contoh Kuantiti (unit), Harga (RM)); rentetan kosong jika tidak kelihatan.",
   "asalan: titik persilangan paksi tegak dengan paksi datar. hujung_x: hujung kanan garis paksi datar. hujung_y: hujung atas garis paksi tegak (hujung garis, bukan labelnya).",
-  "tanda_x dan tanda_y: setiap NOMBOR yang tertulis di sepanjang paksi datar (tanda_x) dan paksi tegak (tanda_y), sama ada tanda skala atau nilai di hujung garis panduan putus-putus. nilai ialah nombor itu; x (bagi tanda_x) atau y (bagi tanda_y) ialah kedudukan tanda itu pada garis paksi, bukan kedudukan teksnya. Abaikan sifar di asalan dan label bukan nombor seperti P0, Q1 atau E. Senarai kosong jika paksi tiada nombor.",
+  "tanda_x dan tanda_y: SETIAP label yang tertulis di sepanjang paksi datar (tanda_x) dan paksi tegak (tanda_y): nombor (contoh 8, 13, 2.50) ATAU simbol (contoh P0, P1, Pe, Q0, Q1), sama ada tanda skala atau label di hujung garis panduan putus-putus. teks ialah label itu tepat seperti tertulis (subskrip sebagai digit biasa: Q₁ → Q1); x (bagi tanda_x) atau y (bagi tanda_y) ialah kedudukan tanda itu pada garis paksi, bukan kedudukan teksnya. Abaikan sifar atau O di asalan dan nama paksi itu sendiri. Senarai kosong jika paksi tiada label.",
   "Jika gambar bukan graf dengan dua paksi, atau keluknya tidak dapat dilihat dengan jelas, beri ada_graf = false dan senarai keluk kosong.",
   "Jawab dengan SATU objek JSON sahaja, tanpa teks lain, dalam bentuk ini:",
-  '{"ada_graf": true, "paksi_x": "Kuantiti (unit)", "paksi_y": "Harga (RM)", "asalan": {"x": 12.5, "y": 88}, "hujung_x": {"x": 93, "y": 88}, "hujung_y": {"x": 12.5, "y": 7}, "tanda_x": [{"nilai": 50, "x": 52.5}], "tanda_y": [{"nilai": 5, "y": 47.5}], "keluk": [{"label": "D", "jenis": "permintaan | penawaran | kkp | lain", "titik": [{"x": 20, "y": 15.5}, {"x": 85, "y": 80}]}]}'
+  '{"ada_graf": true, "paksi_x": "Kuantiti (unit)", "paksi_y": "Harga (RM)", "asalan": {"x": 12.5, "y": 88}, "hujung_x": {"x": 93, "y": 88}, "hujung_y": {"x": 12.5, "y": 7}, "tanda_x": [{"teks": "50", "x": 52.5}], "tanda_y": [{"teks": "P0", "y": 47.5}], "keluk": [{"label": "D", "jenis": "permintaan | penawaran | kkp | lain", "titik": [{"x": 20, "y": 15.5}, {"x": 85, "y": 80}]}]}'
 ].join("\n");
 
 const TITIK = {
@@ -56,11 +57,11 @@ const SKEMA = {
     hujung_y: TITIK,
     tanda_x: {
       type: "array",
-      items: { type: "object", additionalProperties: false, required: ["nilai", "x"], properties: { nilai: { type: "number" }, x: { type: "number" } } }
+      items: { type: "object", additionalProperties: false, required: ["teks", "x"], properties: { teks: { type: "string" }, x: { type: "number" } } }
     },
     tanda_y: {
       type: "array",
-      items: { type: "object", additionalProperties: false, required: ["nilai", "y"], properties: { nilai: { type: "number" }, y: { type: "number" } } }
+      items: { type: "object", additionalProperties: false, required: ["teks", "y"], properties: { teks: { type: "string" }, y: { type: "number" } } }
     },
     keluk: {
       type: "array",
@@ -116,20 +117,29 @@ function titikUV(p) {
   return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? [pecahan(p.x), +(1 - pecahan(p.y)).toFixed(4)] : null;
 }
 
-// Nombor pada paksi → [[nilai, kedudukan]], kedudukan = pecahan gambar di sepanjang paksi itu
-function tandaPaksi(senarai, kunci) {
-  const keluar = [];
+// Label pada satu paksi → { tandaX: [[nilai, kedudukan]] (nombor sahaja), labelX: [[teks, kedudukan]] (semua label) },
+// kedudukan = pecahan gambar di sepanjang paksi itu. Akhiran "X" atau "Y" pada kunci.
+function tandaPaksi(senarai, kunci, akhiran) {
+  const tanda = [],
+    label = [];
   for (const t of Array.isArray(senarai) ? senarai : []) {
-    if (keluar.length >= MAKS_TITIK) break;
-    if (!t || !Number.isFinite(t.nilai) || Math.abs(t.nilai) > 1e9 || !Number.isFinite(t[kunci])) continue;
-    keluar.push([t.nilai, kunci === "y" ? +(1 - pecahan(t.y)).toFixed(4) : pecahan(t.x)]);
+    if (label.length >= MAKS_TITIK) break;
+    if (!t || !Number.isFinite(t[kunci])) continue;
+    // model lama mungkin masih menghantar { nilai }
+    const mentah = typeof t.teks === "string" ? t.teks : Number.isFinite(t.nilai) ? String(t.nilai) : "";
+    const tulisan = teks(mentah, 12).replace(/[^\p{L}\p{N}.,′' *-]/gu, "").slice(0, 8);
+    if (!tulisan) continue;
+    const kedudukan = kunci === "y" ? +(1 - pecahan(t.y)).toFixed(4) : pecahan(t.x);
+    label.push([tulisan, kedudukan]);
+    const nombor = /^(RM)?\s?\d[\d ]*([.,]\d+)?$/i.test(tulisan) ? Number(tulisan.replace(/^RM/i, "").replace(/ /g, "").replace(",", ".")) : NaN;
+    if (Number.isFinite(nombor) && Math.abs(nombor) <= 1e9) tanda.push([nombor, kedudukan]);
   }
-  return keluar;
+  return { ["tanda" + akhiran]: tanda, ["label" + akhiran]: label };
 }
 
 // Jawapan model → bentuk yang selamat untuk pelayar: nombor terhad 0..1, bilangan terhad, y dibalikkan (dari bawah).
 export function kemasHasil(mentah) {
-  const kosong = { keluk: [], paksi: { x: "", y: "", O: null, hujungX: null, hujungY: null, tandaX: [], tandaY: [] } };
+  const kosong = { keluk: [], paksi: { x: "", y: "", O: null, hujungX: null, hujungY: null, tandaX: [], tandaY: [], labelX: [], labelY: [] } };
   if (!mentah || mentah.ada_graf !== true || !Array.isArray(mentah.keluk)) return kosong;
   const keluk = [];
   for (const k of mentah.keluk) {
@@ -162,8 +172,8 @@ export function kemasHasil(mentah) {
       O: titikUV(mentah.asalan),
       hujungX: titikUV(mentah.hujung_x),
       hujungY: titikUV(mentah.hujung_y),
-      tandaX: tandaPaksi(mentah.tanda_x, "x"),
-      tandaY: tandaPaksi(mentah.tanda_y, "y")
+      ...tandaPaksi(mentah.tanda_x, "x", "X"),
+      ...tandaPaksi(mentah.tanda_y, "y", "Y")
     }
   };
 }

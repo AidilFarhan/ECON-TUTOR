@@ -278,10 +278,12 @@
               );
             })
             .join(", ") +
-          "." + (paksiAI.length ? " Label paksi daripada gambar: " + esc(paksiAI.join(" dan ")) + "." : " Gambar tiada label paksi, jadi label lalai digunakan.") +
+          "." + (paksiAI.length ? " Nama paksi daripada gambar: " + esc(paksiAI.join(" dan ")) + "." : " Gambar tiada nama paksi, jadi nama lalai digunakan.") +
           (im.ai.maks
             ? " Nombor paksi daripada gambar: paksi tegak " + senaraiTanda(im.ai.maks.tandaY) + "; paksi datar " + senaraiTanda(im.ai.maks.tandaX) + ". Nilai di antara nombor itu ialah anggaran."
-            : " Paksi tiada nombor, jadi harga dan kuantiti ditanda P₀, P₁, Q₀ dan Q₁.") +
+            : im.ai.nama
+              ? " Tanda pada paksi mengikut gambar: paksi tegak " + (senaraiNama(im.ai.nama.y) || "tiada") + "; paksi datar " + (senaraiNama(im.ai.nama.x) || "tiada") + "."
+              : " Paksi tiada nombor atau tanda, jadi harga dan kuantiti ditanda P₀, P₁, Q₀ dan Q₁.") +
           "</p>" +
           '<p class="teks-lemah">Bandingkan dengan gambar di belakang graf. Jika ada yang salah, tukar nama keluk dalam senarai di bawah graf atau jenisnya dalam <b>Terangkan graf</b>.</p>' +
           '<div class="bina-imbas-butang">' +
@@ -347,6 +349,14 @@
         .join(", ");
     }
 
+    function senaraiNama(t) {
+      return (t || [])
+        .map(function (p) {
+          return esc(B.subskrip(p[1]));
+        })
+        .join(", ");
+    }
+
     function kesanAI() {
       var im = st.imej;
       im.ai = "tunggu";
@@ -406,7 +416,11 @@
         });
         var maks = adaPers ? null : E.imbas.maksPaksi(rect, p);
         if (maks) st.graf = B.tetapSkala(st.graf, maks, id);
-        im.ai = { id: id, beralih: beralih, paksi: p, maks: maks, asal: asal };
+        // tanpa nombor pada kedua-dua paksi: label paksi gambar (P0, Q1, atau nombor pada satu paksi) dipaparkan seperti tertulis
+        var nama = maks || adaPers ? null : E.imbas.namaPaksi(rect, p);
+        if (nama) st.graf = B.tetapNama(st.graf, nama);
+        var adaNama = !!(nama && (nama.x.length || nama.y.length));
+        im.ai = { id: id, beralih: beralih, paksi: p, maks: maks, nama: adaNama ? nama : null, asal: asal };
         st.pilih = beralih[0] || id[0];
         st.baruDilukis = null;
         // terus terangkan: mod peralihan jika gambar menunjukkan keluk beralih, dan panel penerangan dibuka
@@ -782,8 +796,24 @@
         plot.cfg.fmtTikY = labelTanda(ty, my);
         plot.cfg.grid = true;
       } else {
-        plot.cfg.tikX = [];
-        plot.cfg.tikY = [];
+        // paksi tanpa nilai: label gambar (P₀, Q₁ …) dipaparkan di kedudukan asalnya jika ada
+        var nx = B.namaPaksi(st.graf, "x"),
+          ny = B.namaPaksi(st.graf, "y");
+        var labelNama = function (t) {
+          return function (n) {
+            for (var i = 0; t && i < t.length; i++) if (Math.abs(t[i][0] - n) < 1e-9) return t[i][1];
+            return "";
+          };
+        };
+        var tempat = function (t) {
+          return (t || []).map(function (p) {
+            return p[0];
+          });
+        };
+        plot.cfg.tikX = tempat(nx);
+        plot.cfg.tikY = tempat(ny);
+        plot.cfg.fmtTikX = labelNama(nx);
+        plot.cfg.fmtTikY = labelNama(ny);
         plot.cfg.grid = false;
       }
       plot.kosong();
@@ -866,7 +896,14 @@
       function cip(e, sub) {
         if (!alih) return null;
         if (r.bernilai) return { labelX: E.fmt(e.w[0], 2), labelY: E.fmt(e.w[1], 2) };
-        return { labelX: "Q" + sub, labelY: "P" + sub };
+        // paksi berlabel ikut gambar: label gambar pada kedudukan itu sudah tertera, jadi cip tidak diulang;
+        // jika tiada label gambar di situ, guna P₀/Q₀ lalai
+        var c = { labelX: "Q" + sub, labelY: "P" + sub };
+        if (B.namaPaksi(st.graf, "x")) c.labelX = B.namaHampir(st.graf, "x", e.n[0]) ? undefined : c.labelX;
+        if (B.namaPaksi(st.graf, "y")) c.labelY = B.namaHampir(st.graf, "y", e.n[1]) ? undefined : c.labelY;
+        if (c.labelX === undefined) delete c.labelX;
+        if (c.labelY === undefined) delete c.labelY;
+        return c;
       }
       if (r.berubah && e0 && e0.nampak) {
         var c0 = cip(e0, "₀");

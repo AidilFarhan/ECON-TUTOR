@@ -260,6 +260,41 @@
     return g;
   };
 
+  // Label paksi seperti dalam gambar (P₀, Q₁, atau nombor pada satu paksi sahaja): paparan sahaja, tanpa nilai.
+  // nama = { x: [[kedudukan 0..1, teks], …], y: […] }. Digunakan hanya selagi paksi tidak bernombor.
+  B.tetapNama = function (graf, nama) {
+    var g = klon(graf);
+    ["x", "y"].forEach(function (a) {
+      var t = nama && nama[a];
+      if (t && t.length) {
+        g.paksi[a].nama = t.map(function (p) {
+          return [p[0], B.subskrip(String(p[1])).slice(0, 8)];
+        });
+      } else delete g.paksi[a].nama;
+    });
+    return g;
+  };
+
+  B.namaPaksi = function (graf, a) {
+    var p = graf.paksi[a];
+    return p && p.nama && p.nama.length && !(graf.paksi.x.maks > 0 && graf.paksi.y.maks > 0) ? p.nama : null;
+  };
+
+  // Label gambar yang paling hampir dengan kedudukan n pada paksi a (dalam jarak tol), atau null
+  B.namaHampir = function (graf, a, n, tol) {
+    var t = B.namaPaksi(graf, a),
+      pilih = null,
+      jarak = tol == null ? 0.045 : tol;
+    (t || []).forEach(function (p) {
+      var d = Math.abs(p[0] - n);
+      if (d <= jarak) {
+        jarak = d;
+        pilih = p[1];
+      }
+    });
+    return pilih;
+  };
+
   // Nombor paksi daripada gambar ([[kedudukan, nilai], …]) jika masih sah bagi skala semasa; jika tidak, null
   B.tandaPaksi = function (graf, a) {
     var p = graf.paksi[a];
