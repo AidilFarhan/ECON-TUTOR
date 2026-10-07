@@ -366,7 +366,27 @@
 
   /* ---------- BAB ---------- */
   // Cerita interaktif (visual novel) bagi sesuatu bab: halaman penuh berasingan di bawah cerita/.
-  var CERITA = { "t4-b1": "cerita/episod-1/index.html" };
+  var CERITA = {
+    "t4-b1": {
+      href: "cerita/episod-1/index.html",
+      tajuk: "Misi Mengumpul Dana Buku Kelas",
+      masa: "±15 minit",
+      gambar: "assets/img/cerita/episod-1-pratonton.jpg",
+      alt: "Mira menunjukkan lakaran booth dan Hakim memegang buku kira-kira di dalam kelas"
+    }
+  };
+
+  // Kad besar di sebelah kanan kepala bab: gambar pratonton, tajuk cerita dan ajakan bermain.
+  function kadCerita(b) {
+    var c = CERITA[b.id];
+    return (
+      '<a class="kad-cerita" href="' + c.href + '">' +
+      '<span class="kad-cerita-gambar"><img src="' + c.gambar + '" alt="' + esc(c.alt) + '" width="760" height="428" decoding="async"></span>' +
+      '<span class="kad-cerita-teks"><span class="label-kecil"><span class="titik"></span>Cerita interaktif · ' + esc(c.masa) + "</span>" +
+      "<b>" + esc(c.tajuk) + "</b>" +
+      '<span class="kad-cerita-main">Main misi Bab ' + b.no + " " + E.ikon("kanan") + "</span></span></a>"
+    );
+  }
 
   function pBab(b) {
     E.kemas(function (d) {
@@ -383,7 +403,8 @@
     var html =
       '<div class="bekas pandangan" style="--warna-bab:' + b.warna + '">' +
       '<nav class="remah"><a href="#utama">Utama</a><span>/</span><a href="#nota">Nota</a><span>/</span><span>' + esc(E.labelKumpulan(b)) + "</span></nav>" +
-      '<header class="bab-kepala kaca">' +
+      '<header class="bab-kepala kaca' + (CERITA[b.id] ? " ada-cerita" : "") + '">' +
+      '<div class="bab-kepala-isi">' +
       '<div class="atas"><span class="lencana-bab">' + b.no + '</span><span class="label-kecil">' + esc(E.labelKumpulan(b)) + " · Bab " + b.no + "</span></div>" +
       "<h1>" + esc(b.tajuk) + "</h1>" +
       (b.ringkas ? '<p class="ringkas">' + b.ringkas + "</p>" : "") +
@@ -391,8 +412,9 @@
       '<a class="btn btn-utama" href="#kad-' + b.id + '">' + E.ikon("kad") + " Kad study (" + b.kad.length + ")</a>" +
       (nKuiz ? '<a class="btn" href="#kuiz-' + b.id + '">' + E.ikon("kuiz") + " Kuiz bab (" + nKuiz + ")</a>" : "") +
       (nKalk ? '<a class="btn" href="#kalkulator-' + b.id + '">' + E.ikon("kalkulator") + " Kalkulator (" + nKalk + ")</a>" : "") +
-      (CERITA[b.id] ? '<a class="btn" href="' + CERITA[b.id] + '">' + E.ikon("bintang") + " Main cerita Bab " + b.no + "</a>" : "") +
-      "</div></header>" +
+      "</div></div>" +
+      (CERITA[b.id] ? kadCerita(b) : "") +
+      "</header>" +
       '<div class="bab-susun">' +
       '<aside class="isi-kandungan kaca" id="toc"></aside>' +
       '<div class="nota">';
