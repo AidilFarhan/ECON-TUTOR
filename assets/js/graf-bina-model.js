@@ -29,8 +29,10 @@
   var WARNA = ["d", "s", "c3", "c4", "c5"];
   var MAKS_KELUK = 6;
   var BAHAGIAN = 16; // segmen licin antara dua titik kawalan
-  var TEPI = 0.95; // hujung keluk tidak boleh melepasi 95% paksi (label mesti kelihatan)
-  var NAMPAK_MIN = 0.1; // hujung jauh keluk kekal sekurang-kurangnya 10% dari paksi (boleh dialih hampir ke paksi)
+  // Had peralihan seminimum mungkin (permintaan pemilik): keluk boleh diseret hingga hampir keluar dari kotak paksi;
+  // hanya 3% daripadanya mesti kekal di dalam supaya ia masih boleh dicapai. Bahagian di luar kotak dipotong.
+  var TEPI = 0.97; // hujung dekat keluk boleh sampai 97% paksi
+  var NAMPAK_MIN = 0.03; // hujung jauh keluk kekal sekurang-kurangnya 3% dari paksi
   var S_MIN = 0.04;
   var S_MAKS = 0.96;
 
@@ -542,8 +544,8 @@
   B.hadAnjak = function (k) {
     var h = had(B.laluan(k, false));
     return {
-      x: [Math.min(0, NAMPAK_MIN - h.x1), Math.max(0, TEPI - h.x1)],
-      y: [Math.min(0, NAMPAK_MIN - h.y1), Math.max(0, TEPI - h.y1)]
+      x: [Math.min(0, NAMPAK_MIN - h.x1), Math.max(0, TEPI - h.x0)],
+      y: [Math.min(0, NAMPAK_MIN - h.y1), Math.max(0, TEPI - h.y0)]
     };
   };
 
@@ -551,7 +553,7 @@
   B.hadSkala = function (k) {
     var h = had(B.laluan(k, false));
     var m = Math.max(h.x1, h.y1, 1e-6);
-    return [Math.min(1, 0.2 / m), Math.max(1, TEPI / m)];
+    return [Math.min(1, 0.05 / m), Math.max(1, 3 / m)];
   };
 
   /* ---------- tindakan (pulang graf baharu) ---------- */

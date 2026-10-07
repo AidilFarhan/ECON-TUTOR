@@ -211,7 +211,7 @@ GrafBina {
   - *Pergerakan di sepanjang keluk* drags point A → B along the same curve (`B.gerakTitik`).
   - *Peralihan keluk* drags the whole curve D₀ → D₁ (`B.anjakKeluk`), with the original shown dashed.
   - Each drag or key press records one `peristiwa`. `B.catat` merges consecutive events of the same kind.
-- **Limits.** A shift keeps the curve's end inside 95% of the axis (so its label stays visible), and the far end of the curve at least 10% from the axis, so a curve can be moved almost to the axis. Parts past an axis are clipped (`B.klipKotak`). Horizontal curves shift vertically; all others shift horizontally.
+- **Limits.** Kept to the minimum (owner request, 2026-10-07): a curve can be dragged until only 3% of it is still inside the axes box (its near end may reach 97% of the axis and its far end 3% from the axis), so it can go right across the plot and still be grabbed. A KKP may shrink to 5% or grow to three times the axis. Parts past an axis are clipped (`B.klipKotak`). Horizontal curves shift vertically; all others shift horizontally.
 - **Equations (`EKO.persamaan`).** A hand-written recursive-descent parser. It does not use `eval`.
   - Syntax: `+ − × ÷ ^`, brackets, implicit multiplication (`2P`, `bP`) and textbook thousands spaces (`1 000`).
   - Variables: P goes on the Y axis; Q, Qd and Qs go on the X axis. `x`/`y` may be used instead, but a graph cannot mix the two systems.
