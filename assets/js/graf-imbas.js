@@ -6,7 +6,8 @@
    - Gambar dikecilkan (≤ 1600 px) dan dikod semula ke JPEG (metadata EXIF/GPS terbuang),
      dipegang sebagai object URL, dan dibuang apabila widget dimusnahkan. Gambar tidak
      masuk ke dalam model GrafBina dan tidak disimpan. Tekap sendiri: gambar kekal dalam peranti.
-   - Matematik penjajaran (IM.muatAwal, IM.padan) dan petaan hasil AI (IM.dariAI, IM.paksiAI, IM.maksPaksi) ialah fungsi tulen: boleh diuji dalam Node.
+   - Hasil AI ialah anggaran (ralat 1–3% gambar), jadi ia dikancing pada dakwat sebenar gambar (IM.halusi).
+   - Matematik penjajaran (IM.muatAwal, IM.padan), kancingan (IM.petaDakwat, IM.halusi) dan petaan hasil AI (IM.dariAI, IM.paksiAI, IM.maksPaksi) ialah fungsi tulen: boleh diuji dalam Node.
    - IM.pengecam: pengecam automatik (AI). analisis() menghantar JPEG itu ke /api/kesan-graf
      (pembekal AI luar) dan hanya dipanggil selepas pelajar bersetuju dalam UI. Hasilnya ialah
      cadangan yang mesti disahkan oleh pelajar ([Sahkan] / [Sunting]).
@@ -327,6 +328,298 @@
     return keluar;
   };
 
+  /* ---------- kancing hasil AI pada dakwat gambar ---------- */
+  // Model AI membaca kedudukan dengan ralat 1–3% gambar. Selepas AI memberi anggaran, paksi, tanda paksi dan
+  // keluk dikancing pada dakwat sebenar dalam gambar (pemprosesan imej biasa, dalam peranti, tanpa AI).
+  // Semua fungsi di sini tulen: peta = { w, h, d: Uint8Array (1 = dakwat) }.
+
+  // Kecerahan (0..255) setiap piksel → peta dakwat; null jika gambar tiada kontras yang jelas.
+  // Dakwat = warna minoriti yang jauh daripada latar (gelap atas kertas cerah, atau cerah atas papan gelap).
+  IM.petaDakwat = function (lum, w, h) {
+    var hist = new Array(256),
+      i;
+    for (i = 0; i < 256; i++) hist[i] = 0;
+    for (i = 0; i < lum.length; i++) hist[lum[i]]++;
+    function persentil(p) {
+      var sasaran = lum.length * p,
+        jumlah = 0;
+      for (var v = 0; v < 256; v++) {
+        jumlah += hist[v];
+        if (jumlah >= sasaran) return v;
+      }
+      return 255;
+    }
+    var latar = persentil(0.5),
+      // garis nipis hanya sebahagian kecil gambar, jadi hujung taburan diambil pada 0.1%
+      gelap = persentil(0.001),
+      cerah = persentil(0.999);
+    var songsang = cerah - latar > latar - gelap;
+    var jarak = songsang ? cerah - latar : latar - gelap;
+    if (jarak < 45) return null;
+    var ambang = songsang ? latar + jarak * 0.5 : latar - jarak * 0.5;
+    var d = new Uint8Array(w * h);
+    for (i = 0; i < lum.length; i++) d[i] = (songsang ? lum[i] > ambang : lum[i] < ambang) ? 1 : 0;
+    return { w: w, h: h, d: d };
+  };
+
+  function dakwat(peta, x, y) {
+    x = Math.round(x);
+    y = Math.round(y);
+    return x >= 0 && y >= 0 && x < peta.w && y < peta.h && peta.d[y * peta.w + x] === 1;
+  }
+
+  // Dari (x, y), cari larian dakwat terdekat di sepanjang arah (nx, ny) dalam jarak R; pulang ofset pusat larian, atau null
+  function kancing(peta, x, y, nx, ny, R) {
+    for (var t = 0; t <= R; t++) {
+      for (var s = 1; s >= -1; s -= 2) {
+        var o = t * s;
+        if (dakwat(peta, x + nx * o, y + ny * o)) {
+          var a = o,
+            b = o;
+          while (b - a < R && dakwat(peta, x + nx * (a - 1), y + ny * (a - 1))) a--;
+          while (b - a < R && dakwat(peta, x + nx * (b + 1), y + ny * (b + 1))) b++;
+          return (a + b) / 2;
+        }
+        if (t === 0) break;
+      }
+    }
+    return null;
+  }
+
+  function median(senarai) {
+    var s = senarai.slice().sort(function (a, b) {
+      return a - b;
+    });
+    return s.length ? s[Math.floor(s.length / 2)] : 0;
+  }
+
+  // Garis lurus (2 titik piksel) → garis yang dipadankan pada dakwat: sampel di sepanjang garis dikancing,
+  // garis lurus dipadankan pada ofsetnya (pencilan dibuang: persilangan dengan garis lain, huruf), kemudian
+  // kedua-dua hujung dipanjangkan atau dipendekkan mengikut dakwat. Pulang [p, q] atau null jika tidak yakin.
+  function kancingGaris(peta, p, q, R) {
+    var dx = q[0] - p[0],
+      dy = q[1] - p[1];
+    var L = Math.sqrt(dx * dx + dy * dy);
+    if (L < 12) return null;
+    var ux = dx / L,
+      uy = dy / L,
+      nx = -uy,
+      ny = ux;
+    var N = 31,
+      sampel = [];
+    for (var i = 0; i < N; i++) {
+      var t = 0.06 + (0.88 * i) / (N - 1);
+      var o = kancing(peta, p[0] + dx * t, p[1] + dy * t, nx, ny, R);
+      if (o != null) sampel.push([t, o]);
+    }
+    if (sampel.length < N * 0.45) return null;
+    var a = 0,
+      b = 0;
+    for (var pusingan = 0; pusingan < 4; pusingan++) {
+      var n = sampel.length,
+        st = 0,
+        so = 0,
+        stt = 0,
+        sto = 0;
+      sampel.forEach(function (s) {
+        st += s[0];
+        so += s[1];
+        stt += s[0] * s[0];
+        sto += s[0] * s[1];
+      });
+      var den = n * stt - st * st;
+      if (Math.abs(den) < 1e-9) return null;
+      b = (n * sto - st * so) / den;
+      a = (so - b * st) / n;
+      var sisa = sampel.map(function (s) {
+        return Math.abs(s[1] - a - b * s[0]);
+      });
+      var had = Math.max(1.5, median(sisa) * 2.5);
+      var baki = sampel.filter(function (s, k) {
+        return sisa[k] <= had;
+      });
+      if (baki.length === sampel.length || baki.length < N * 0.35) break;
+      sampel = baki;
+    }
+    if (sampel.length < N * 0.35) return null;
+    var p2 = [p[0] + nx * a, p[1] + ny * a],
+      q2 = [q[0] + nx * (a + b), q[1] + ny * (a + b)];
+    // hujung mengikut dakwat: jalan di sepanjang garis; berhenti selepas jurang 5 piksel
+    var ex = q2[0] - p2[0],
+      ey = q2[1] - p2[1],
+      EL = Math.sqrt(ex * ex + ey * ey);
+    ex /= EL;
+    ey /= EL;
+    function atas(x, y) {
+      for (var k = -2; k <= 2; k++) if (dakwat(peta, x - ey * k, y + ex * k)) return true;
+      return false;
+    }
+    function hujung(x, y, arah) {
+      var maks = EL * 0.3,
+        s = 0;
+      // undur ke dalam jika hujung AI melepasi dakwat
+      while (s > -EL * 0.2 && !atas(x + ex * arah * s, y + ey * arah * s)) s--;
+      var akhir = s,
+        jurang = 0;
+      for (var k = s + 1; k <= maks && jurang <= 5; k++) {
+        if (atas(x + ex * arah * k, y + ey * arah * k)) {
+          akhir = k;
+          jurang = 0;
+        } else jurang++;
+      }
+      return [x + ex * arah * akhir, y + ey * arah * akhir];
+    }
+    return [hujung(p2[0], p2[1], -1), hujung(q2[0], q2[1], 1)];
+  }
+
+  // Lengkung (≥ 3 titik piksel): setiap bucu dikancing di sepanjang normalnya; ofset yang jauh daripada median dibuang
+  function kancingLengkung(peta, pts, R) {
+    var ofset = pts.map(function (p, i) {
+      var a = pts[Math.max(0, i - 1)],
+        b = pts[Math.min(pts.length - 1, i + 1)];
+      var dx = b[0] - a[0],
+        dy = b[1] - a[1],
+        L = Math.sqrt(dx * dx + dy * dy) || 1;
+      return { n: [-dy / L, dx / L], o: kancing(peta, p[0], p[1], -dy / L, dx / L, R) };
+    });
+    var ada = ofset
+      .filter(function (o) {
+        return o.o != null;
+      })
+      .map(function (o) {
+        return o.o;
+      });
+    if (ada.length < pts.length * 0.6) return null;
+    var m = median(ada);
+    return pts.map(function (p, i) {
+      var o = ofset[i].o;
+      if (o == null || Math.abs(o - m) > R * 0.6) o = m;
+      return [p[0] + ofset[i].n[0] * o, p[1] + ofset[i].n[1] * o];
+    });
+  }
+
+  // Lajur (tegak = true) atau baris yang paling banyak dakwat berhampiran c, di antara a dan b pada arah satu lagi.
+  // perlu = pecahan minimum julat yang berdakwat. Pulang pusat jalur itu, atau null.
+  function jalur(peta, tegak, c, a, b, R, perlu) {
+    var lo = Math.max(0, Math.round(Math.min(a, b))),
+      hi = Math.min((tegak ? peta.h : peta.w) - 1, Math.round(Math.max(a, b)));
+    if (hi - lo < 8) return null;
+    var kira = function (k) {
+      var n = 0;
+      for (var j = lo; j <= hi; j++) if (tegak ? dakwat(peta, k, j) : dakwat(peta, j, k)) n++;
+      return n / (hi - lo + 1);
+    };
+    var terbaik = null,
+      skor = perlu;
+    for (var t = 0; t <= R; t++) {
+      for (var s = 1; s >= -1; s -= 2) {
+        var k = Math.round(c) + t * s;
+        var v = kira(k);
+        // jalur terdekat yang cukup berdakwat menang (garis lain yang lebih jauh tidak dipilih walaupun lebih tebal)
+        if (v >= perlu && terbaik == null) {
+          terbaik = k;
+          skor = v;
+        }
+        if (t === 0) break;
+      }
+      if (terbaik != null) break;
+    }
+    if (terbaik == null) return null;
+    var x1 = terbaik,
+      x2 = terbaik;
+    while (terbaik - x1 < R && kira(x1 - 1) >= skor * 0.7) x1--;
+    while (x2 - terbaik < R && kira(x2 + 1) >= skor * 0.7) x2++;
+    return (x1 + x2) / 2;
+  }
+
+  // Hasil /api/kesan-graf (pecahan gambar: u dari kiri, v dari bawah) → hasil yang sama, dikancing pada dakwat.
+  // Apa-apa yang tidak dapat dikancing dengan yakin dikekalkan seperti jawapan AI.
+  IM.halusi = function (peta, d) {
+    if (!peta || !d) return d;
+    var W = peta.w - 1,
+      H = peta.h - 1,
+      S = Math.max(peta.w, peta.h);
+    function kePx(t) {
+      return [t[0] * W, (1 - t[1]) * H];
+    }
+    function keUV(p) {
+      return [Math.round(Math.min(1, Math.max(0, p[0] / W)) * 1e4) / 1e4, Math.round(Math.min(1, Math.max(0, 1 - p[1] / H)) * 1e4) / 1e4];
+    }
+    var keluar = JSON.parse(JSON.stringify(d));
+    var pk = keluar.paksi || {};
+    // 1. paksi: garis tegak dan garis datar yang panjang berhampiran asalan AI
+    var yPaksi = null,
+      xPaksi = null,
+      yAtas = 0,
+      xKanan = W;
+    if (pk.O && pk.hujungX && pk.hujungY) {
+      var O = kePx(pk.O),
+        hx = kePx(pk.hujungX),
+        hy = kePx(pk.hujungY);
+      xPaksi = jalur(peta, true, O[0], hy[1] + (O[1] - hy[1]) * 0.15, O[1] - (O[1] - hy[1]) * 0.1, S * 0.08, 0.6);
+      yPaksi = jalur(peta, false, O[1], O[0] + (hx[0] - O[0]) * 0.1, hx[0] - (hx[0] - O[0]) * 0.15, S * 0.08, 0.6);
+      if (xPaksi != null) O[0] = hy[0] = xPaksi;
+      if (yPaksi != null) O[1] = hx[1] = yPaksi;
+      yAtas = hy[1];
+      xKanan = hx[0];
+      pk.O = keUV(O);
+      pk.hujungX = keUV(hx);
+      pk.hujungY = keUV(hy);
+      // 2. tanda paksi: garis panduan (putus-putus atau penuh) berhampiran kedudukan AI
+      var kancingTanda = function (senarai, datar) {
+        (senarai || []).forEach(function (t) {
+          var c = datar ? t[1] * W : (1 - t[1]) * H;
+          var k = datar ? jalur(peta, true, c, yAtas, O[1] - 4, S * 0.035, 0.12) : jalur(peta, false, c, O[0] + 4, xKanan, S * 0.035, 0.12);
+          if (k != null) t[1] = Math.round((datar ? k / W : 1 - k / H) * 1e4) / 1e4;
+        });
+      };
+      // label dan tanda bernombor berkongsi kedudukan: kancing label, kemudian salin kepada tanda yang sama
+      [["labelX", "tandaX", true], ["labelY", "tandaY", false]].forEach(function (a) {
+        var asal = (pk[a[0]] || []).map(function (t) {
+          return t[1];
+        });
+        kancingTanda(pk[a[0]], a[2]);
+        (pk[a[1]] || []).forEach(function (t) {
+          var i = asal.indexOf(t[1]);
+          if (i !== -1) t[1] = pk[a[0]][i][1];
+          else kancingTanda([t], a[2]);
+        });
+      });
+    }
+    // 3. keluk
+    (keluar.keluk || []).forEach(function (k) {
+      var px = (k.titik || []).map(kePx);
+      var baharu = px.length === 2 ? kancingGaris(peta, px[0], px[1], S * 0.04) : px.length > 2 ? kancingLengkung(peta, px, S * 0.035) : null;
+      if (baharu) k.titik = baharu.map(keUV);
+    });
+    return keluar;
+  };
+
+  // Gambar (URL) → peta dakwat pada ≤ 900 px; selesai(peta | null)
+  IM.muatPeta = function (url, selesai) {
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var k = Math.min(1, 900 / Math.max(img.naturalWidth, img.naturalHeight));
+        var c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.naturalWidth * k));
+        c.height = Math.max(1, Math.round(img.naturalHeight * k));
+        var x = c.getContext("2d");
+        x.drawImage(img, 0, 0, c.width, c.height);
+        var px = x.getImageData(0, 0, c.width, c.height).data;
+        var lum = new Uint8Array(c.width * c.height);
+        for (var i = 0; i < lum.length; i++) lum[i] = Math.round(0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2]);
+        selesai(IM.petaDakwat(lum, c.width, c.height));
+      } catch (e) {
+        selesai(null);
+      }
+    };
+    img.onerror = function () {
+      selesai(null);
+    };
+    img.src = url;
+  };
+
   IM.MESEJ_AI = {
     tiada: "Graf tidak dapat dikesan. Pastikan paksi dan keluk jelas dalam gambar, kemudian cuba lagi atau tekap sendiri.",
     had: "Had imbasan AI untuk hari ini sudah habis. Cuba lagi esok, atau tekap keluk sendiri.",
@@ -408,8 +701,15 @@
           if (res.status === 404 || res.status === 503) return selesai(M.tutup);
           if (!res.ok) return selesai(M.gagal);
           return res.json().then(function (d) {
-            if (!d.keluk || !d.keluk.length) selesai(M.tiada, { baki: d.baki });
-            else selesai(null, d);
+            if (!d.keluk || !d.keluk.length) return selesai(M.tiada, { baki: d.baki });
+            // kancing anggaran AI pada dakwat sebenar gambar (dalam peranti); jika gagal, guna jawapan AI seadanya
+            IM.muatPeta(hasil.url, function (peta) {
+              var halus = d;
+              try {
+                halus = IM.halusi(peta, d);
+              } catch (e) {}
+              selesai(null, halus);
+            });
           });
         })
         .catch(function () {
