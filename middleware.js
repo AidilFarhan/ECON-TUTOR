@@ -2,8 +2,10 @@
    Econ Tutor · Routing Middleware Vercel
    Semua kandungan memerlukan kuki sesi yang sah dan email dalam
    senarai akses. Hanya halaman log masuk dan asetnya dibuka.
+   Halaman juga menyemak had satu sesi aktif (lib/satu-sesi.js).
    ========================================================= */
 import { ambilKuki, bacaSesi, dibenarkan } from "./lib/sesi.js";
+import { statusSesi } from "./lib/satu-sesi.js";
 
 const TERBUKA = [
   /^\/masuk(\.html)?$/,
@@ -30,9 +32,13 @@ export default async function middleware(req) {
   if (TERBUKA.some((r) => r.test(url.pathname))) return teruskan();
 
   const sesi = await bacaSesi(ambilKuki(req.headers.get("cookie")), process.env.RAHSIA_SESI);
-  if (sesi && dibenarkan(sesi.email, process.env.EMAIL_DIBENARKAN)) return teruskan();
+  const bukaHalaman = (req.method === "GET" || req.method === "HEAD") && halaman(url);
+  if (sesi && dibenarkan(sesi.email, process.env.EMAIL_DIBENARKAN)) {
+    // Stor disemak pada halaman sahaja; fail lain cukup dengan kuki supaya setiap aset tidak memanggil stor.
+    if (!bukaHalaman || (await statusSesi(sesi, process.env)) === "sah") return teruskan();
+  }
 
-  if ((req.method === "GET" || req.method === "HEAD") && halaman(url)) {
+  if (bukaHalaman) {
     const ke = url.pathname === "/" || url.pathname === "/index.html" ? "" : "?ke=" + encodeURIComponent(url.pathname + url.search);
     return new Response(null, { status: 302, headers: { location: "/masuk.html" + ke, "cache-control": "no-store" } });
   }

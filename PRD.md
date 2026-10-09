@@ -196,6 +196,7 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 - **FR-29** The server requires a verified email before entry, including for existing sessions. Unverified accounts return to the Google button with a clear message.
 - **FR-30** The header shows the signed-in account. Its menu has a **Hubungi cikgu** button that opens the teacher's WhatsApp with a ready message ("Salam cikgu, saya ada soalan tentang Nota Ekonomi Interaktif." + the student's name and email), and a *Log keluar* (sign-out) button.
 - **FR-31** A session lasts 12 hours and renews silently while the Firebase sign-in is still valid. Removing an email blocks that user after the next redeploy.
+- **FR-31a** One account is open on one device at a time. A new sign-in replaces the earlier one; the replaced device shows *Dibuka di peranti lain* and can take the account back with **Guna di peranti ini**. Emails in `EMAIL_BANYAK_PERANTI` are exempt. The limit needs the Upstash Redis store in Vercel; without it the site allows several devices as before.
 
 ### 5.8 Teacher operations: ✅
 - **FR-32** Deploy by merging to `main` (Vercel auto-deploys). The AI agent merges its own PRs as soon as all checks pass and tells the teacher "SAYA DAH MERGE KE MAIN"; changes to access, exam material or deletions still wait for the teacher.
@@ -232,9 +233,9 @@ Status key: ✅ shipped · ⏸ built but hidden · 🔜 planned
 | Accessibility | Keyboard-operable graphs and flashcards, visible focus, `aria-live` readings, colour never the only cue, reduced-motion support (see DESIGN_SYSTEM §12). |
 | Offline / local | Opening `index.html` locally or with `python3 -m http.server` works without sign-in (for the teacher's own use and for development). |
 | Browser support | Current Chrome, Safari (iOS 15+), Edge and Firefox. Glass effects fall back to solid surfaces where `backdrop-filter` is missing. |
-| Privacy | Learning progress never leaves the device. Firebase stores only the account (email, name, provider). No analytics or trackers. |
+| Privacy | Learning progress never leaves the device. Firebase stores only the account (email, name, provider). When the one-device limit is on, Upstash Redis holds each signed-in email with its latest session ID for 12 hours. No analytics or trackers. |
 | Security | The server verifies tokens and signs the session cookie. Secrets live only in Vercel env vars. Source PDFs are never deployed. |
-| Cost | Runs on free tiers: Vercel Hobby and Firebase Spark (Auth only). |
+| Cost | Runs on free tiers: Vercel Hobby, Firebase Spark (Auth only) and Upstash Redis (one-device limit). |
 | Maintainability | Content is in plain JS data files, one per chapter. The UI and content are in Bahasa Melayu. The docs are these four files plus the README. |
 
 ## 7. Content inventory (v1)
@@ -314,6 +315,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-06 | Story episode *Misi Karnival · Episod 1* (visual novel) for T4 Bab 1: **Main cerita Bab 1** button in the notes, full-page game with **Kembali ke nota Bab 1**, behind the same sign-in |
 | 2026-10-06 | Story episode updated to *Misi Mengumpul Dana Buku Kelas*: new title, action pictures for every *Pencerita* line, sound effects and five BGM tracks with Menu volume and mute, promo-card scene redrawn with an open-palm stop signal |
 | 2026-10-07 | T4 Bab 1 notes: the *Main cerita Bab 1* button becomes a large story card with a preview picture of Mira and Hakim and **Main misi Bab 1** |
+| 2026-10-09 | One account, one device at a time: a new sign-in replaces the earlier session, the replaced device shows *Dibuka di peranti lain* with **Guna di peranti ini**; needs the Upstash Redis store in Vercel, with `EMAIL_BANYAK_PERANTI` for exempt accounts |
 
 ## 10. Roadmap and open questions
 

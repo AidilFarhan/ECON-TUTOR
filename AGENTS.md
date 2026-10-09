@@ -22,7 +22,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 - Verify your change (§4) before committing, including dark mode and a 360–390 px viewport.
 
 **Never**
-- Commit secrets. `RAHSIA_SESI`, `EMAIL_DIBENARKAN` and `MIRELD_API_KEY` live only in Vercel env vars. (`assets/js/firebase-config.js` is public by design and is fine to commit.)
+- Commit secrets. `RAHSIA_SESI`, `EMAIL_DIBENARKAN`, `MIRELD_API_KEY` and the Upstash store token (`KV_REST_API_TOKEN`) live only in Vercel env vars. (`assets/js/firebase-config.js` is public by design and is fine to commit.)
 - Add a content path to the `TERBUKA` (public) list in `middleware.js`. Only the login page and the assets it needs may be public.
 - Weaken token checks in `lib/token-firebase.js`: algorithm pin, `kid`, `aud`/`iss`/`exp`/`iat`/`auth_time`, and `email_verified` in `api/sesi.js`.
 - Deploy source PDFs or the hidden Terengganu paper. Keep `.vercelignore` as it is unless the owner asks.
@@ -39,7 +39,7 @@ Read first: [ARCHITECTURE.md](ARCHITECTURE.md) (how it works) · [DESIGN_SYSTEM.
 | `index.html` | SPA shell; script tags in load order |
 | `masuk.html`, `assets/js/masuk.js` | Login page (Firebase Auth, ES module) |
 | `middleware.js` | Vercel Routing Middleware: access gate |
-| `api/sesi.js`, `lib/*.js` | Session API, signed cookie, allowlist, Firebase token verification |
+| `api/sesi.js`, `lib/*.js` | Session API, signed cookie, allowlist, Firebase token verification, and one active session per email (`lib/satu-sesi.js`, ARCHITECTURE §4.2a) |
 | `api/kesan-graf.js`, `lib/had-ai.js` | AI curve detection for *Tekap gambar*: sends the student's photo to the AI provider (OpenAI-style API, default mireld.my; signed-in students only, after consent in the UI) and the signed daily-limit cookie (10 scans a day) |
 | `assets/js/eko-core.js` | `window.EKO`: registries, storage, formatting, icons |
 | `assets/js/graf.js` | `EKO.graf` SVG engine + market graphs |
@@ -151,6 +151,7 @@ console.log(ctx.EKO.kalkulator.senarai.length, "calculators checked");
 | **Change the "Hubungi cikgu" WhatsApp** | The number lives in **two** files; change both. `assets/js/masuk.js`: `WHATSAPP_CIKGU` (international format, digits only, e.g. `601160757145`) and `MESEJ_AKSES` (ready message for the "Tiada akses" screen; the student's email is appended automatically). `assets/js/akaun.js`: `WHATSAPP_CIKGU` and `MESEJ_HUBUNGI` (ready message for the account menu; the student's name and email are appended) |
 | **Turn AI scanning on or off** | Vercel → project **econwebsite** → Settings → Environment Variables → `MIRELD_API_KEY` (the provider key) and `MIRELD_MODEL` (an enabled model ID that can read images; `MIRELD_BASE_URL` only for another OpenAI-style provider) → Redeploy. Without the key or the model the button shows "Imbasan AI tidak tersedia" and manual tracing still works. The daily limit is `HAD_SEHARI` in `lib/had-ai.js`; the model and prompt are in `api/kesan-graf.js`. Watch the balance in the provider account, because the cookie-based daily limit restarts if a student clears cookies |
 | **Sign everyone out** | Change `RAHSIA_SESI` (random, at least 32 characters) in Vercel → Redeploy |
+| **Turn the one-device limit on or off** | On: Vercel → project **econwebsite** → Storage → add **Upstash Redis** and connect it to the project (this adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`) → Redeploy. Off: disconnect the store or remove those two env vars → Redeploy. To let an account (e.g. the teacher's) stay on several devices, list it in `EMAIL_BANYAK_PERANTI` → Redeploy. Logic is in `lib/satu-sesi.js`; the client check interval is `SELANG_SEMAK` in `assets/js/akaun.js` |
 | **Update the Firebase SDK** | Bundle the exports used by `masuk.js` with esbuild into `assets/js/vendor/firebase-auth-<version>.js`, update the import path, and delete the old bundle (see the README) |
 | **New sign-in domain** | Add it in Firebase → Authentication → Settings → Authorized domains (owner action) |
 | **Make a video** | Use the HyperFrames skills in `.claude/skills/` (start with `/hyperframes`); they are excluded from deploys by `.vercelignore`. Only if the owner asks for Remotion: `npx create-video@latest --yes --hello-world video` from the repo root (`video/` is already in `.vercelignore`). Keep video code out of the content app |
@@ -232,5 +233,6 @@ The owner is an Economics teacher, not a full-time developer. Communicate in cas
 | `data()`, `kemas()`, `dibaca`, `diingat`, `terbaik`, `akhir` | read storage, update storage, read (chapters), remembered (cards), best score, last opened |
 | `masuk`, `keluar`, `sesi`, `akaun`, `kuki`, `rahsia` | sign in, sign out, session, account, cookie, secret |
 | `EMAIL_DIBENARKAN`, `RAHSIA_SESI`, `TERBUKA` | allowlist env var, cookie-signing secret env var, public path list |
+| `satu sesi`, `diganti`, `ambilAlih`, `stor`, `EMAIL_BANYAK_PERANTI` | one active session per email, replaced (signed in elsewhere), take over on this device, the Upstash Redis store, env var of emails exempt from the one-device limit |
 | `kesan`, `pengecam`, `had`, `baki`, `tanda`, `skala`, `MIRELD_API_KEY`, `MIRELD_MODEL` | detect (AI), recogniser hook, daily limit, scans left today, number on an axis, axis scale of a photo curve, AI provider key and model env vars |
 | `tema` `sistem`/`cerah`/`gelap` | theme: system / light / dark |

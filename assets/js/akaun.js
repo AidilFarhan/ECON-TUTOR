@@ -24,12 +24,37 @@
     });
   }
 
-  fetch("/api/sesi", { credentials: "same-origin", cache: "no-store" })
-    .then(function (res) {
-      return res.ok ? res.json() : null;
-    })
+  // Satu akaun, satu peranti pada satu masa: jika akaun ini dibuka di peranti lain,
+  // pelayan menjawab 401 "diganti" dan pelajar dibawa ke halaman log masuk.
+  var SELANG_SEMAK = 5 * 60 * 1000;
+  var JARAK_MIN = 60 * 1000;
+  var semakAkhir = Date.now();
+
+  function tanyaSesi() {
+    semakAkhir = Date.now();
+    return fetch("/api/sesi", { credentials: "same-origin", cache: "no-store" }).then(function (res) {
+      if (res.ok) return res.json();
+      if (res.status !== 401) return null;
+      return res.json().then(function (d) {
+        if (d && d.ralat === "diganti") {
+          location.href = "/masuk.html?ke=" + encodeURIComponent(location.pathname + location.search + location.hash);
+        }
+        return null;
+      });
+    });
+  }
+
+  function semakBerkala() {
+    if (document.hidden || Date.now() - semakAkhir < JARAK_MIN) return;
+    tanyaSesi().catch(function () {});
+  }
+
+  tanyaSesi()
     .then(function (sesi) {
-      if (sesi && sesi.email) bina(sesi);
+      if (!sesi || !sesi.email) return;
+      bina(sesi);
+      setInterval(semakBerkala, SELANG_SEMAK);
+      document.addEventListener("visibilitychange", semakBerkala);
     })
     .catch(function () {});
 

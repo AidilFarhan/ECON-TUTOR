@@ -11,6 +11,7 @@
    membaca gambar), MIRELD_BASE_URL (pilihan; lalai https://api.mireld.my/v1).
    ========================================================= */
 import { ambilKuki, bacaSesi, dibenarkan } from "../lib/sesi.js";
+import { statusSesi } from "../lib/satu-sesi.js";
 import { HAD_SEHARI, NAMA_KUKI_AI, bacaKiraan, hariIni, kukiKiraan, tandatanganKiraan } from "../lib/had-ai.js";
 
 const URL_LALAI = "https://api.mireld.my/v1";
@@ -237,6 +238,7 @@ export async function kendaliPost(req, pilihan = {}) {
 
   const sesi = await bacaSesi(ambilKuki(req.headers.get("cookie")), env.RAHSIA_SESI, Math.floor(sekarang / 1000));
   if (!sesi || !dibenarkan(sesi.email, env.EMAIL_DIBENARKAN)) return json(401, { ralat: "tiada_sesi" });
+  if ((await statusSesi(sesi, env, pilihan.ambilStor)) === "diganti") return json(401, { ralat: "tiada_sesi" });
   const cfg = { kunci: env.MIRELD_API_KEY, model: env.MIRELD_MODEL, url: (env.MIRELD_BASE_URL || URL_LALAI).replace(/\/+$/, "") };
   if (!cfg.kunci || !cfg.model || !/^https:\/\//.test(cfg.url)) return json(503, { ralat: "belum_sedia" });
 

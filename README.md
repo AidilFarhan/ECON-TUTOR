@@ -6,6 +6,8 @@ Laman pembelajaran interaktif **Ekonomi SPM Tingkatan 4 dan 5** (KSSM), **Ekonom
 
 Tekan **Teruskan dengan Google** untuk log masuk atau daftar akaun. Email Google mesti berada dalam senarai akses cikgu. Halaman masuk tiada medan email atau kata laluan.
 
+Satu akaun hanya boleh dibuka pada satu peranti pada satu masa. Apabila akaun yang sama log masuk di peranti lain, peranti yang lama dilog keluar dan memaparkan "Dibuka di peranti lain" dengan butang **Guna di peranti ini**. Had ini aktif selepas cikgu menambah **Upstash Redis** dalam Vercel (projek **econwebsite** → Storage) dan *Redeploy*. Untuk mengecualikan akaun cikgu, isi `EMAIL_BANYAK_PERANTI` dalam Environment Variables.
+
 ## Kandungan
 
 | Bahagian | Isi |

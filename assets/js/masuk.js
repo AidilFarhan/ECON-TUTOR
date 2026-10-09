@@ -12,7 +12,8 @@ import konfigurasi from "./firebase-config.js";
 
 const $ = (id) => document.getElementById(id);
 const param = new URLSearchParams(location.search);
-const PANEL = ["panel-muat", "panel-utama", "panel-tiada-akses"];
+const PANEL = ["panel-muat", "panel-utama", "panel-tiada-akses", "panel-diganti"];
+const TAJUK = { "panel-tiada-akses": "Tiada akses", "panel-diganti": "Dibuka di peranti lain" };
 
 // Destinasi selepas log masuk: hanya laluan dalam laman ini.
 const destinasi = (function () {
@@ -40,7 +41,7 @@ let auth = null;
 function tunjuk(id, teksMuat) {
   PANEL.forEach((p) => ($(p).hidden = p !== id));
   if (teksMuat) $("teks-muat").textContent = teksMuat;
-  $("tajuk-masuk").textContent = id === "panel-tiada-akses" ? "Tiada akses" : "Log masuk";
+  $("tajuk-masuk").textContent = TAJUK[id] || "Log masuk";
 }
 
 function mesej(teks, jenis) {
@@ -50,7 +51,7 @@ function mesej(teks, jenis) {
 }
 
 function sibuk(ya) {
-  document.querySelectorAll("#panel-utama button, #panel-tiada-akses button").forEach((el) => {
+  document.querySelectorAll("#panel-utama button, #panel-tiada-akses button, #panel-diganti button").forEach((el) => {
     el.disabled = ya;
   });
   $("btn-google").setAttribute("aria-busy", String(ya));
@@ -76,7 +77,7 @@ function ralat(e) {
 }
 
 /* ---------- aliran utama ---------- */
-async function teruskan(pengguna) {
+async function teruskan(pengguna, ambilAlih) {
   if (sedangProses) return;
   sedangProses = true;
   mesej("");
@@ -87,7 +88,7 @@ async function teruskan(pengguna) {
       method: "POST",
       headers: { "content-type": "application/json" },
       credentials: "same-origin",
-      body: JSON.stringify({ idToken })
+      body: JSON.stringify(ambilAlih ? { idToken, ambilAlih: true } : { idToken })
     });
     if (res.ok) {
       tunjuk("panel-muat", "Berjaya. Membuka Econ Tutor…");
@@ -99,6 +100,12 @@ async function teruskan(pengguna) {
       $("email-tiada-akses").textContent = data.email || pengguna.email || "";
       $("btn-hubungi").href = pautanWhatsApp(data.email || pengguna.email);
       tunjuk("panel-tiada-akses");
+      return;
+    }
+    // Akaun ini telah dibuka di peranti lain: pelajar pilih sendiri untuk mengambil alih.
+    if (data.ralat === "diganti") {
+      $("email-diganti").textContent = data.email || pengguna.email || "";
+      tunjuk("panel-diganti");
       return;
     }
     tunjuk("panel-utama");
@@ -172,6 +179,10 @@ async function mula() {
 
   $("btn-cuba-lagi").addEventListener("click", () => {
     if (auth.currentUser) teruskan(auth.currentUser);
+    else tunjuk("panel-utama");
+  });
+  $("btn-ambil-alih").addEventListener("click", () => {
+    if (auth.currentUser) teruskan(auth.currentUser, true);
     else tunjuk("panel-utama");
   });
   document.querySelectorAll("[data-tukar-akaun]").forEach((b) => b.addEventListener("click", tukarAkaun));

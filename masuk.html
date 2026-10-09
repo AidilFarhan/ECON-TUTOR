@@ -68,6 +68,19 @@
       </a>
     </div>
 
+    <!-- akaun yang sama telah dibuka di peranti lain -->
+    <div class="masuk-panel" id="panel-diganti" hidden>
+      <div class="masuk-ikon-besar amaran" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="12" height="9" rx="1.8"/><path d="M5.5 17.5h6"/><rect x="15.5" y="9" width="6" height="11" rx="1.6"/></svg>
+      </div>
+      <p>Akaun <b id="email-diganti"></b> sedang dibuka pada peranti lain.</p>
+      <p class="masuk-nota">Satu akaun hanya boleh dibuka pada satu peranti pada satu masa. Jika anda teruskan di sini, peranti yang satu lagi akan dilog keluar.</p>
+      <button type="button" class="btn btn-utama" id="btn-ambil-alih">Guna di peranti ini</button>
+      <div class="masuk-baris">
+        <button type="button" class="btn btn-hantu btn-kecil" data-tukar-akaun>Guna akaun lain</button>
+      </div>
+    </div>
+
     <p class="masuk-mesej" id="mesej" role="status" aria-live="polite"></p>
   </section>
 
