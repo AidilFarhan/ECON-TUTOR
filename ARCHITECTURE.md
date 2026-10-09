@@ -414,7 +414,7 @@ The login page offers one Google button for existing and new accounts. Email/pas
 
 One account works on one device at a time: a new sign-in replaces the old one (`lib/satu-sesi.js`).
 
-- **Store.** Upstash Redis through its REST API (`fetch` only), configured by `KV_REST_API_URL` + `KV_REST_API_TOKEN` or `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (added by the Vercel Storage integration). Key `econ:sesi:<email>` holds the latest session ID for 12 hours. **Without these env vars the limit is off** and the site behaves as before.
+- **Store.** Upstash Redis through its REST API (`fetch` only), configured by `STORAGE_KV_REST_API_URL` + `STORAGE_KV_REST_API_TOKEN` (the names the Vercel Storage integration added to **econwebsite**, Production and Preview); `KV_REST_API_*` and `UPSTASH_REDIS_REST_*` are also recognised. Key `econ:sesi:<email>` holds the latest session ID for 12 hours. **Without these env vars the limit is off** and the site behaves as before.
 - **Sign-in.** `POST /api/sesi` creates a random session ID, stores it and signs it into the cookie (`s`). Any cookie carrying another ID is now *diganti* (replaced).
 - **Where it is checked.** `GET /api/sesi` (`401 diganti`), page requests in `middleware.js` (`302 /masuk.html`), and `POST /api/kesan-graf` (`401`). Other static files are checked by cookie only, so one page load costs one store read. `akaun.js` asks `GET /api/sesi` on load, every 5 minutes and when the tab becomes visible again, and sends a replaced browser to the login page.
 - **No silent ping-pong.** The login page signs in automatically while the Firebase session is alive. If the browser still holds a replaced cookie, `POST /api/sesi` answers `409 diganti` and the page shows *Dibuka di peranti lain*; the student must press **Guna di peranti ini**, which resends with `ambilAlih: true` and replaces the other device.
@@ -456,7 +456,7 @@ flowchart LR
 - **Env vars.**
   - `RAHSIA_SESI` (sensitive; production + preview)
   - `EMAIL_DIBENARKAN` (encrypted; all environments)
-  - `KV_REST_API_URL` + `KV_REST_API_TOKEN` (or `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`), added by Vercel → Storage → Upstash Redis, turn on the one-device limit; optional `EMAIL_BANYAK_PERANTI` exempts emails from it (§4.2a)
+  - `STORAGE_KV_REST_API_URL` + `STORAGE_KV_REST_API_TOKEN` (sensitive; production + preview), added by Vercel → Storage → Upstash Redis, turn on the one-device limit; optional `EMAIL_BANYAK_PERANTI` exempts emails from it (§4.2a)
   - `MIRELD_API_KEY` (sensitive; production) and `MIRELD_MODEL` (model ID that can read images) for AI detection in *Tekap gambar*; `MIRELD_BASE_URL` only when another OpenAI-style provider is used. Optional: without them the feature reports that AI is unavailable
 - **Domain.** `econwebsite.vercel.app` is the only production domain and the only one in Firebase **Authorized domains**, so Google sign-in works there. (A duplicate project, `econ-tutor`, created during setup has been deleted.) A new custom domain must be added to Firebase Authorized domains before Google sign-in works on it.
 - **Merging.** The agent merges its own PR once all checks pass (AGENTS §6) and reports "SAYA DAH MERGE KE MAIN"; access, exam-material and deletion changes still wait for the owner.
