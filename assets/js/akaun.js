@@ -26,8 +26,9 @@
 
   // Satu akaun, satu peranti pada satu masa: jika akaun ini dibuka di peranti lain,
   // pelayan menjawab 401 "diganti" dan pelajar dibawa ke halaman log masuk.
-  var SELANG_SEMAK = 5 * 60 * 1000;
-  var JARAK_MIN = 60 * 1000;
+  // Disemak setiap minit, apabila tab dibuka semula dan setiap kali pelajar bertukar halaman.
+  var SELANG_SEMAK = 60 * 1000;
+  var JARAK_MIN = 20 * 1000;
   var semakAkhir = Date.now();
 
   function tanyaSesi() {
@@ -55,6 +56,7 @@
       bina(sesi);
       setInterval(semakBerkala, SELANG_SEMAK);
       document.addEventListener("visibilitychange", semakBerkala);
+      window.addEventListener("hashchange", semakBerkala);
     })
     .catch(function () {});
 
