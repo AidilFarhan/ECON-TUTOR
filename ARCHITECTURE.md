@@ -461,6 +461,7 @@ flowchart LR
 - **Domain.** `econwebsite.vercel.app` is the only production domain and the only one in Firebase **Authorized domains**, so Google sign-in works there. (A duplicate project, `econ-tutor`, created during setup has been deleted.) A new custom domain must be added to Firebase Authorized domains before Google sign-in works on it.
 - **Merging.** The agent merges its own PR once all checks pass (AGENTS §6) and reports "SAYA DAH MERGE KE MAIN"; access, exam-material and deletion changes still wait for the owner.
 - **Previews.** Preview deployments sit behind Vercel SSO (Standard Protection). Production domains are public and gated by the middleware.
+- **Analytics.** Vercel Web Analytics is turned on for **econwebsite**. `index.html`, `masuk.html` and `cerita/episod-1/index.html` load `/_vercel/insights/script.js`, a script Vercel serves itself, so the app stays dependency-free. Visits appear in Vercel → econwebsite → Analytics. Locally the script returns 404, which is expected.
 
 ---
 

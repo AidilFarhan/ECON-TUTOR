@@ -316,6 +316,7 @@ Measuring these automatically needs the planned progress sync (§10).
 | 2026-10-06 | Story episode updated to *Misi Mengumpul Dana Buku Kelas*: new title, action pictures for every *Pencerita* line, sound effects and five BGM tracks with Menu volume and mute, promo-card scene redrawn with an open-palm stop signal |
 | 2026-10-07 | T4 Bab 1 notes: the *Main cerita Bab 1* button becomes a large story card with a preview picture of Mira and Hakim and **Main misi Bab 1** |
 | 2026-10-09 | One account, one device at a time: a new sign-in replaces the earlier session, the replaced device shows *Dibuka di peranti lain* with **Guna di peranti ini**; needs the Upstash Redis store in Vercel, with `EMAIL_BANYAK_PERANTI` for exempt accounts |
+| 2026-10-20 | Vercel Web Analytics: page views counted on the main app, login page and story episode through the script Vercel serves at `/_vercel/insights/script.js` (no npm package) |
 
 ## 10. Roadmap and open questions
 
